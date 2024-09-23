@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}details' {{client.name}}{% endblock %}
+{% block content %}
+ <h1>BANK HAP CLIENT DETAIL</h1>
+
+    <p>
+       <li> INFORMATION: 
+            <ul>name: {{client.name}}</ul>
+            <ul>email: {{client.email}}</ul>
+            <ul>Phone_number: {{client.phone_number}}</ul>
+            <ul>Address: {{client.address}}</ul>
+            <ul>STATUS: {{client.get_status_display}}</ul>
+            <ul>NumberAccount: {{account_number}}, {{ model }}</ul>
+            <ul>
+        </li>
+    </p>
+
+ {{ post.body|truncatewords:30|linebreaks }}
+
+{% endblock %}

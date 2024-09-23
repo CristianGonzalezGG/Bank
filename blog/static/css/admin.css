@@ -1,0 +1,35 @@
+/* admin.css */
+
+/* Estilo para el footer utilizando Flexbox */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#content {
+    flex: 1; /* Permite que el contenido ocupe el espacio restante */
+}
+
+footer {
+    background: #4CAF50; /* Color verde para el pie de página */
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Si decides usar position: fixed, puedes añadir lo siguiente en lugar de lo anterior */
+/* footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: #4CAF50; /* Color verde para el pie de página */
+    color: white;
+    text-align: center;
+    padding: 20px;
+} */

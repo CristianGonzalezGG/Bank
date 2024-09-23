@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Client List{% endblock %}
+
+{% block content %}
+    <h1>BANK HAP CLIENTS</h1>
+    {% for client in clients %}
+        <div class="client-card">
+            <h2>
+                <a href="{% url 'blog:client_detail' client.id %}">
+                    {{ client.name }}
+                </a>
+            </h2>
+            <p class="date">
+                Created on {{ client.created_at }} by {{ model }}
+            </p>
+        </div>
+    {% endfor %}
+{% endblock %}
