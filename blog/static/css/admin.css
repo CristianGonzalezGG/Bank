@@ -16,7 +16,7 @@ body {
 }
 
 footer {
-    background: #4CAF50; /* Color verde para el pie de página */
+    background: #333; /* Color verde para el pie de página */
     color: white;
     text-align: center;
     padding: 20px;
@@ -28,8 +28,11 @@ footer {
     left: 0;
     bottom: 0;
     width: 100%;
-    background: #4CAF50; /* Color verde para el pie de página */
+    background: #4CAF50; 
     color: white;
     text-align: center;
-    padding: 20px;
-} */
+    padding: 20px */
+
+
+
+

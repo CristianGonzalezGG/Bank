@@ -1,6 +1,9 @@
 from django.urls import path
 from . import views
 from .views import get_card_info
+from django.conf import settings
+from django.conf.urls.static import static
+
 app_name = 'blog'
 
 urlpatterns = [

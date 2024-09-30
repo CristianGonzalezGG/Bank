@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Panel de Administración - Banco{% endblock %}</title>
@@ -10,17 +12,37 @@
 </head>
 <body>
     <header>
-        <h1>Panel de Administración del Banco</h1>
-        <nav>
+        <div class="top-menu">
             <ul>
-                <li><a href="{% url 'blog:client_list' %}">Clientes</a></li>
-                <li><a href="{% url 'blog:get_card_info' %}">Cuentas</a></li>
-                <li><a >Transacciones</a></li>
-                <li><a >Reportes</a></li>
-                <li><a >Cerrar Sesión</a></li>
+                <li><a href="#">Asesores</a></li>
+                <li><a href="#">Negocios</a></li>
+                <li><a href="#">PQR</a></li>
+                <li><a href="#">Blog</a></li>
             </ul>
-        </nav>
+        </div>
+    
+        <div class="header-container">
+            <div class="logo">
+                <img src="tu-logo.png" alt="Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="client/client_list.html">clientes</a></li>
+                    <li><a href="card_info.html">Informacion de cuentas</a></li>
+                    <li><a href="#">Educación Financiera</a>
+                        <ul class="submenu">
+                            <li><a href="#">Submenú 1</a></li>
+                            <li><a href="#">Submenú 2</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Trámites digitales</a></li>
+                </ul>
+            </nav>
+            <button class="cta-button">Entrar</button>
+        </div>
     </header>
+    
 
     <div id="content">
         {% block content %}

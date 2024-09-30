@@ -1,16 +1,132 @@
+/* General Styles */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif; /* Asegúrate de que Roboto esté importado */
     background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Estilos generales para el header */
+header {
+    background-color: #333; /* Fondo oscuro */
+    color: #fff;
+    padding: 10px 0;
+    position: relative;
+    z-index: 1000;
+}
+
+/* Contenedor del logo y el menú */
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Estilo para el logo */
+.logo img {
+    max-width: 150px;
+}
+
+/* Estilo para el menú principal */
+nav {
+    display: flex;
+    align-items: center;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
     margin: 0;
     padding: 0;
 }
 
-header {
-    background: #4CAF50; /* Color verde para el encabezado */
-    color: white;
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: #ffc107; /* Color amarillo de hover */
+}
+
+/* Submenú desplegable */
+nav ul li:hover .submenu {
+    display: block;
+}
+
+.submenu {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.submenu li {
+    margin: 5px 0;
+}
+
+.submenu li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Estilo del botón destacado */
+.cta-button {
+    background-color: #ffc107; /* Botón con color amarillo */
+    border: none;
     padding: 10px 20px;
+    border-radius: 50px;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #e0a800;
+}
+
+/* Estilo para el menú superior (ejemplo de "Personas", "Negocios", etc.) */
+.top-menu {
+    background-color: #444;
+    padding: 5px 0;
     text-align: center;
 }
+
+.top-menu ul {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.top-menu ul li {
+    margin: 0 20px;
+}
+
+.top-menu ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.top-menu ul li a:hover {
+    color: #ffc107;
+}
+
 
 nav {
     margin: 20px 0;
@@ -19,38 +135,131 @@ nav {
 nav ul {
     list-style-type: none;
     padding: 0;
+    display: flex;
+    justify-content: center;
 }
 
 nav ul li {
-    display: inline;
-    margin: 0 15px;
+    margin: 0 20px;
 }
 
 nav ul li a {
     color: white;
     text-decoration: none;
     font-weight: bold;
+    transition: color 0.3s ease;
 }
 
 nav ul li a:hover {
+    color: #ffdd57;
     text-decoration: underline;
 }
 
 #content {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
+    max-width: 900px;
+    margin: 20px auto; /* Añadido margen para más separación */
+    padding: 30px; /* Mayor padding para más espacio */
     background: white;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.8s ease-in-out;
 }
 
-footer {
-    text-align: center;
+.client-detail-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.client-info {
+    width: 60%;
+    background-color: #f9f9f9;
     padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.6s ease-in-out;
+}
+
+.client-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.client-info li {
+    margin: 15px 0; /* Aumentar espacio entre elementos */
+    font-size: 1.1rem;
+}
+
+.client-info li strong {
+    color: #333;
+}
+
+.client-image {
+    width: 35%;
+    text-align: center;
+    animation: zoomIn 0.7s ease-in-out;
+}
+
+.client-image img {
+    width: 100%;  /* La imagen ocupa el 100% del contenedor */
+    height: auto; /* Mantiene la proporción de la imagen */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra de la imagen */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.client-image img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer */
+footer {
     background: #4CAF50; /* Color verde para el pie de página */
     color: white;
+    text-align: center;
+    padding: 20px;
     position: relative;
     bottom: 0;
     width: 100%;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+    animation: slideUp 1s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    #content {
+        flex-direction: column;
+        padding: 15px; /* Menos padding en móvil */
+    }
+
+    .client-info, .client-image {
+        width: 100%;
+    }
+
+    .client-image img {
+        max-width: 100%;
+    }
 }

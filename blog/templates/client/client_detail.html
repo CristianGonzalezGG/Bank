@@ -1,20 +1,29 @@
 {% extends "base.html" %}
-{% block title %}details' {{client.name}}{% endblock %}
+{% load static %}
+
+{% block title %}Details: {{ client.name }}{% endblock %}
+
 {% block content %}
- <h1>BANK HAP CLIENT DETAIL</h1>
-
-    <p>
-       <li> INFORMATION: 
-            <ul>name: {{client.name}}</ul>
-            <ul>email: {{client.email}}</ul>
-            <ul>Phone_number: {{client.phone_number}}</ul>
-            <ul>Address: {{client.address}}</ul>
-            <ul>STATUS: {{client.get_status_display}}</ul>
-            <ul>NumberAccount: {{account_number}}, {{ model }}</ul>
+   <h1>BANK HAP CLIENT DETAIL</h1>
+   <div id="content">
+      <div class="client-detail-container">
+         <div class="client-info">
+            <h2>INFORMATION:</h2>
             <ul>
-        </li>
-    </p>
+               <li>Name: <strong>{{ client.name }}</strong></li>
+               <li>Email: <strong>{{ client.email }}</strong></li>
+               <li>Phone Number: <strong>{{ client.phone_number }}</strong></li>
+               <li>Address: <strong>{{ client.address }}</strong></li>
+               <li>Status: <strong>{{ client.get_status_display }}</strong></li>
+               <li>Account Number: <strong>{{ client.get_account_number }}</strong></li>
+               <li>Account's Type: <strong> {{ client.get_type }}</strong></li>
+            </ul>
+         </div>
+         <div class="client-image">
+            <img src="{{ client.image }}" class="card-img-top" alt="{{ client.name }}"> 
+            <img src="{{ client.imageSave}}" class="card-img-top" alt="{{ client.name }}"> 
 
- {{ post.body|truncatewords:30|linebreaks }}
-
+         </div>
+      </div>
+   </div>
 {% endblock %}
