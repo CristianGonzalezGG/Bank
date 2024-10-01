@@ -3,54 +3,59 @@
 {% block title %}Client List{% endblock %}
 
 {% block content %}
-    <h1>BANK HAP CLIENTS</h1>
+    
     {% block javascript %}
         <script src="{% static 'javascript/client_filter.js' %}"></script>
     {% endblock %}
 
-    <!-- Formulario de Filtros -->
-    <form id="filterForm">
-        <div>
-            <label for="account_number">Account Number:</label>
-            <input type="text" name="account_number" id="account_number">
-        </div>
-        <div>
-            <label for="status">Account Status:</label>
-            <select name="status" id="status">
-                <option value="">All</option>
-                <option value="ACT">Active</option>
-                <option value="INV">Inactive</option>
-                <option value="RP">Reported</option>
-            </select>
-        </div>
-        <div>
-            <label for="created_from">Created From:</label>
-            <input type="date" name="created_from" id="created_from">
-        </div>
-        <div>
-            <label for="created_to">Created To:</label>
-            <input type="date" name="created_to" id="created_to">
-        </div>
-        <button type="button" id="filterButton">Filter</button>
-    </form>
+    <div class="el-dorado-container">
+        <div class="filters-and-list">
+            <!-- Formulario de Filtros -->
+            <form id="filterForm">
+                <div>
+                    <label for="account_number">Account Number:</label>
+                    <input type="text" name="account_number" id="account_number">
+                </div>
+                <div>
+                    <label for="status">Account Status:</label>
+                    <select name="status" id="status">
+                        <option value="">All</option>
+                        <option value="ACT">Active</option>
+                        <option value="INV">Inactive</option>
+                        <option value="RP">Reported</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="created_from">Created From:</label>
+                    <input type="date" name="created_from" id="created_from">
+                </div>
+                <div>
+                    <label for="created_to">Created To:</label>
+                    <input type="date" name="created_to" id="created_to">
+                </div>
+                <button type="button" id="filterButton">Filter</button>
+            </form>
     
-    <!-- Lista de Clientes -->
-    <div id="clientList">
-        {% for client in clients %}
-            <div class="client-card" 
-                 data-account-number="{{ client.account.numberAccount }}" 
-                 data-status="{{ client.account.status }}" 
-                 data-created-at="{{ client.created_at|date:'Y-m-d' }}">
-                 
-                <h2>
-                    <a href="{{ client.get_absolute_url }}">
-                        {{ client.name }}
-                    </a>
-                </h2>
-                <p class="date">
-                    Created on {{ client.created_at }} by {{ client.account.numberAccount }}
-                </p>
+            <!-- Lista de Clientes -->
+            <div id="clientList">
+                {% for client in clients %}
+                    <div class="client-card" 
+                         data-account-number="{{ client.account.numberAccount }}" 
+                         data-status="{{ client.account.status }}" 
+                         data-created-at="{{ client.created_at|date:'Y-m-d' }}">
+                         
+                        <h2>
+                            <a href="{{ client.get_absolute_url }}">
+                                {{ client.name }}
+                            </a>
+                        </h2>
+                        <p class="date">
+                            Created on {{ client.created_at }} by {{ client.account.numberAccount }}
+                        </p>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
     </div>
+    
 {% endblock %}

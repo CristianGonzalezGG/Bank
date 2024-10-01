@@ -12,6 +12,10 @@ import requests
 from django.shortcuts import render
 import requests
 
+from django.shortcuts import render
+
+def home(request):
+    return render(request, 'index.html')
 def get_card_info(request):
     card_data = None
     error = None

@@ -4,9 +4,34 @@ body {
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
+    width: 100%;
     animation: fadeIn 1s ease-in-out;
 }
+.el-dorado-container {
+    text-align: center; /* Centrar el contenido */
+    margin: 50px 0; /* Espaciado vertical alrededor del contenedor */
+}
+.main-title {
+    font-size: 38px; /* Tamaño de fuente para el título principal */
+    color: #d6a700; /* Color dorado */
+    margin: 0; /* Eliminar margen */
+}
 
+.golden-line {
+    width: 50%; /* Ajustar el ancho de la línea */
+    border: 1px solid #d6a700; /* Color dorado para la línea */
+    margin: 20px auto; /* Centrar la línea con márgenes */
+}
+
+.subtitle {
+    font-size: 24px; /* Tamaño de fuente para el subtítulo */
+    color: #d6a700; /* Color dorado */
+    margin: 0; /* Eliminar margen */
+}
+.logo {
+    width: 10%; /* Resizes according to screen width */
+    height: auto; /* Keeps aspect ratio */
+}
 /* Estilos generales para el header */
 header {
     background-color: #333; /* Fondo oscuro */
@@ -27,7 +52,7 @@ header {
 
 /* Estilo para el logo */
 .logo img {
-    max-width: 150px;
+    max-width: 50px;
 }
 
 /* Estilo para el menú principal */
@@ -262,4 +287,81 @@ footer {
     .client-image img {
         max-width: 100%;
     }
+}
+
+
+
+
+/* Contenedor para los filtros y la lista */
+.filters-and-list {
+    display: flex; /* Usar flexbox para los elementos hijos */
+    width: 1400px; /* Ancho completo */
+    margin-left: -200px;
+    
+}
+
+/* Formulario de Filtros */
+#filterForm {
+    max-width: 100%; /* Ancho máximo del formulario */
+    padding: 20px; /* Espaciado interno */
+    background-color: #ffffff; /* Fondo blanco para el formulario */
+    border: 1px solid #d6d6d6; /* Borde gris claro */
+    border-radius: 5px; /* Bordes redondeados */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    margin-right: 100px; /* Espacio entre el formulario y la lista */
+}
+
+/* Alineación de etiquetas y campos de entrada */
+#filterForm div {
+    margin-bottom: 15px; 
+    /* Espaciado entre los elementos del formulario */
+}
+
+#filterForm label {
+    font-weight: bold; /* Texto en negrita para las etiquetas */
+    margin-bottom: 5px; /* Espaciado entre la etiqueta y el campo */
+    display: block; /* Asegura que las etiquetas ocupen todo el ancho */
+}
+
+/* Los campos de entrada y selecciones */
+#filterForm input[type="text"],
+#filterForm input[type="date"],
+#filterForm select {
+    width: 100%; /* Ancho completo de los campos */
+    padding: 10px; /* Espaciado interno */
+    border: 1px solid #d6d6d6; /* Borde gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 14px; /* Tamaño de fuente para los campos */
+    box-sizing: border-box; /* Incluye padding y border en el ancho total */
+}
+
+/* Botón de filtro */
+#filterButton {
+    background-color: #d6a700; /* Color de fondo dorado */
+    color: white; /* Color del texto */
+    padding: 10px; /* Espaciado interno */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados */
+    cursor: pointer; /* Cambiar cursor al pasar por encima */
+    font-size: 16px; /* Tamaño de fuente del botón */
+}
+
+#filterButton:hover {
+    background-color: #c69b00; /* Color más oscuro al pasar el mouse */
+}
+
+/* Lista de Clientes */
+#clientList {
+    flex-grow: 1; /* Ocupa el resto del espacio disponible */
+    padding: 20px; /* Espaciado interno */
+    width: 100%;
+}
+
+/* Tarjetas de clientes */
+.client-card {
+    margin-bottom: 15px; /* Espaciado entre tarjetas */
+    padding: 15px; /* Espaciado interno */
+    border: 1px solid #d6d6d6; /* Borde gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+    background-color: #f9f9f9; /* Fondo gris claro */
 }
