@@ -16,6 +16,23 @@ from django.shortcuts import render
 
 def home(request):
     return render(request, 'index.html')
+
+def asesores(request):
+    return render(request, 'asesores.html')
+
+def educacion(request):
+    return render(request, 'educacion_financiera.html')
+
+def negocios(request):
+    return render(request, 'negocios.html')
+def pqr(request):
+    return render(request, 'pqr.html')
+def tramites(request):
+    return render(request, 'tramites_digitales.html')
+def blog(request):
+    return render(request, 'blog.html')
+
+
 def get_card_info(request):
     card_data = None
     error = None

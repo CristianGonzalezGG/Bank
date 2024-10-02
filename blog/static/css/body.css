@@ -365,3 +365,91 @@ footer {
     border-radius: 4px; /* Bordes redondeados */
     background-color: #f9f9f9; /* Fondo gris claro */
 }
+.footer {
+    background-color: #222;
+    color: #fff;
+    padding: 40px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px; /* Ajusta el ancho máximo */
+    margin: 0 auto; /* Centra el footer */
+    padding: 0 20px;
+}
+
+.footer-section {
+    width: 30%;
+}
+
+.footer-section h4 {
+    margin-bottom: 20px;
+    font-weight: bold;
+    border-bottom: 2px solid #f39c12; /* Línea debajo del título */
+    padding-bottom: 5px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin: 10px 0;
+}
+
+.footer-section ul li a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease; /* Transición de color */
+}
+
+.footer-section ul li a:hover {
+    color: #f39c12; /* Color al pasar el mouse */
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    border-top: 1px solid #444; /* Línea superior */
+    padding-top: 20px;
+}
+
+.footer-bottom p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.social-media {
+    margin-top: 20px;
+}
+
+.social-media a {
+    margin: 0 10px;
+    transition: transform 0.3s ease; /* Transición de transformación */
+}
+
+.social-media a:hover {
+    transform: scale(1.2); /* Escala al pasar el mouse */
+}
+
+.social-media img {
+    width: 30px;
+    height: 30px;
+}
+
+/* Animaciones de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.footer {
+    animation: fadeIn 0.8s ease-in; /* Animación de entrada */
+}

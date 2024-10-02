@@ -1,0 +1,40 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #f39c12; /* Color destacado */
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #333;
+    margin-top: 15px;
+}
+
+p {
+    line-height: 1.6;
+    color: #555;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.col-md-4 {
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.col-md-4:hover {
+    transform: translateY(-5px);
+}

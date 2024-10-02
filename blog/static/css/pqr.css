@@ -1,0 +1,35 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #f39c12; /* Color destacado */
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #333;
+    margin-top: 15px;
+}
+
+ol {
+    padding-left: 20px;
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+a {
+    color: #f39c12;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #d98b0e; /* Color de hover */
+}
