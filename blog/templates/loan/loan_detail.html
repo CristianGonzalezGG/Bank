@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Loan Detail</h2>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Detalles del Préstamo</h5>
+        </div>
+        <div class="card-body">
+            <h6 class="card-title">Información del Cliente</h6>
+            <p class="card-text"><strong>Cliente:</strong> {{ loan.client.name }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ loan.client.email }}</p>
+            <p class="card-text"><strong>Teléfono:</strong> {{ loan.client.phone_number }}</p>
+            <hr>
+            <h6 class="card-title">Detalles del Préstamo</h6>
+            <p class="card-text"><strong>Monto:</strong> ${{ loan.amount }}</p>
+            <p class="card-text"><strong>Interés:</strong> {{ loan.interest }}%</p>
+            <p class="card-text"><strong>Tiempo de Pago:</strong> {{ loan.duration }} meses</p>
+            <p class="card-text"><strong>Estado:</strong> {{ loan.status }}</p>
+        </div>
+        <div class="card-footer text-right">
+            <a href="{% url 'blog:loan_list' %}" class="btn btn-secondary">Volver a la lista de Préstamos</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

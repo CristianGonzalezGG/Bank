@@ -1,63 +1,82 @@
 {% extends "base.html" %}
-{%load static%}
+{% load static %}
 {% block title %}Client List{% endblock %}
 
 {% block content %}
-    
-    {% block javascript %}
-        <script src="{% static 'javascript/client_filter.js' %}"></script>
-    {% endblock %}
 
-    <div class="el-dorado-container">
-        <div class="filters-and-list">
-            <!-- Formulario de Filtros -->
-            <form id="filterForm">
-                <div>
-                    <label for="account_number">Account Number:</label>
-                    <input type="text" name="account_number" id="account_number">
-                </div>
-                <div>
-                    <label for="status">Account Status:</label>
-                    <select name="status" id="status">
-                        <option value="">All</option>
-                        <option value="ACT">Active</option>
-                        <option value="INV">Inactive</option>
-                        <option value="RP">Reported</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="created_from">Created From:</label>
-                    <input type="date" name="created_from" id="created_from">
-                </div>
-                <div>
-                    <label for="created_to">Created To:</label>
-                    <input type="date" name="created_to" id="created_to">
-                </div>
-                <button type="button" id="filterButton">Filter</button>
-            </form>
+{% block javascript %}
+<script src="{% static 'javascript/client_filter.js' %}"></script>
+{% endblock %}
+
+<div class="container py-5">
+    <h1 class="display-6 text-primary mb-4">Client List</h1>
     
-            <!-- Lista de Clientes -->
-            <div id="clientList">
+    <div class="row">
+        
+
+        <!-- Lista de Clientes -->
+        <div class="col-md-8">
+            <div id="clientList" class="row gy-4">
                 {% for client in clients %}
-                    <div class="client-card" 
-                         data-account-number="{{ client.account.numberAccount }}" 
-                         data-status="{{ client.account.status }}" 
-                         data-created-at="{{ client.created_at|date:'Y-m-d' }}">
-                         
-                        <h2>
-                            <a href="{{ client.get_absolute_url }}">
-                                {{ client.name }}
-                            </a>
-                        </h2>
-                        
-                        <p class="date">
-                            Created on {{ client.created_at }} by {{ client.account.numberAccount }}
-                        </p>
+                <div class="col-12">
+                    <div class="card client-card shadow-sm border-0 h-100">
+                        <div class="card-body d-flex align-items-start">
+                            <div class="me-3 icon-container">
+                                <i class="bi bi-person-circle display-5 text-secondary"></i>
+                            </div>
+                            <div>
+                                <h5 class="card-title">
+                                    <a href="{{ client.get_absolute_url }}" class="text-dark text-decoration-none">{{ client.name }}</a>
+                                </h5>
+                                <p class="card-text text-muted small">
+                                    Created on {{ client.created_at }} by {{ client.account.numberAccount }}
+                                </p>
+                                <span class="badge bg-success">{{ client.account.status }}</span>
+                            </div>
+                        </div>
                     </div>
+                </div>
                 {% endfor %}
             </div>
         </div>
     </div>
+</div>
 
+<style>
+    /* Animación de entrada suave para cada tarjeta de cliente */
+    .client-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        opacity: 0;
+        animation: fadeInUp 0.5s forwards ease-in-out;
+    }
+
+    .client-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Definición de animación */
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Estilos para el ícono de cliente */
+    .icon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        background-color: #e9ecef;
+        border-radius: 50%;
+    }
+</style>
 
 {% endblock %}

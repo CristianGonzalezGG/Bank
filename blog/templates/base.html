@@ -14,6 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link href="{% static 'css/chatbot.css' %}" rel="stylesheet"> <!-- Estilos del chatbot -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 </head>
 <body>
     <header>
@@ -52,7 +54,15 @@
             {% endif %}
         </div>
     </header>
-
+    {% if messages %}
+    <div class="container mt-4">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div id="content">
         {% block content %}
         <h2>Bienvenido, {{ user.username }}</h2>

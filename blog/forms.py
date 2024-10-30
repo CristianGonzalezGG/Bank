@@ -14,3 +14,11 @@ class EmailForm(forms.Form):
         label='Mensaje',
         widget=forms.Textarea(attrs={'class': 'form-control'})
     )
+
+from django import forms
+from .models import Loan
+
+class LoanForm(forms.ModelForm):
+    class Meta:
+        model = Loan
+        fields = ['client', 'amount', 'interest_rate', 'repayment_term']

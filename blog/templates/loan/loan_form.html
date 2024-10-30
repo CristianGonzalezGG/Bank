@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Loan</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary mb-3">Save</button>
+</form>
+<a href="{% url 'blog:loan_list' %}" class="btn btn-danger">Cancel</a>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Loans</h2>
+    <a href="{% url 'blog:loan_create' %}" class="btn btn-primary mb-3">Create New Loan</a>
+    <ul class="list-group">
+        {% for loan in loans %}
+            <li class="list-group-item">
+                <a href="{% url 'blog:loan_detail' loan.id %}">Loan for {{ loan.client.name }} - ${{ loan.amount }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
