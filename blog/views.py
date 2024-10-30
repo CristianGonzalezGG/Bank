@@ -14,6 +14,37 @@ import requests
 
 from django.shortcuts import render
 
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.conf import settings
+from .forms import EmailForm
+
+def sent_email_success(request):
+    return render(request, 'email_sent_success.html')
+
+def send_email_view(request):
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            # Extract data from the form
+            recipient_email = form.cleaned_data['recipient_email']
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+
+
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,  # Sender's email
+                [recipient_email],  # Recipient's email
+                fail_silently=False,
+            )
+            return redirect('/email-sent-success/')  # Redirect to a success page
+    else:
+        form = EmailForm()
+
+    return render(request, 'send_email_form.html', {'form': form})
+
 def home(request):
     return render(request, 'index.html')
 
@@ -84,3 +115,35 @@ def client_detail(request, id):
         raise Http404("Client not found")
     
     return render(request, 'client/client_detail.html', {'client': client, 'account_number': account_number, 'model': model,})
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST['email']
+        password = request.POST['password']
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/')  # Redirigir a la página de inicio
+        else:
+            messages.error(request, 'Credenciales inválidas.')
+    return render(request, 'index.html')  # Renderiza tu template de login (index.html)
+
+def logout_view(request):
+    logout(request)
+    return redirect('/')
+
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cuenta creada exitosamente.')
+            return redirect('/')
+    else:
+        form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})  # Renderiza tu template de registro (register.html)

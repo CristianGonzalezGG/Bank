@@ -1,4 +1,24 @@
 /* General Styles */
+form label {
+    font-size: 16px; /* Asegurar un tamaño de fuente legible */
+    font-weight: bold; /* Negrita para mayor visibilidad */
+    color: #333; /* Color del texto del label */
+    display: block; /* Asegurar que los labels ocupen todo el ancho */
+    margin-bottom: 5px; /* Espacio entre el label y el campo de entrada */
+}
+
+/* Estilos para los campos del formulario */
+form input[type="text"], form select, form textarea {
+    width: 100%; /* Asegurar que los campos ocupen todo el ancho disponible */
+    padding: 10px; /* Espaciado interno */
+    border: 1px solid #ccc; /* Borde ligero */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 14px; /* Tamaño de fuente */
+    box-sizing: border-box; /* Para incluir el padding en el ancho total */
+}
+
+
+
 body {
     font-family: 'Roboto', sans-serif; /* Asegúrate de que Roboto esté importado */
     background-color: #f4f4f4;

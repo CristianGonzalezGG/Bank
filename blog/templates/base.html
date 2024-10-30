@@ -14,7 +14,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link href="{% static 'css/chatbot.css' %}" rel="stylesheet"> <!-- Estilos del chatbot -->
-
 </head>
 <body>
     <header>
@@ -29,14 +28,13 @@
     
         <div class="header-container">
             <div class="logo">
-                {% load static %}
                 <img src="{% static 'images/logo.png' %}" alt="Logo">   
             </div>
             <nav>
                 <ul>
                     <li><a href="/">Inicio</a></li>
-                    <li><a href="/clients/">clientes</a></li>
-                    <li><a href="/get-card-info">Informacion de cuentas</a></li>
+                    <li><a href="/clients/">Clientes</a></li>
+                    <li><a href="/get-card-info">Información de cuentas</a></li>
                     <li><a href="/educacion/">Educación Financiera</a>
                         <ul class="submenu">
                             <li><a href="#">Submenú 1</a></li>
@@ -46,13 +44,18 @@
                     <li><a href="/tramites/">Trámites digitales</a></li>
                 </ul>
             </nav>
-            <button class="cta-button">Entrar</button>
-        </div><!-- Aquí va el contenido del header que ya tienes -->
+            {% if user.is_authenticated %}
+            <a href="#" class="cta-button">Cerrar Sesión</a>
+
+            {% else %}
+                <a href="/login/" class="cta-button">Entrar</a>
+            {% endif %}
+        </div>
     </header>
 
     <div id="content">
         {% block content %}
-        <h2>Bienvenido, [Cristian]</h2>
+        <h2>Bienvenido, {{ user.username }}</h2>
         <p>Seleccione una opción del menú para comenzar.</p>
         {% endblock %}
     </div>
@@ -103,7 +106,6 @@
             </div>
         </div>
     </footer>
-    
     
     <!-- Botón de ayuda -->
     <div class="help-button" onclick="toggleChatbot()">

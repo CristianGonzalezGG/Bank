@@ -1,38 +1,54 @@
 {% extends 'base.html' %}
 {% load static%}
 {% block title %}
-Inicio | Banco el dorado
+Inicio de Sesión | Banco el dorado
 {% endblock %}
 
 {% block content %}
-<h2>Nuestros Servicios</h2>
-<div class="row">
-    <div class="col-md-4">
-        <div class="card">
-            <img src="{% static 'images/servicio1.jpg' %}" class="card-img-top" alt="Servicio 1">
-            <div class="card-body">
-                <h5 class="card-title">Cuentas de Ahorro</h5>
-                <p class="card-text">Abre tu cuenta de ahorro y disfruta de beneficios exclusivos.</p>
+<section class="vh-90" style="background-color: #809292;">
+    <div class="container py-5 h-10">
+        <div class="row d-flex justify-content-center align-items-center h-10">
+            <div class="col col-xl-10">
+                <div class="card" style="border-radius: 1rem;">
+                    <div class="row g-0">
+                        <div class="col-md-6 col-lg-5 d-none d-md-block">
+                            <img src="https://i.postimg.cc/ZqkK1nnQ/Logo-de-producto-Finanzas-Ilustrativo-Le-n-Oro-1.png"
+                                alt="login form" class="img-fluid"
+                                style="border-radius: 1rem 0 0 1rem; padding-left: 80px" />
+                        </div>
+                        <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                            <div class="card-body p-4 p-lg-5 text-black">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="d-flex align-items-center mb-3 pb-1">
+                                        <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
+                                        <span class="h1 fw-bold mb-0">Logo</span>
+                                    </div>
+                                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Iniciar sesión en tu cuenta</h5>
+                                    <div class="form-outline mb-4">
+                                        <input type="email" name="email" class="form-control form-control-lg" required />
+                                        <label class="form-label">Correo Electrónico</label>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <input type="password" name="password" class="form-control form-control-lg" required />
+                                        <label class="form-label">Contraseña</label>
+                                    </div>
+                                    <div class="pt-1 mb-4">
+                                        <button class="btn btn-dark btn-lg btn-block" type="submit">Iniciar sesión</button>
+                                    </div>
+                                    <a class="small text-muted" href="#!">¿Olvidaste tu contraseña?</a>
+                                    <p class="mb-5 pb-lg-2" style="color: #393f81;">¿No tienes una cuenta? 
+                                        <a href="/registro/" style="color: #393f81;">Regístrate aquí</a>
+                                    </p>
+                                    <a href="#!" class="small text-muted">Términos de uso.</a>
+                                    <a href="#!" class="small text-muted">Política de privacidad</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <img src="{% static 'images/servicio2.jpg' %}" class="card-img-top" alt="Servicio 2">
-            <div class="card-body">
-                <h5 class="card-title">Préstamos Personales</h5>
-                <p class="card-text">Solicita un préstamo personal con condiciones flexibles.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <img src="{% static 'images/servicio3.png' %}" class="card-img-top" alt="Servicio 3">
-            <div class="card-body">
-                <h5 class="card-title">Tarjetas de Crédito</h5>
-                <p class="card-text">Descubre nuestras tarjetas de crédito y elige la que más te convenga.</p>
-            </div>
-        </div>
-    </div>
-</div>
+</section>
 {% endblock %}

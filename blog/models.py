@@ -77,3 +77,4 @@ class Account(models.Model):
 
     def get_absolute_url(self):
         return reverse('blog:client_detail', args=[self.id])
+    

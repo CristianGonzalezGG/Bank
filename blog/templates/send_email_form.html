@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog - Banco El Dorado{% endblock %}
+
+{% block content %}
+
+    <h2>Send an Email</h2>
+    <form method="post" action="{% url 'blog:send_email' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Send Email</button>
+    </form>
+
+{% endblock content %}
