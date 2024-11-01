@@ -152,27 +152,12 @@
     </footer>
     
     <!-- Botón de ayuda -->
-    <div class="help-button" onclick="toggleChatbot()">
-        <img src="{% static 'images/help.png' %}" alt="Ayuda">
+    <div class="help-button">
+        <a href="https://www.userlike.com/umc/#/inbox/81431049">
+            <img src="{% static 'images/help.png' %}" alt="Ayuda">
+        </a>
+        
     </div>
 
-    <!-- Ventana emergente del chatbot -->
-    <div id="chatbot" class="chatbot-container">
-        <div class="chatbot-header">
-            <h3>Asesor Virtual</h3>
-            <button onclick="toggleChatbot()" class="close-chatbot">&times;</button>
-        </div>
-        <div class="chatbot-body">
-            <p><strong>Preguntas frecuentes:</strong></p>
-            <ul>
-                <li><button onclick="botResponse('¿Dónde puedo registrar un nuevo cliente?')">¿Dónde puedo registrar un nuevo cliente?</button></li>
-                <li><button onclick="botResponse('¿Cómo puedo ver la información de la tarjeta de un cliente?')">¿Cómo puedo ver la información de la tarjeta de un cliente?</button></li>
-                <li><button onclick="botResponse('¿Qué trámites puedo realizar en línea?')">¿Qué trámites puedo realizar en línea?</button></li>
-            </ul>
-            <div id="chatbot-response" class="chatbot-response"></div>
-        </div>
-    </div>
-
-    <script src="{% static 'javascript/chatbot.js' %}"></script> <!-- Script del chatbot -->
 </body>
 </html>
