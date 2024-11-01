@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        .email-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e6e9ec;
+        }
+        .email-header {
+            background-color: #004080;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .email-header img {
+            width: 120px;
+            margin-bottom: 10px;
+            border-radius: 50%;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: normal;
+        }
+        .email-body {
+            padding: 30px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .email-body h2 {
+            font-size: 20px;
+            color: #004080;
+        }
+        .email-body p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .email-footer {
+            background-color: #f4f6f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #888888;
+            border-top: 1px solid #e6e9ec;
+        }
+        .email-footer a {
+            color: #004080;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .email-footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Encabezado del correo -->
+        <div class="email-header">
+            <img src="https://i.postimg.cc/ZnQjmqR9/logo.png" alt="Logo de Banco El Dorado">
+            <h1>Banco El Dorado</h1>
+        </div>
+
+        <!-- Cuerpo del correo -->
+        <div class="email-body">
+            <h2>{{ subject }}</h2>
+            <p>{{ message }}</p>
+        </div>
+        <p>Estimado:
+
+            Esperamos que este mensaje le encuentre bien. En Banco El Dorado, nos comprometemos a brindarle un servicio excepcional y a mantenerlo informado sobre nuestros productos y servicios.
+            
+            Le recordamos que puede acceder a su cuenta en línea a través de nuestro portal seguro, donde podrá realizar transacciones, revisar su saldo y consultar sus estados de cuenta de manera fácil y rápida. Si necesita asistencia, no dude en comunicarse con nuestro servicio de atención al cliente al [número de teléfono] o a través de nuestro correo electrónico [correo electrónico de atención al cliente].
+            
+            Además, le invitamos a mantenerse al tanto de nuestras últimas ofertas y promociones visitando nuestra página web o siguiendo nuestras redes sociales.
+            
+            Agradecemos su confianza en Banco El Dorado. Estamos aquí para ayudarle en todo lo que necesite.</p>
+        <!-- Pie de página del correo -->
+        <div class="email-footer">
+            <p>Banco El Dorado - Todos los derechos reservados.</p>
+            <p>
+                <a href="https://www.bancoeldorado.com/terminos">Términos y Condiciones</a> |
+                <a href="https://www.bancoeldorado.com/privacidad">Política de Privacidad</a>
+            </p>
+            <p>¿Necesitas ayuda? Contacta a nuestro <a href="https://www.bancoeldorado.com/soporte">centro de soporte</a>.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -4,23 +4,26 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Peticiones, Quejas y Reclamos (PQR)</h2>
-    <p>En Banco El Dorado, tu opinión es importante. Ponemos a tu disposición nuestro sistema de PQR para atender tus inquietudes de manera oportuna y eficaz.</p>
-    
+    <div class="text-center mb-4 p-4" style="background-color: #f9fafb; border-radius: 8px;">
+        <h2 class="display-5 font-weight-bold animate__animated animate__fadeInDown">Peticiones, Quejas y Reclamos</h2>
+        <p class="lead animate__animated animate__fadeIn animate__delay-1s">Tu opinión es importante para nosotros.</p>
+    </div>
+
     <h3>¿Cómo presentar un PQR?</h3>
     <ol>
         <li><strong>Petición:</strong> Solicita información o servicios específicos.</li>
         <li><strong>Queja:</strong> Expón tu inconformidad respecto a un servicio recibido.</li>
-        <li><strong>Reclamo:</strong> Solicita la corrección de un error o la compensación por algún inconveniente.</li>
+        <li><strong>Reclamo:</strong> Solicita la corrección de un error o compensación por un inconveniente.</li>
     </ol>
 
     <p>Puedes presentar tu PQR de las siguientes formas:</p>
-    <ul>
-        <li>En línea a través de nuestro <a href="#">formulario web</a>.</li>
-        <li>Por teléfono llamando a nuestra línea de atención al cliente.</li>
-        <li>Directamente en cualquiera de nuestras sucursales.</li>
+    <ul class="list-unstyled">
+        <li class="mb-2 animate__animated animate__fadeInRight"><a href="#">Formulario web</a> en línea.</li>
+        <li class="mb-2 animate__animated animate__fadeInRight animate__delay-1s">Llamando a nuestra línea de atención al cliente.</li>
+        <li class="mb-2 animate__animated animate__fadeInRight animate__delay-2s">En cualquiera de nuestras sucursales.</li>
     </ul>
 
     <p>Nos comprometemos a dar respuesta en un plazo máximo de 15 días hábiles.</p>
 </div>
-{% endblock %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+{% endblock %}

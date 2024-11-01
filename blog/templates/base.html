@@ -15,6 +15,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link href="{% static 'css/chatbot.css' %}" rel="stylesheet"> <!-- Estilos del chatbot -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 <body>
@@ -46,14 +47,47 @@
                     <li><a href="/tramites/">Trámites digitales</a></li>
                 </ul>
             </nav>
-            {% if user.is_authenticated %}
-            <a href="#" class="cta-button">Cerrar Sesión</a>
+            
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                    <button class="custom-button" onclick="window.location.href='/logout/'">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"></path>
+                        </svg>
+                        <div class="custom-text">
+                            Salir
+                        </div>
+                    </button>
+                    <span class="welcome-message" style="margin-left: 30px; background-color: #BC9C22; padding: 5px 10px; border-radius: 5px; animation: fadeIn 1s;">
+                        Bienvenido, {{ user.username }}
+                    </span>
+                    
+                    <style>
+                        @keyframes fadeIn {
+                            from {
+                                opacity: 0;
+                            }
+                            to {
+                                opacity: 1;
+                            }
+                        }
+                    </style>
+                    
 
-            {% else %}
-                <a href="/login/" class="cta-button">Entrar</a>
-            {% endif %}
+                {% else %}
+                    <button class="custom-button" onclick="window.location.href='/login/'">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"></path>
+                        </svg>
+                        <div class="custom-text">
+                            Ingresa
+                        </div>
+                    </button>
+                {% endif %}
+            </div>
         </div>
     </header>
+    
     {% if messages %}
     <div class="container mt-4">
         {% for message in messages %}

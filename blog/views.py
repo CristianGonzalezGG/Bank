@@ -1,49 +1,57 @@
-from django.shortcuts import render
 from django.http import Http404
-
-# Create your views here.
+from django.contrib.auth import logout
 from .models import Client, Account
-from django.shortcuts import render
-import requests
-
-from django.shortcuts import render
-import requests
-
-from django.shortcuts import render
 import requests
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-
 from django.core.mail import send_mail
-from django.shortcuts import render, redirect
 from django.conf import settings
 from .forms import EmailForm
-@login_required
-def sent_email_success(request):
-    return render(request, 'email_sent_success.html')
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.shortcuts import render, redirect
+from .forms import EmailForm
+
 @login_required
 def send_email_view(request):
     if request.method == 'POST':
         form = EmailForm(request.POST)
         if form.is_valid():
-            # Extract data from the form
+            # Extrae datos del formulario
             recipient_email = form.cleaned_data['recipient_email']
             subject = form.cleaned_data['subject']
             message = form.cleaned_data['message']
 
+            # URL del logo
+            logo_url = f"{settings.STATIC_URL}images/logo.png"
 
-            send_mail(
-                subject,
-                message,
-                settings.EMAIL_HOST_USER,  # Sender's email
-                [recipient_email],  # Recipient's email
-                fail_silently=False,
+            # Renderiza el contenido HTML del correo
+            html_content = render_to_string('emails/send_email_template.html', {
+                'logo_url': logo_url,
+                'subject': subject,
+                'message': message,
+            })
+
+            # Configura y envía el correo
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=message,  # Versión en texto plano
+                from_email=settings.EMAIL_HOST_USER,
+                to=[recipient_email]
             )
-            return redirect('/email-sent-success/')  # Redirect to a success page
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+
+            return redirect('/email-sent-success/')  # Redirige a la página de éxito
     else:
         form = EmailForm()
 
     return render(request, 'send_email_form.html', {'form': form})
+
+@login_required
+def sent_email_success(request):
+    return render(request, 'email_sent_success.html')
+
 
 def home(request):
     return render(request, 'index.html')
@@ -169,6 +177,11 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, "login.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request) 
+    return redirect('blog:home') 
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Loan

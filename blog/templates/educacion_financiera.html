@@ -4,24 +4,95 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Educación Financiera</h2>
-    <p>En Banco El Dorado, creemos que la educación financiera es clave para el éxito económico. Por ello, ofrecemos recursos y herramientas que ayudan a nuestros clientes a entender cómo gestionar mejor su dinero, ahorrar de forma inteligente e invertir en el futuro.</p>
+    <!-- Hero Section -->
+    <div class="text-center mb-4 p-4" style="background-color: #f9fafb; border-radius: 8px;">
+        <h2 class="display-5 font-weight-bold animate__animated animate__fadeInDown">Educación Financiera</h2>
+        <p class="lead animate__animated animate__fadeIn animate__delay-1s">
+            En Banco El Dorado, nos comprometemos a mejorar la educación financiera de nuestros clientes, ayudándolos a gestionar sus finanzas personales y alcanzar sus metas.
+        </p>
+        <button class="btn btn-primary btn-lg mt-3 animate__animated animate__fadeInUp animate__delay-2s">Conoce más</button>
+    </div>
     
-    <h3>¿Qué es la educación financiera?</h3>
-    <p>La educación financiera es el conjunto de conocimientos que permite a los individuos tomar decisiones informadas sobre el uso de sus recursos financieros. Implica entender cómo funcionan productos como cuentas de ahorro, inversiones, créditos y cómo crear un plan financiero personal.</p>
+    <!-- Main Content Section -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <h3 class="font-weight-bold">¿Qué es la educación financiera?</h3>
+            <p>La educación financiera permite tomar decisiones informadas sobre el uso de recursos financieros. Con este conocimiento, se comprende cómo funcionan cuentas de ahorro, inversiones, créditos, y cómo diseñar un plan financiero sólido.</p>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <img src="https://cdn-icons-png.flaticon.com/512/11782/11782273.png" alt="Educación Financiera" class="img-fluid rounded animate__animated animate__fadeInRight">
+        </div>
+    </div>
+
+    <!-- Key Topics Section -->
+    <div class="mt-4">
+        <h3>Temas Clave:</h3>
+        <ul class="list-unstyled">
+            <li class="mb-3 animate__animated animate__fadeInLeft">
+                <strong>Presupuesto:</strong> Aprende a equilibrar tus ingresos y gastos, y a establecer metas financieras.
+            </li>
+            <li class="mb-3 animate__animated animate__fadeInLeft animate__delay-1s">
+                <strong>Créditos:</strong> Conoce cómo funcionan los créditos y cómo usarlos responsablemente para evitar sobreendeudamiento.
+            </li>
+            <li class="mb-3 animate__animated animate__fadeInLeft animate__delay-2s">
+                <strong>Inversiones:</strong> Descubre diferentes tipos de inversiones y cómo pueden ayudarte a generar ingresos adicionales.
+            </li>
+            <li class="mb-3 animate__animated animate__fadeInLeft animate__delay-3s">
+                <strong>Planificación para el retiro:</strong> Asegura tu futuro con un plan de pensión adecuado que se ajuste a tus necesidades.
+            </li>
+        </ul>
+    </div>
     
-    <h3>Temas Clave:</h3>
-    <ul>
-        <li><strong>Presupuesto:</strong> Aprende a equilibrar tus ingresos y gastos, y a establecer metas financieras.</li>
-        <li><strong>Créditos:</strong> Conoce cómo funcionan los créditos y cómo usarlos de forma responsable para evitar sobreendeudamiento.</li>
-        <li><strong>Inversiones:</strong> Descubre los diferentes tipos de inversiones y cómo pueden ayudarte a generar ingresos adicionales.</li>
-        <li><strong>Planificación para el retiro:</strong> Asegura tu futuro con un plan de pensión adecuado que se ajuste a tus necesidades.</li>
-    </ul>
+    <!-- Additional Resources Section -->
+    <div class="mt-5">
+        <h3>Recursos Adicionales</h3>
+        <div class="row">
+            <div class="col-md-6 animate__animated animate__fadeIn">
+                <div class="card border-0 shadow-sm rounded-lg">
+                    <div class="card-body">
+                        <h5 class="card-title">Banco Nacional</h5>
+                        <p class="card-text">El Banco Nacional ofrece una serie de guías y talleres gratuitos en línea para ayudar a sus clientes a mejorar su bienestar financiero.</p>
+                        <a href="#" class="btn btn-outline-primary btn-sm">Visita su sitio</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 animate__animated animate__fadeIn animate__delay-1s">
+                <div class="card border-0 shadow-sm rounded-lg">
+                    <div class="card-body">
+                        <h5 class="card-title">Asesoría Profesional</h5>
+                        <p class="card-text">Consulta con asesores financieros expertos que pueden ayudarte a planificar tu futuro financiero, creando estrategias de ahorro y presupuesto personalizadas.</p>
+                        <a href="#" class="btn btn-outline-primary btn-sm">Agendar Consulta</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <p>Para obtener más información, visita nuestras <a href="#">guías de educación financiera</a> o agenda una consulta con uno de nuestros asesores.</p>
+    <!-- Call to Action -->
+    <div class="text-center mt-5">
+        <p>Para obtener más información, visita nuestras <a href="#">guías de educación financiera</a> o agenda una consulta con uno de nuestros asesores.</p>
+    </div>
 </div>
 
+<!-- Custom CSS -->
+<style>
+    h2, h3, p, ul li {
+        color: #34495e;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        transition: transform 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: scale(1.05);
+        background-color: #0056b3;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+    }
+</style>
 
-
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 {% endblock %}

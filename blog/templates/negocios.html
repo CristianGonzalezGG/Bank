@@ -4,16 +4,32 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Negocios y Emprendimientos</h2>
-    <p>El Banco El Dorado no solo está aquí para gestionar tus finanzas, también es un socio en el crecimiento de tu negocio. Conoce nuestros nuevos emprendimientos y asociaciones estratégicas.</p>
+    <div class="text-center mb-4 p-4" style="background-color: #f9fafb; border-radius: 8px;">
+        <h2 class="display-5 font-weight-bold animate__animated animate__fadeInDown">Negocios y Emprendimientos</h2>
+        <p class="lead animate__animated animate__fadeIn animate__delay-1s">
+            Banco El Dorado, tu aliado en el crecimiento empresarial. Conoce nuestros emprendimientos y asociaciones estratégicas.
+        </p>
+        <button class="btn btn-primary btn-lg mt-3 animate__animated animate__fadeInUp animate__delay-2s">Descubre Más</button>
+    </div>
 
     <h3>Nuevos Emprendimientos</h3>
-    <ul>
-        <li><strong>DoradoTech:</strong> Innovación en soluciones tecnológicas para pequeñas y medianas empresas.</li>
-        <li><strong>EcoFuturo:</strong> Iniciativa para financiar proyectos ecológicos que contribuyan a la sostenibilidad ambiental.</li>
-        <li><strong>Comercio Global:</strong> Plataforma de comercio electrónico que ayuda a nuestros clientes a expandir sus negocios a nivel internacional.</li>
+    <ul class="list-unstyled">
+        <li class="mb-3 animate__animated animate__fadeInLeft">
+            <strong>DoradoTech:</strong> Innovación en soluciones tecnológicas para PYMES.
+        </li>
+        <li class="mb-3 animate__animated animate__fadeInLeft animate__delay-1s">
+            <strong>EcoFuturo:</strong> Financiamiento de proyectos ecológicos que promuevan la sostenibilidad.
+        </li>
+        <li class="mb-3 animate__animated animate__fadeInLeft animate__delay-2s">
+            <strong>Comercio Global:</strong> Plataforma de comercio para la expansión internacional.
+        </li>
     </ul>
 
-    <p>Para conocer más sobre nuestras soluciones para emprendedores, visita nuestra sección de <a href="#">Negocios</a>.</p>
+    <p>Para más información, visita nuestra sección de <a href="#">Negocios</a>.</p>
 </div>
-{% endblock %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<style>
+    .btn-primary { transition: transform 0.3s ease; }
+    .btn-primary:hover { transform: scale(1.05); background-color: #0056b3; }
+</style>
+{% endblock %}

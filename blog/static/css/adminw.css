@@ -1,13 +1,46 @@
+.custom-button {
+    background-color: #ffffff00;
+    color: #fff;
+    width: 8.5em;
+    height: 2.9em;
+    border: #3654ff 0.2em solid;
+    border-radius: 11px;
+    text-align: right;
+    transition: all 0.6s ease;
+}
+  
+.custom-button:hover {
+    background-color: #3654ff;
+    cursor: pointer;
+}
+  
+.custom-button svg {
+    width: 1.6em;
+    margin: -0.2em 0.8em 1em;
+    position: absolute;
+    display: flex;
+    transition: all 0.6s ease;
+}
+  
+.custom-button:hover svg {
+    transform: translateX(5px);
+}
+  
+.custom-text {
+    margin: 0 1.5em;
+}
+
 /* admin.css */
 .gradient-custom-2 {
     /* fallback for old browsers */
     background: #fccb90;
     
     /* Chrome 10-25, Safari 5.1-6 */
-    background: -webkit-linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
+    background: -webkit-linear-gradient(to right, #9c9e8e, #fcd34d); /* Para navegadores Webkit */
+    background: linear-gradient(to right, #9c9e8e, #fcd34d); /* Estándar */
     
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    background: linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
+    
+    
     }
     
     @media (min-width: 768px) {

@@ -1,38 +1,129 @@
 {% extends 'base.html' %}
-{% load static%}
+{% load static %}
 {% block title %}
-Inicio | Banco el dorado
+Inicio | Banco el Dorado
 {% endblock %}
 
 {% block content %}
-<h2>Nuestros Servicios</h2>
-<div class="row">
-    <div class="col-md-4">
-        <div class="card">
-            <img src="{% static 'images/servicio1.jpg' %}" class="card-img-top" alt="Servicio 1">
-            <div class="card-body">
-                <h5 class="card-title">Cuentas de Ahorro</h5>
-                <p class="card-text">Abre tu cuenta de ahorro y disfruta de beneficios exclusivos.</p>
+<div class="container mt-5">
+    <h2 class="text-center mb-5">Nuestros Servicios</h2>
+    <div class="hero-section text-center p-5" style="background-color: #f1f3f5; border-radius: 8px;">
+        <h1 class="display-4 font-weight-bold animate__animated animate__fadeInDown">Bienvenido a Banco El Dorado</h1>
+        <p class="lead animate__animated animate__fadeIn animate__delay-1s">Tu aliado financiero para alcanzar tus metas y construir un futuro próspero.</p>
+        <button class="btn btn-primary btn-lg mt-3 animate__animated animate__fadeInUp animate__delay-2s">Conoce Nuestros Servicios</button>
+    </div>
+
+    <!-- Servicios Section -->
+    <section class="mt-5">
+        <h2 class="mb-4">Nuestros Servicios</h2>
+        <div class="row">
+            <!-- Servicio 1 -->
+            <div class="col-md-4">
+                <div class="card animate__animated animate__fadeIn">
+                    <img src="{% static 'images/servicio1.jpg' %}" class="card-img-top" alt="Servicio 1">
+                    <div class="card-body">
+                        <h5 class="card-title">Cuentas de Ahorro</h5>
+                        <p class="card-text">Abre tu cuenta de ahorro y disfruta de beneficios exclusivos como tasas de interés preferenciales.</p>
+                        <a href="#" class="btn btn-outline-primary">Más información</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Servicio 2 -->
+            <div class="col-md-4">
+                <div class="card animate__animated animate__fadeIn animate__delay-1s">
+                    <img src="{% static 'images/servicio2.jpg' %}" class="card-img-top" alt="Servicio 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Préstamos Personales</h5>
+                        <p class="card-text">Solicita un préstamo con condiciones flexibles para cubrir todas tus necesidades.</p>
+                        <a href="#" class="btn btn-outline-primary">Más información</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Servicio 3 -->
+            <div class="col-md-4">
+                <div class="card animate__animated animate__fadeIn animate__delay-2s">
+                    <img src="{% static 'images/servicio3.png' %}" class="card-img-top" alt="Servicio 3">
+                    <div class="card-body">
+                        <h5 class="card-title">Tarjetas de Crédito</h5>
+                        <p class="card-text">Elige la tarjeta que más te convenga y obtén beneficios exclusivos.</p>
+                        <a href="#" class="btn btn-outline-primary">Más información</a>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <img src="{% static 'images/servicio2.jpg' %}" class="card-img-top" alt="Servicio 2">
-            <div class="card-body">
-                <h5 class="card-title">Préstamos Personales</h5>
-                <p class="card-text">Solicita un préstamo personal con condiciones flexibles.</p>
+    </section>
+    <!-- Sección Cuentas de Ahorro -->
+    <section class="service-section bg-light-blue">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Cuentas de Ahorro</h3>
+                <p>Disfruta de los beneficios de nuestras cuentas de ahorro, con tasas preferenciales y fácil acceso en nuestras plataformas digitales.</p>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <img src="{% static 'images/servicio3.png' %}" class="card-img-top" alt="Servicio 3">
-            <div class="card-body">
-                <h5 class="card-title">Tarjetas de Crédito</h5>
-                <p class="card-text">Descubre nuestras tarjetas de crédito y elige la que más te convenga.</p>
+    </section>
+
+    <!-- Sección Préstamos Personales -->
+    <section class="service-section bg-light-gray">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Préstamos Personales</h3>
+                <p>Obtén un préstamo personal con condiciones flexibles y aprobación rápida para que puedas alcanzar tus objetivos.</p>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Sección Tarjetas de Crédito -->
+    <section class="service-section bg-light-blue">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Tarjetas de Crédito</h3>
+                <p>Elige entre nuestras tarjetas de crédito y disfruta de beneficios exclusivos y flexibilidad en tus pagos.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Citas -->
+    <section class="service-section bg-light-gray">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Agenda una Cita</h3>
+                <p>Programa una cita con uno de nuestros asesores financieros para obtener asesoramiento personalizado.</p>
+                <button class="btn btn-primary">Agendar Cita</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Sedes -->
+    <section class="service-section bg-light-blue">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Nuestras Sedes</h3>
+                <p>Visita cualquiera de nuestras sedes a nivel nacional. Encuentra la más cercana a ti.</p>
+                <button class="btn btn-primary">Ubicaciones</button>
+            </div>
+        </div>
+    </section>
 </div>
+
+<style>
+    /* Estilos diferenciados y minimalistas para cada sección */
+    .service-section {
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .bg-light-blue {
+        background-color: #f0f8ff; /* Azul claro */
+    }
+    .bg-light-gray {
+        background-color: #f7f7f7; /* Gris claro */
+    }
+    .service-section h3 {
+        font-weight: bold;
+        color: #2a4d69;
+    }
+    .service-section p {
+        color: #4d4d4d;
+    }
+</style>
 {% endblock %}
