@@ -9,6 +9,12 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BIN_CHECKER_API_KEY = os.getenv("2db1f56bf1msh82f51b028c8554ap12550djsnf40398a4e")
 
 from pathlib import Path
 

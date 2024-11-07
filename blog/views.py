@@ -8,9 +8,13 @@ from django.conf import settings
 from .forms import EmailForm
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.conf import settings
+
 from django.shortcuts import render, redirect
-from .forms import EmailForm
+
+
+
+
+
 
 @login_required
 def send_email_view(request):
@@ -74,38 +78,37 @@ def blog(request):
     return render(request, 'blog.html')
 
 @login_required
-def get_card_info(request):
+
+
+def bin_lookup(request):
     card_data = None
     error = None
 
     if request.method == 'POST':
         bin_number = request.POST.get('bin_number')
-
-        # Validar si el número BIN tiene entre 6 y 8 dígitos
-        if not bin_number or len(bin_number) < 6 or len(bin_number) > 8:
-            error = 'El número BIN debe tener entre 6 y 8 dígitos.'
-        else:
+        if bin_number:
+            # URL de la API
+            api_key = settings.BIN_CHECKER_API_KEY
+            url = f"https://api.bincodes.com/bin/?format=json&api_key={api_key}&bin={bin_number}"
+            
+            # Hacer la solicitud a la API
             try:
-                url = f"https://lookup.binlist.net/{bin_number}"
-                # Añadimos un timeout para evitar esperas infinitas y controlamos las excepciones
-                response = requests.get(url, timeout=10)
-                
-                # Si la respuesta es 200, todo está bien
-                if response.status_code == 200:
-                    card_data = response.json()  # Convertir la respuesta a un diccionario
-                elif response.status_code == 404:
-                    error = f'No se encontró información para el BIN {bin_number}.'
-                elif response.status_code == 429:
-                    error = 'Has excedido el límite de peticiones. Inténtalo más tarde.'
+                response = requests.get(url)
+                response.raise_for_status()  # Asegura que no haya error HTTP
+                data = response.json()
+                print(data)
+                # Verifica si la respuesta contiene datos válidos
+                if data.get("valid") == "true":
+                    card_data = data
                 else:
-                    error = f'Ocurrió un error. Código de estado: {response.status_code}'
-            except requests.Timeout:
-                error = 'La solicitud a la API ha superado el tiempo de espera. Inténtalo de nuevo más tarde.'
-            except requests.RequestException as e:
-                error = f'Ocurrió un error de conexión: {str(e)}'
-    
-    # Renderizamos el template con los datos de la tarjeta o el mensaje de error
+                    error = "El BIN ingresado no es válido o no se encuentra en la base de datos."
+
+            except requests.exceptions.RequestException as e:
+                error = f"Ocurrió un error al hacer la solicitud: {str(e)}"
+
     return render(request, 'card_info.html', {'card_data': card_data, 'error': error})
+
+
 
 @login_required
 def client_list(request):

@@ -19,74 +19,53 @@
 
 </head>
 <body>
-    <header>
-        <div class="top-menu">
-            <ul>
-                <li><a href="/asesores/">Asesores</a></li>
-                <li><a href="/negocios/">Negocios</a></li>
-                <li><a href="/pqr/">PQR</a></li>
-                <li><a href="/blog/">Blog</a></li>
-            </ul>
+    <header class="bg-white shadow-lg">
+        <div class="top-menu bg-gray-100 text-gray-500 text-sm py-2">
+            <div class="container mx-auto flex justify-end space-x-6">
+                <a href="/asesores/" class="hover:text-gray-800 transition-colors">Asesores</a>
+                <a href="/negocios/" class="hover:text-gray-800 transition-colors">Negocios</a>
+                <a href="/pqr/" class="hover:text-gray-800 transition-colors">PQR</a>
+                <a href="/blog/" class="hover:text-gray-800 transition-colors">Blog</a>
+            </div>
         </div>
     
-        <div class="header-container">
-            <div class="logo">
-                <img src="{% static 'images/logo.png' %}" alt="Logo">   
+        <div class="container mx-auto flex justify-between items-center py-4 px-4 md:px-0">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-12 w-auto">
             </div>
-            <nav>
-                <ul>
-                    <li><a href="/">Inicio</a></li>
-                    <li><a href="/clients/">Clientes</a></li>
-                    <li><a href="/get-card-info">Información de cuentas</a></li>
-                    <li><a href="/educacion/">Educación Financiera</a>
-                        <ul class="submenu">
-                            <li><a href="#">Submenú 1</a></li>
-                            <li><a href="#">Submenú 2</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="/tramites/">Trámites digitales</a></li>
-                </ul>
+    
+            <!-- Navegación principal -->
+            <nav class="hidden md:flex space-x-8 text-gray-700">
+                <a href="/" class="font-medium hover:text-blue-500 transition-colors">Inicio</a>
+                <a href="/clients/" class="font-medium hover:text-blue-500 transition-colors">Clientes</a>
+                <a href="/check-bin/" class="font-medium hover:text-blue-500 transition-colors">Información de cuentas</a>
+                <a href="/educacion/" class="font-medium hover:text-blue-500 transition-colors relative">
+                    Educación Financiera
+                    <ul class="absolute hidden group-hover:block bg-white shadow-lg mt-2 py-2 w-48 text-gray-600 text-sm rounded-md">
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Submenú 1</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Submenú 2</a></li>
+                    </ul>
+                </a>
+                <a href="/tramites/" class="font-medium hover:text-blue-500 transition-colors">Trámites digitales</a>
             </nav>
-            
-            <div class="user-info">
+    
+            <!-- Botón de acción -->
+            <div class="flex items-center space-x-4">
                 {% if user.is_authenticated %}
-                    <button class="custom-button" onclick="window.location.href='/logout/'">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"></path>
-                        </svg>
-                        <div class="custom-text">
-                            Salir
-                        </div>
-                    </button>
-                    <span class="welcome-message" style="margin-left: 30px; background-color: #BC9C22; padding: 5px 10px; border-radius: 5px; animation: fadeIn 1s;">
-                        Bienvenido, {{ user.username }}
-                    </span>
-                    
-                    <style>
-                        @keyframes fadeIn {
-                            from {
-                                opacity: 0;
-                            }
-                            to {
-                                opacity: 1;
-                            }
-                        }
-                    </style>
-                    
-
+                    <a href="/logout/" class="px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition">Cerrar Sesión</a>
                 {% else %}
-                    <button class="custom-button" onclick="window.location.href='/login/'">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"></path>
-                        </svg>
-                        <div class="custom-text">
-                            Ingresa
-                        </div>
-                    </button>
+                    <a href="/login/" class="px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition">Entrar</a>
                 {% endif %}
             </div>
+    
+            <!-- Menú móvil -->
+            <button class="md:hidden text-gray-700 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
         </div>
     </header>
+    
     
     {% if messages %}
     <div class="container mt-4">
@@ -104,60 +83,91 @@
         {% endblock %}
     </div>
 
-    <footer class="footer">
-        <div class="footer-container">
+    <footer class="footer bg-gray-900 text-gray-300 py-10 mt-10">
+        <div class="footer-container container mx-auto px-4 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0">
+            
+            <!-- Sección "Te puede interesar" -->
             <div class="footer-section">
-                <h4>Te puede interesar</h4>
-                <ul>
-                    <li><a href="#">Acerca de nosotros</a></li>
-                    <li><a href="#">Trabaja con nosotros</a></li>
-                    <li><a href="#">Grupo Banco el dorado</a></li>
-                    <li><a href="#">Centro de Ayuda</a></li>
-                    <li><a href="#">Canales</a></li>
-                    <li><a href="#">Puntos de atención</a></li>
-                    <li><a href="#">Accesibilidad</a></li>
+                <h4 class="text-lg font-semibold mb-4">Te puede interesar</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Acerca de nosotros</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Trabaja con nosotros</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Grupo Banco el dorado</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Centro de Ayuda</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Canales</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Puntos de atención</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Accesibilidad</a></li>
                 </ul>
             </div>
+    
+            <!-- Sección "Legales" -->
             <div class="footer-section">
-                <h4>Legales</h4>
-                <ul>
-                    <li><a href="#">Gobierno Corporativo</a></li>
-                    <li><a href="#">SARLAFT</a></li>
-                    <li><a href="#">Protección de datos</a></li>
-                    <li><a href="#">Términos y Condiciones de uso</a></li>
-                    <li><a href="#">Proceso de licitación de seguros 2023-2025</a></li>
-                    <li><a href="#">Tarifas</a></li>
-                    <li><a href="#">Autorización para tratamiento de datos personales</a></li>
+                <h4 class="text-lg font-semibold mb-4">Legales</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Gobierno Corporativo</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">SARLAFT</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Protección de datos</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Términos y Condiciones de uso</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Proceso de licitación de seguros 2023-2025</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Tarifas</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition-colors">Autorización para tratamiento de datos personales</a></li>
                 </ul>
             </div>
+    
+            <!-- Sección "Contáctanos" -->
             <div class="footer-section">
-                <h4>Contáctanos</h4>
-                <p>Carrera 48 # 26 - 85 Medellín - Colombia</p>
-                <p>Bogotá: +57 (601) 343 0000</p>
-                <p>Medellín: +57 (604) 510 9000</p>
-                <p>Línea gratuita resto del país: 01 8000 9 12345</p>
+                <h4 class="text-lg font-semibold mb-4">Contáctanos</h4>
+                <p class="mb-2">Carrera 48 # 26 - 85 Medellín - Colombia</p>
+                <p class="mb-2">Bogotá: +57 (601) 343 0000</p>
+                <p class="mb-2">Medellín: +57 (604) 510 9000</p>
+                <p class="mb-2">Línea gratuita resto del país: 01 8000 9 12345</p>
                 <p>Línea ética: 01 8000 524499</p>
             </div>
         </div>
-        <div class="footer-bottom">
+    
+        <!-- Línea inferior del footer -->
+        <div class="footer-bottom text-center mt-6 text-sm text-gray-500">
             <p>&copy; 2024 Grupo Banco el dorado. Todos los derechos reservados.</p>
             <p>Productos y servicios de Banca, Fiducia, Banca de Inversión, Financiamiento, además del portafolio ofrecido por las entidades del exterior en Panamá, Estados Unidos y Puerto Rico.</p>
-            <div class="social-media">
-                <a href="#"><img src="{% static 'images/facebook.png' %}" alt="Facebook"></a>
-                <a href="#"><img src="{% static 'images/x.png' %}" alt="Twitter"></a>
-                <a href="#"><img src="{% static 'images/instagram.png' %}" alt="Instagram"></a>
-                <a href="#"><img src="{% static 'images/linked.png' %}" alt="LinkedIn"></a>
+    
+            <!-- Redes sociales -->
+            <div class="social-media flex justify-center space-x-4 mt-4">
+                <a href="#"><img src="{% static 'images/facebook.png' %}" alt="Facebook" class="w-6 h-6 hover:opacity-75 transition-opacity"></a>
+                <a href="#"><img src="{% static 'images/x.png' %}" alt="Twitter" class="w-6 h-6 hover:opacity-75 transition-opacity"></a>
+                <a href="#"><img src="{% static 'images/instagram.png' %}" alt="Instagram" class="w-6 h-6 hover:opacity-75 transition-opacity"></a>
+                <a href="#"><img src="{% static 'images/linked.png' %}" alt="LinkedIn" class="w-6 h-6 hover:opacity-75 transition-opacity"></a>
             </div>
         </div>
     </footer>
     
+    {% if user.is_authenticated %}
     <!-- Botón de ayuda -->
-    <div class="help-button">
-        <a href="https://www.userlike.com/umc/#/inbox/81431049">
-            <img src="{% static 'images/help.png' %}" alt="Ayuda">
+    <div class="help-button fixed bottom-8 right-8 flex items-center justify-center w-16 h-16 bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:scale-105 animate-pulse">
+        <a href="https://www.userlike.com/umc/#/inbox/81431049" target="_blank" rel="noopener noreferrer">
+            <img src="{% static 'images/help.ico' %}" alt="Ayuda" class="w-10 h-10">
         </a>
-        
     </div>
+    {% else %}
+    <!-- Aviso de Validación de Identidad -->
+    <div class="fixed bottom-8 right-8 max-w-sm w-full p-4 bg-white border border-red-200 rounded-lg shadow-lg transform transition-all ease-out duration-300 opacity-100">
+        <div class="flex items-start">
+            <div class="mr-3 text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h.01M12 8h.01M21 12c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8 8 3.582 8 8z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-gray-800">Acceso Restringido</h3>
+                <p class="text-gray-600 mt-1">Para acceder a las herramientas de asesoría, por favor inicia sesión o valida tu identidad.</p>
+            </div>
+            <div class="ml-3">
+                <a href="/login/" class="text-blue-600 font-semibold hover:underline">Iniciar Sesión</a>
+            </div>
+        </div>
+    </div>
+{% endif %}
 
+    
+    
 </body>
 </html>
