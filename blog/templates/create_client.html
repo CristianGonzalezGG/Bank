@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Cliente{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Crear Cliente</h2>
+    <form method="post" enctype="multipart/form-data" class="p-4 border rounded bg-white shadow-sm">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="mb-3">
+            <button type="button" id="capture" class="btn btn-primary">Capturar Imagen</button>
+        </div>
+
+        <div class="mb-3">
+            <video id="video" class="border rounded" width="200" height="150" autoplay></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+        </div>
+
+        <div class="mb-3">
+            <img id="preview" src="" width="200" height="150" style="display:none;" class="border rounded">
+            <input type="hidden" id="image_input" name="image">
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar Cliente</button>
+    </form>
+</div>
+
+<script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const preview = document.getElementById("preview");
+    const captureButton = document.getElementById("capture");
+    const imageInput = document.getElementById("image_input");
+
+    // Acceder a la cámara
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+            window.cameraStream = stream; // Guardamos la referencia para detenerla luego
+        })
+        .catch(err => {
+            console.error("Error al acceder a la cámara:", err);
+        });
+
+    // Capturar imagen
+    captureButton.addEventListener("click", () => {
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convertir la imagen a base64
+        const imageData = canvas.toDataURL("image/png");
+
+        // Mostrar vista previa
+        preview.src = imageData;
+        preview.style.display = "block";
+
+        // Guardar en input hidden
+        imageInput.value = imageData;
+
+        // Apagar la cámara después de capturar la imagen
+        if (window.cameraStream) {
+            window.cameraStream.getTracks().forEach(track => track.stop());
+            video.style.display = "none"; // Ocultar el video
+        }
+    });
+</script>
+
+{% endblock %}

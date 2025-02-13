@@ -1,5 +1,11 @@
 from django import forms
-
+from django import forms
+from .models import Client
+import cv2
+import os
+import base64
+from django.core.files.base import ContentFile
+from django.http import JsonResponse
 from django import forms
 
 class EmailForm(forms.Form):
@@ -14,3 +20,12 @@ class LoanForm(forms.ModelForm):
     class Meta:
         model = Loan
         fields = ['client', 'amount', 'interest_rate', 'repayment_term']
+        
+
+
+class ClientForm(forms.ModelForm):
+    imageSave = forms.ImageField(required=False)
+
+    class Meta:
+        model = Client
+        fields = ['cardId', 'name', 'imageSave', 'email', 'phone_number', 'address']

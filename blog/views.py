@@ -8,12 +8,30 @@ from django.conf import settings
 from .forms import EmailForm
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
 from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django import forms
+from .models import Client
+import cv2
+import os
+import base64
+from django.core.files.base import ContentFile
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+from .forms import ClientForm
 
 
 
 
+
+from django.shortcuts import render
+
+def create_client(request):
+    return render(request, 'create_client.html')
 
 
 @login_required
@@ -115,6 +133,45 @@ def client_list(request):
     clients = Client.objects.all() #Busca todos los clientes que se encuentren, sin verificar estatus
     
     return render(request, 'client/client_list.html', {'clients': clients})
+def create_client(request):
+    if request.method == "POST":
+        form = ClientForm(request.POST, request.FILES)  # Si capturas imagen, usa request.FILES
+        if form.is_valid():
+            form.save()
+            return redirect('blog:client_list')  # Redirigir a la lista de clientes
+    else:
+        form = ClientForm()
+    return render(request, 'create_client.html', {'form': form})
+
+@csrf_exempt
+def capture_image(request):
+    if request.method == "POST":
+        cam = cv2.VideoCapture(0)
+        if not cam.isOpened():
+            return JsonResponse({'error': 'No se pudo abrir la cámara'})
+        ret, frame = cam.read()
+        cam.release()
+
+        if not ret:
+            return JsonResponse({'error': 'No se pudo capturar la imagen'})
+        
+        _, buffer = cv2.imencode('.jpg', frame)
+        image_data = buffer.tobytes()
+        
+        # Convertir la imagen a base64 para previsualización
+        image_base64 = base64.b64encode(image_data).decode('utf-8')
+
+        # Guardar la imagen en un archivo temporal
+        image_file = ContentFile(image_data, name="captured_image.jpg")
+
+        # Crear un nuevo cliente solo para pruebas (puedes eliminar esto después)
+        client = Client.objects.create(name="Cliente Prueba", imageSave=image_file)
+        
+        return JsonResponse({'image_data': image_base64, 'image_url': client.imageSave.url})
+    
+    return JsonResponse({'error': 'Método no permitido'})
+
+
 @login_required
 def client_detail(request, id):
     try:
@@ -140,11 +197,6 @@ def client_detail(request, id):
     
     return render(request, 'client/client_detail.html', {'client': client, 'account_number': account_number, 'model': model,})
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 
 # Vista de registro de usuario
 def register_view(request):

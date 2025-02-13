@@ -6,7 +6,7 @@ class Client(models.Model):
     class Status(models.TextChoices):
         OWE = 'O', 'OWE'
         NODEBT = 'ND', 'NODEBT'
-         
+    cardId = models.CharField(max_length= 10, null= True, blank = True)       
     name = models.CharField(max_length=100)
     image = models.URLField(blank=True)
     imageSave = models.ImageField(blank=True)
