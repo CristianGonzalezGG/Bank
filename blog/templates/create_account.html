@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Cuenta{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-primary">Crear Cuenta para {{ client.name }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Tipo de Cuenta</label>
+            {{ form.account_type }}
+        </div>
+        <button type="submit" class="btn btn-success">Crear Cuenta</button>
+    </form>
+</div>
+{% endblock %}

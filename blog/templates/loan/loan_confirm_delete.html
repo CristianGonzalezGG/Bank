@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Delete Loan</h2>
-<p>Are you sure you want to delete this loan?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, delete</button>
-</form>
-<a href="{% url 'blog:loan_detail' loan.id %}">Cancel</a>
+<div class="container mt-4">
+    <h2 class="mb-4 text-danger">Eliminar Préstamo</h2>
+    <div class="alert alert-warning">
+        <p>¿Estás seguro de que deseas eliminar este préstamo?</p>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
+        <a href="{% url 'blog:loan_detail' loan.id %}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</a>
+    </form>
+</div>
 {% endblock %}

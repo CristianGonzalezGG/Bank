@@ -1,11 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Loan</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary mb-3">Save</button>
-</form>
-<a href="{% url 'blog:loan_list' %}" class="btn btn-danger">Cancel</a>
-
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary">{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Préstamo</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_client" class="form-label">Cliente</label>
+                    {{ form.client }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_amount" class="form-label">Monto</label>
+                    {{ form.amount }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_interest_rate" class="form-label">Tasa de Interés</label>
+                    {{ form.interest_rate }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_repayment_term" class="form-label">Plazo (meses)</label>
+                    {{ form.repayment_term }}
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar</button>
+                <a href="{% url 'blog:loan_list' %}" class="btn btn-danger"><i class="fas fa-times"></i> Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
+

@@ -1,28 +1,49 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Loan Detail</h2>
-
+    <h2 class="mb-4 text-primary">Detalles del Préstamo</h2>
+    
     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">Detalles del Préstamo</h5>
+        <div class="card-header bg-dark text-white">
+            <h5>Información del Cliente</h5>
         </div>
         <div class="card-body">
-            <h6 class="card-title">Información del Cliente</h6>
-            <p class="card-text"><strong>Cliente:</strong> {{ loan.client.name }}</p>
-            <p class="card-text"><strong>Email:</strong> {{ loan.client.email }}</p>
-            <p class="card-text"><strong>Teléfono:</strong> {{ loan.client.phone_number }}</p>
-            <hr>
-            <h6 class="card-title">Detalles del Préstamo</h6>
-            <p class="card-text"><strong>Monto:</strong> ${{ loan.amount }}</p>
-            <p class="card-text"><strong>Interés:</strong> {{ loan.interest }}%</p>
-            <p class="card-text"><strong>Tiempo de Pago:</strong> {{ loan.duration }} meses</p>
-            <p class="card-text"><strong>Estado:</strong> {{ loan.status }}</p>
+            <p><strong>Cliente:</strong> {{ loan.client.name }}</p>
+            <p><strong>Email:</strong> {{ loan.client.email }}</p>
+            <p><strong>Teléfono:</strong> {{ loan.client.phone_number }}</p>
         </div>
-        <div class="card-footer text-right">
-            <a href="{% url 'blog:loan_list' %}" class="btn btn-secondary">Volver a la lista de Préstamos</a>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header bg-dark text-white">
+            <h5>Detalles del Préstamo</h5>
         </div>
+        <div class="card-body">
+            <p><strong>Monto:</strong> ${{ loan.amount }}</p>
+            <p><strong>Interés:</strong> {{ loan.interest_rate }}%</p>
+            <p><strong>Plazo:</strong> {{ loan.repayment_term }} meses</p>
+            <p><strong>Estado:</strong> 
+                <span class="badge {% if loan.status == 'Pagado' %}badge-success{% else %}badge-warning{% endif %}">
+                    {{ loan.status }}
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{% url 'blog:loan_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+
+        {% if prestamo.monto_restante == 0 %}
+        <a href="{% url 'generar_paz_y_salvo' prestamo.id %}" class="btn btn-success">
+            Generar Paz y Salvo
+        </a>
+    
+        {% else %}
+            <p class="text-warning">Este préstamo aún no ha sido pagado completamente.</p>
+        {% endif %}
+    
     </div>
 </div>
 {% endblock %}

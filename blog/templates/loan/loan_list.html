@@ -1,15 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h2>Loans</h2>
-    <a href="{% url 'blog:loan_create' %}" class="btn btn-primary mb-3">Create New Loan</a>
-    <ul class="list-group">
-        {% for loan in loans %}
-            <li class="list-group-item">
-                <a href="{% url 'blog:loan_detail' loan.id %}">Loan for {{ loan.client.name }} - ${{ loan.amount }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+<div class="container py-4">
+    <h2 class="mb-4 text-primary">Listado de Préstamos</h2>
+    <a href="{% url 'blog:loan_create' %}" class="btn btn-success mb-3">Nuevo Préstamo</a>
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Cliente</th>
+                    <th>Monto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in loans %}
+                <tr>
+                    <td>{{ loan.client.name }}</td>
+                    <td>${{ loan.amount }}</td>
+                    <td>{{ loan.status }}</td>
+                    <td>
+                        <a href="{% url 'blog:loan_detail' loan.id %}" class="btn btn-info btn-sm">Ver</a>
+                        <a href="{% url 'blog:loan_update' loan.id %}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{% url 'blog:loan_delete' loan.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay préstamos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

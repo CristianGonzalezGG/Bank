@@ -29,3 +29,14 @@ class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
         fields = ['cardId', 'name', 'imageSave', 'email', 'phone_number', 'address']
+
+from django import forms
+from .models import Account
+
+class AccountForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ['account_type']
+        widgets = {
+            'account_type': forms.Select(attrs={'class': 'form-select'}),
+        }

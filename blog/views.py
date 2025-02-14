@@ -24,9 +24,45 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from .forms import ClientForm
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Client, Account
+from .forms import AccountForm
 
+@login_required
+def search_client(request):
+    query = request.GET.get('cardId', '')  
+    client = None
+    account = None
 
+    if query:
+        try:
+            client = Client.objects.get(cardId=query)
+            if hasattr(client, 'account'):
+                account = client.account
+        except Client.DoesNotExist:
+            client = None
 
+    return render(request, 'card_info.html', {'client': client, 'account': account, 'query': query})
+
+@login_required
+def create_account(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    
+    if hasattr(client, 'account'):
+        return redirect('blog:search_client')  
+
+    if request.method == "POST":
+        form = AccountForm(request.POST)
+        if form.is_valid():
+            account = form.save(commit=False)
+            account.client = client
+            account.save()
+            return redirect('blog:search_client')
+    else:
+        form = AccountForm()
+
+    return render(request, 'create_account.html', {'form': form, 'client': client})
 
 from django.shortcuts import render
 
@@ -283,3 +319,32 @@ def loan_delete(request, id):
         loan.delete()
         return redirect('blog:loan_list')
     return render(request, 'loan/loan_confirm_delete.html', {'loan': loan})
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from .models import Prestamo
+
+def generar_paz_y_salvo(request, prestamo_id):
+    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
+
+    if not prestamo.esta_pagado():
+        return HttpResponse("El préstamo aún no está pagado en su totalidad.", status=400)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="paz_y_salvo_{prestamo.cliente.nombre}.pdf"'
+
+    p = canvas.Canvas(response)
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(100, 750, "BANCO SIMULADO")
+    p.drawString(100, 730, "CERTIFICADO DE PAZ Y SALVO")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(100, 700, f"Cliente: {prestamo.cliente.nombre}")
+    p.drawString(100, 680, f"Monto Total: ${prestamo.monto_total}")
+    p.drawString(100, 660, f"Fecha de Solicitud: {prestamo.fecha_solicitud}")
+    p.drawString(100, 640, "Estado: PAGADO EN SU TOTALIDAD")
+    
+    p.showPage()
+    p.save()
+    return response

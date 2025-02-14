@@ -3,49 +3,32 @@
 
 {% block title %}Información tarjeta{% endblock %}
 {% block content %}
-    <div class="container mt-5">
-        <h1>Buscar Información de la Tarjeta</h1>
+<div class="container mt-5">
+    <form class="d-flex" method="GET" action="{% url 'blog:search_client' %}">
+        <input class="form-control me-2" type="text" name="cardId" placeholder="Ingrese cédula (cardId)" value="{{ query }}">
+        <button class="btn btn-primary" type="submit">Buscar</button>
+    </form>
 
-        <!-- Formulario para ingresar el número BIN -->
-        <form method="POST" class="mb-4">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="bin_number" class="form-label">Introduce el Número BIN (6-8 dígitos):</label>
-                <input type="text" class="form-control" id="bin_number" name="bin_number" placeholder="Ej. 457173" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </form>
+    {% if client %}
+        <div class="mt-4">
+            <h2 class="text-success">Cliente encontrado</h2>
+            <p><strong>Nombre:</strong> {{ client.name }}</p>
+            <p><strong>Email:</strong> {{ client.email }}</p>
+            <p><strong>Teléfono:</strong> {{ client.phone_number }}</p>
 
-        <!-- Mostrar error si existe -->
-        {% if error %}
-            <p class="alert alert-danger">{{ error }}</p>
-        {% endif %}
-
-        <!-- Mostrar datos de la tarjeta si existen -->
-        {% if card_data %}
-            <div class="card-info mb-4">
-                <h3>Detalles de la Tarjeta:</h3>
-                <p><strong>Esquema:</strong> {{ card_data.scheme|default:"No disponible" }}</p>
-                <p><strong>Marca:</strong> {{ card_data.brand|default:"No disponible" }}</p>
-                <p><strong>Tipo:</strong> {{ card_data.type|default:"No disponible" }}</p>
-                <p><strong>Prepagada:</strong> {% if card_data.prepaid %}Sí{% else %}No{% endif %}</p>
-            </div>
-
-            <div class="card-info mb-4">
-                <h3>Detalles del País:</h3>
-                <p><strong>País:</strong> {{ card_data.country.name|default:"No disponible" }}</p>
-                <p><strong>Moneda:</strong> {{ card_data.country.currency|default:"No disponible" }}</p>
-                <p><strong>Emoji:</strong> {{ card_data.country.emoji|default:"No disponible" }}</p>
-            </div>
-
-            <div class="card-info mb-4">
-                <h3>Detalles del Banco:</h3>
-                <p><strong>Nombre del Banco:</strong> {{ card_data.bank.name|default:"No disponible" }}</p>
-                <p><strong>Sitio Web:</strong> <a href="http://{{ card_data.bank.url }}" target="_blank">{{ card_data.bank.url|default:"No disponible" }}</a></p>
-                <p><strong>Teléfono:</strong> {{ card_data.bank.phone|default:"No disponible" }}</p>
-                <p><strong>Ciudad:</strong> {{ card_data.bank.city|default:"No disponible" }}</p>
-            </div>
-        {% endif %}
-    </div>
+            {% if account %}
+                <h3 class="text-primary">Cuenta Asociada</h3>
+                <p><strong>Número de Cuenta:</strong> {{ account.numberAccount }}</p>
+                <p><strong>Tipo de Cuenta:</strong> {{ account.get_account_type_display }}</p>
+                <p><strong>Tarjeta Débito:</strong> {{ account.debit_card_number }} (Vence: {{ account.debit_expiration_date }})</p>
+                <p><strong>Tarjeta Crédito:</strong> {{ account.credit_card_number }} (Vence: {{ account.credit_expiration_date }})</p>
+            {% else %}
+                <p class="text-danger">Este cliente no tiene cuentas asociadas.</p>
+                <a href="{% url 'blog:create_account' client.id %}" class="btn btn-success">Crear Cuenta</a>
+            {% endif %}
+        </div>
+    {% elif query %}
+        <p class="text-danger">No se encontró ningún cliente con la cédula ingresada.</p>
+    {% endif %}
+</div>
 {% endblock %}
-
