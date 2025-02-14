@@ -12,7 +12,9 @@
 
       <!-- Client Image Section -->
       <div class="client-image flex items-center justify-center">
-         <img src="{{ client.image }}" class="w-40 h-40 rounded-full object-cover shadow-lg" alt="{{ client.name }}"> 
+         {% if client.imageSave %}
+            <img src="{{ client.imageSave.url }}" alt="Foto del cliente" class="w-40 h-40 rounded-full object-cover shadow-lg" style="max-width: 300px;">
+         {% endif %}
       </div>
 
       <!-- Contact Button -->

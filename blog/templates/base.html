@@ -2,172 +2,687 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Panel de Administración - Banco{% endblock %}</title>
-    <link href="{% static 'css/body.css' %}" rel="stylesheet">
-    <link href="{% static 'css/adminw.css' %}" rel="stylesheet">
+    <title>{% block title %}Banco El Dorado{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <link href="{% static 'css/chatbot.css' %}" rel="stylesheet"> <!-- Estilos del chatbot -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #1a3b5c;
+            --secondary-color: #ffd700;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #0a1f33;
+            --transition-speed: 0.3s;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --hover-transform: translateY(-3px);
+            --spacing-unit: 1rem;
+            --footer-bg: #0a1f33;
+            --footer-secondary-bg: #142c44;
+            --footer-text: #ffffff;
+            --footer-text-muted: #a3b8cc;
+            --footer-link-hover: #ffd700;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            padding-top: 80px; /* Espacio para la navbar fija */
+        }
+
+        .navbar {
+            backdrop-filter: blur(10px);
+            background-color: rgba(26, 59, 92, 0.95) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            color: var(--secondary-color) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: white !important;
+            padding: 0.5rem 1rem !important;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-color);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .main-container {
+            min-height: calc(100vh - 160px); /* Altura total menos header y footer */
+            padding: var(--spacing-unit) 0;
+        }
+
+        .card {
+            transition: all var(--transition-speed) ease;
+            border: none;
+            box-shadow: var(--box-shadow);
+            margin-bottom: var(--spacing-unit);
+            border-radius: 8px;
+            transform: translateY(0);
+        }
+
+        .card:hover {
+            transform: var(--hover-transform);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px 8px 0 0 !important;
+            padding: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #2a4b6c;
+            border-color: #2a4b6c;
+        }
+
+        .table {
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            transform: scale(1.01);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 1.5rem 0;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary-color), #ff9500);
+        }
+
+        .footer .text-white-50 {
+            color: var(--footer-text-muted) !important;
+        }
+
+        .footer h5 {
+            color: var(--footer-text);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer h5::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--secondary-color);
+        }
+
+        .footer .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background-color: var(--footer-secondary-bg);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+        }
+
+        .footer .social-links a:hover {
+            background-color: var(--secondary-color);
+            color: var(--footer-bg) !important;
+            transform: translateY(-3px);
+        }
+
+        .footer ul li a {
+            color: var(--footer-text-muted);
+            transition: all 0.3s ease;
+            display: inline-block;
+            padding: 0.2rem 0;
+        }
+
+        .footer ul li a:hover {
+            color: var(--footer-link-hover) !important;
+            transform: translateX(5px);
+            text-decoration: none;
+        }
+
+        .footer hr {
+            border-color: var(--footer-secondary-bg);
+            opacity: 0.3;
+            margin: 2rem 0;
+        }
+
+        .footer .contact-info li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .footer .contact-info i {
+            color: var(--secondary-color);
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .footer .bottom-footer {
+            background-color: var(--footer-secondary-bg);
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+
+        .footer .bottom-footer p {
+            margin: 0;
+            color: var(--footer-text-muted);
+        }
+
+        /* Espaciado consistente */
+        .section-padding {
+            padding: 2rem 0;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem !important;
+        }
+
+        .mt-4 {
+            margin-top: 1.5rem !important;
+        }
+
+        /* Mejoras para formularios */
+        .form-control {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .form-control:focus {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 6px rgba(26, 59, 92, 0.1);
+        }
+
+        /* Mejoras para tablas responsivas */
+        .table-responsive {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+
+        /* Badges y estados */
+        .badge {
+            padding: 0.5em 0.75em;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: scale(1.1);
+        }
+
+        /* Contenedor principal con padding */
+        .content-wrapper {
+            padding: 2rem 0;
+        }
+
+        /* Media queries para responsividad */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 60px;
+            }
+
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .footer .col-md-6 {
+                text-align: center !important;
+                margin-bottom: 1rem;
+            }
+            
+            .footer h5 {
+                margin-top: 1.5rem;
+            }
+
+            .footer h5::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Animaciones Generales */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Botones Mejorados */
+        .btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.fade-out {
+            opacity: 0;
+        }
+
+        /* Scrollbar Personalizada */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #15304d;
+        }
+
+        /* Alerts Mejorados */
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Efectos de Hover para Enlaces */
+        a {
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: var(--secondary-color);
+        }
+
+        /* Botón de ayuda Userlike */
+        .help-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: var(--primary-color);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .help-button {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="bg-white shadow-lg">
-        <div class="top-menu bg-gray-100 text-gray-500 text-sm py-2">
-            <div class="container mx-auto flex justify-end space-x-6">
-                <a href="/asesores/" class="hover:text-gray-800 transition-colors">Asesores</a>
-                <a href="/negocios/" class="hover:text-gray-800 transition-colors">Negocios</a>
-                <a href="/pqr/" class="hover:text-gray-800 transition-colors">PQR</a>
-                <a href="/blog/" class="hover:text-gray-800 transition-colors">Blog</a>
-            </div>
-        </div>
-    
-        <div class="container mx-auto flex justify-between items-center py-4 px-4 md:px-0">
-            <!-- Logo -->
-            <div class="flex items-center">
-                <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-12 w-auto">
-            </div>
-    
-            <!-- Navegación principal -->
-            <nav class="hidden md:flex space-x-8 text-gray-700">
-                <a href="/" class="font-medium hover:text-blue-500 transition-colors">Inicio</a>
-                <a href="/clients/" class="font-medium hover:text-blue-500 transition-colors">Clientes</a>
-                <a href="/check-bin/" class="font-medium hover:text-blue-500 transition-colors">cuentas</a>
-                <a href="/educacion/" class="font-medium hover:text-blue-500 transition-colors relative">
-                    Educación Financiera
-                    <ul class="absolute hidden group-hover:block bg-white shadow-lg mt-2 py-2 w-48 text-gray-600 text-sm rounded-md">
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Submenú 1</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Submenú 2</a></li>
-                    </ul>
-                </a>
-                <a href="/loans/" class="font-medium hover:text-blue-500 transition-colors">Prestamos</a>
-            </nav>
-    
-            <!-- Botón de acción -->
-            <div class="flex items-center space-x-4">
-                {% if user.is_authenticated %}
-                    <a href="/logout/" class="px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition">Cerrar Sesión</a>
-                {% else %}
-                    <a href="/login/" class="px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition">Entrar</a>
-                {% endif %}
-            </div>
-    
-            <!-- Menú móvil -->
-            <button class="md:hidden text-gray-700 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <i class="fas fa-bars text-2xl"></i>
+    <!-- Navbar fija -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'blog:home' %}">
+                <i class="fas fa-university"></i> Banco El Dorado
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
             </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <!-- Gestión de Clientes -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="clientesDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-users"></i> Clientes
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:client_list' %}">Lista de Clientes</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:create_client' %}">Nuevo Cliente</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:search_client' %}">Buscar Cliente</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Gestión de Cuentas -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="cuentasDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-piggy-bank"></i> Cuentas
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:client_list' %}">Gestionar Cuentas</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:bin_lookup' %}">Verificar Tarjeta</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Gestión de Préstamos -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="prestamosDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-money-bill-wave"></i> Préstamos
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:loan_list' %}">Lista de Préstamos</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:loan_create' %}">Nuevo Préstamo</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Servicios -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="serviciosDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-concierge-bell"></i> Servicios
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:tramites' %}">Trámites Digitales</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:pqr' %}">PQR</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:blog' %}">Blog</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Información -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="infoDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-info-circle"></i> Información
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:educacion' %}">Educación Financiera</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:negocios' %}">Negocios</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:asesores' %}">Asesores</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Usuario -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'blog:login' %}">
+                                <i class="fas fa-sign-in-alt"></i> Ingresar
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'blog:register' %}">
+                                <i class="fas fa-user-plus"></i> Registrarse
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-    </header>
-    
-    
-    {% if messages %}
-    <div class="container mt-4">
-        {% for message in messages %}
-        <div class="alert {{ message.tags }}">
-            {{ message }}
+    </nav>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    <div id="content">
-        {% block content %}
-        <h2>Bienvenido, {{ user.username }}</h2>
-        <p>Seleccione una opción del menú para comenzar.</p>
-        {% endblock %}
     </div>
 
-    <footer class="footer bg-gray-900 text-gray-300 py-10 mt-10">
-        <div class="footer-container container mx-auto px-4 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0">
-            
-            <!-- Sección "Te puede interesar" -->
-            <div class="footer-section">
-                <h4 class="text-lg font-semibold mb-4">Te puede interesar</h4>
-                <ul class="space-y-2">
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Acerca de nosotros</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Trabaja con nosotros</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Grupo Banco el dorado</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Centro de Ayuda</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Canales</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Puntos de atención</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Accesibilidad</a></li>
-                </ul>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <!-- Columna 1: Información del Banco -->
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="text-white mb-3">Banco El Dorado</h5>
+                    <p class="small text-white-50">
+                        Comprometidos con el desarrollo financiero de nuestros clientes desde 1995.
+                    </p>
+                    <div class="social-links mt-3">
+                        <a href="#" class="me-2 text-white" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="me-2 text-white" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="me-2 text-white" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="me-2 text-white" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Columna 2: Enlaces Rápidos -->
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="text-white mb-3">Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'blog:tramites' %}" class="text-white-50 text-decoration-none">Trámites Digitales</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'blog:pqr' %}" class="text-white-50 text-decoration-none">PQR</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'blog:educacion' %}" class="text-white-50 text-decoration-none">Educación Financiera</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'blog:blog' %}" class="text-white-50 text-decoration-none">Blog</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Legal -->
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="text-white mb-3">Legal</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="#" class="text-white-50 text-decoration-none">Términos y Condiciones</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white-50 text-decoration-none">Política de Privacidad</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white-50 text-decoration-none">Seguridad</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white-50 text-decoration-none">Información Legal</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Columna 4: Contacto -->
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="text-white mb-3">Contacto</h5>
+                    <ul class="list-unstyled text-white-50">
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i> Calle Principal #123, Ciudad
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2"></i> (123) 456-7890
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2"></i> info@bancoeldorado.com
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock me-2"></i> Lun - Vie: 8:00 AM - 5:00 PM
+                        </li>
+                    </ul>
+                </div>
             </div>
-    
-            <!-- Sección "Legales" -->
-            <div class="footer-section">
-                <h4 class="text-lg font-semibold mb-4">Legales</h4>
-                <ul class="space-y-2">
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Gobierno Corporativo</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">SARLAFT</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Protección de datos</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Términos y Condiciones de uso</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Proceso de licitación de seguros 2023-2025</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Tarifas</a></li>
-                    <li><a href="#" class="hover:text-blue-400 transition-colors">Autorización para tratamiento de datos personales</a></li>
-                </ul>
-            </div>
-    
-            <!-- Sección "Contáctanos" -->
-            <div class="footer-section">
-                <h4 class="text-lg font-semibold mb-4">Contáctanos</h4>
-                <p class="mb-2">Carrera 48 # 26 - 85 Medellín - Colombia</p>
-                <p class="mb-2">Bogotá: +57 (601) 343 0000</p>
-                <p class="mb-2">Medellín: +57 (604) 510 9000</p>
-                <p class="mb-2">Línea gratuita resto del país: 01 8000 9 12345</p>
-                <p>Línea ética: 01 8000 524499</p>
-            </div>
-        </div>
-    
-        <!-- Línea inferior del footer -->
-        <div class="footer-bottom text-center mt-6 text-sm text-gray-500">
-            <p>&copy; 2024 Grupo Banco el dorado. Todos los derechos reservados.</p>
-            <p>Productos y servicios de Banca, Fiducia, Banca de Inversión, Financiamiento, además del portafolio ofrecido por las entidades del exterior en Panamá, Estados Unidos y Puerto Rico.</p>
-    
-            <!-- Redes sociales -->
-            <div class="social-media flex justify-center space-x-4 mt-4">
-                <a href="#"><img src="{% static 'images/facebook.png' %}" alt="Facebook" class="w-6 h-6 hover:opacity-75 transition-opacity"></a>
-                <a href="#"><img src="{% static 'images/x.png' %}" alt="Twitter" class="w-6 h-6 hover:opacity-75 transition-opacity"></a>
-                <a href="#"><img src="{% static 'images/instagram.png' %}" alt="Instagram" class="w-6 h-6 hover:opacity-75 transition-opacity"></a>
-                <a href="#"><img src="{% static 'images/linked.png' %}" alt="LinkedIn" class="w-6 h-6 hover:opacity-75 transition-opacity"></a>
+
+            <!-- Bottom Footer -->
+            <div class="bottom-footer mt-4">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 text-white-50 small">
+                        &copy; {% now "Y" %} Banco El Dorado. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0 text-white-50 small">
+                        Vigilado por Superintendencia Financiera de Colombia
+                    </p>
+                </div>
             </div>
         </div>
     </footer>
-    
-    {% if user.is_authenticated %}
-    <!-- Botón de ayuda -->
-    <div class="help-button fixed bottom-8 right-8 flex items-center justify-center w-16 h-16 bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:scale-105 animate-pulse">
+
+    <!-- Botón de ayuda Userlike -->
+    <div class="help-button">
         <a href="https://www.userlike.com/umc/#/inbox/81431049" target="_blank" rel="noopener noreferrer">
             <img src="{% static 'images/help.ico' %}" alt="Ayuda" class="w-10 h-10">
         </a>
     </div>
-    {% else %}
-    <!-- Aviso de Validación de Identidad -->
-    <div class="fixed bottom-8 right-8 max-w-sm w-full p-4 bg-white border border-red-200 rounded-lg shadow-lg transform transition-all ease-out duration-300 opacity-100">
-        <div class="flex items-start">
-            <div class="mr-3 text-red-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h.01M12 8h.01M21 12c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8 8 3.582 8 8z" />
-                </svg>
-            </div>
-            <div class="flex-1">
-                <h3 class="text-lg font-semibold text-gray-800">Acceso Restringido</h3>
-                <p class="text-gray-600 mt-1">Para acceder a las herramientas de asesoría, por favor inicia sesión o valida tu identidad.</p>
-            </div>
-            <div class="ml-3">
-                <a href="/login/" class="text-blue-600 font-semibold hover:underline">Iniciar Sesión</a>
-            </div>
-        </div>
-    </div>
-{% endif %}
 
-    
-    
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

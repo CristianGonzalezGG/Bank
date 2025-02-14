@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary">Registrar Pago - Préstamo</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5>Información del Préstamo</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Cliente:</strong> {{ loan.client.name }}</p>
+            <p><strong>Monto Original:</strong> ${{ loan.amount }}</p>
+            <p><strong>Saldo Restante:</strong> ${{ loan.remaining_balance }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="payment_amount" class="form-label">Monto del Pago</label>
+                    <input type="number" step="0.01" class="form-control" id="payment_amount" name="payment_amount" required>
+                    <div class="form-text">El monto máximo a pagar es ${{ loan.remaining_balance }}</div>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-money-bill-wave"></i> Registrar Pago
+                </button>
+                <a href="{% url 'blog:loan_detail' loan.id %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

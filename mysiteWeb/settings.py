@@ -21,7 +21,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Configuración de archivos multimedia
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Configuración de archivos estáticos (CSS, JavaScript)
 STATIC_URL = '/static/'
@@ -147,5 +148,16 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'asesoresbancoeldorado@gmail.com'  
-EMAIL_HOST_PASSWORD = 'pmzy doom zoxu rjfi'  
+EMAIL_HOST_USER = 'asesoresbancoeldorado@gmail.com'
+EMAIL_HOST_PASSWORD = 'pmzy doom zoxu rjfi'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Configuración para los certificados
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+# Configuración de WKHTMLTOPDF
+WKHTMLTOPDF_CMD = '/usr/bin/wkhtmltopdf'  # Ajusta esta ruta según tu sistema
+WKHTMLTOPDF_CMD_OPTIONS = {
+    'quiet': True,
+} 

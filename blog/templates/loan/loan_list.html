@@ -3,7 +3,9 @@
 {% block content %}
 <div class="container py-4">
     <h2 class="mb-4 text-primary">Listado de Préstamos</h2>
-    <a href="{% url 'blog:loan_create' %}" class="btn btn-success mb-3">Nuevo Préstamo</a>
+    <a href="{% url 'blog:loan_create' %}" class="btn btn-success mb-3">
+        <i class="fas fa-plus"></i> Nuevo Préstamo
+    </a>
     
     <div class="table-responsive">
         <table class="table table-striped table-hover">
@@ -11,6 +13,7 @@
                 <tr>
                     <th>Cliente</th>
                     <th>Monto</th>
+                    <th>Saldo Restante</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -20,16 +23,29 @@
                 <tr>
                     <td>{{ loan.client.name }}</td>
                     <td>${{ loan.amount }}</td>
-                    <td>{{ loan.status }}</td>
+                    <td>${{ loan.remaining_balance }}</td>
                     <td>
-                        <a href="{% url 'blog:loan_detail' loan.id %}" class="btn btn-info btn-sm">Ver</a>
-                        <a href="{% url 'blog:loan_update' loan.id %}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="{% url 'blog:loan_delete' loan.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        <span class="badge {% if loan.status == 'PAID' %}bg-success
+                                         {% elif loan.status == 'PENDING' %}bg-warning
+                                         {% else %}bg-primary{% endif %}">
+                            {{ loan.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'blog:loan_detail' loan.id %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'blog:loan_update' loan.id %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'blog:loan_delete' loan.id %}" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center">No hay préstamos registrados.</td>
+                    <td colspan="5" class="text-center">No hay préstamos registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>

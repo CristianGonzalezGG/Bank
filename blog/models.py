@@ -1,5 +1,13 @@
+from django.core.mail import EmailMessage
 from django.db import models
+from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.timezone import now
+from datetime import datetime, timedelta
+import os
+import pdfkit
+import random
+from django.conf import settings
 
 class Client(models.Model):
     
@@ -8,8 +16,8 @@ class Client(models.Model):
         NODEBT = 'ND', 'NODEBT'
     cardId = models.CharField(max_length= 10, null= True, blank = True)       
     name = models.CharField(max_length=100)
-    image = models.URLField(blank=True)
-    imageSave = models.ImageField(blank=True)
+    image = models.ImageField(upload_to='client_photos/', blank=True, null=True)
+    imageSave = models.ImageField(upload_to='client_photos/', blank=True, null=True)
     email = models.EmailField()
     phone_number = models.CharField(max_length=15)
     address = models.CharField(max_length=200)
@@ -44,16 +52,6 @@ class Client(models.Model):
             return self.account.account_type
         except Account.DoesNotExist:
             return 'NOT TYPE'
-
-import random
-from django.db import models
-from django.urls import reverse
-from datetime import datetime, timedelta
-
-import random
-from datetime import datetime, timedelta
-from django.db import models
-from django.urls import reverse
 
 class Account(models.Model):
     class Status(models.TextChoices):
@@ -131,74 +129,97 @@ class Account(models.Model):
                not Account.objects.filter(debit_card_number=card_number).exists():
                 return card_number
 
-
-from django.db import models
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
-from django.utils.timezone import now
-from django.urls import reverse
-import pdfkit
-import os
-
 class Loan(models.Model):
     STATUS_CHOICES = [
-        ('PENDING', 'Pending'),
-        ('ONGOING', 'Ongoing'),
-        ('PAID', 'Paid')
+        ('PENDING', 'Pendiente'),
+        ('ONGOING', 'En Curso'),
+        ('PAID', 'Pagado')
     ]
-
-    client = models.ForeignKey("Client", on_delete=models.CASCADE, related_name='loans')
+    
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='loans')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
     repayment_term = models.IntegerField(help_text="Número de meses para el reembolso")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    remaining_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    remaining_balance = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
     def save(self, *args, **kwargs):
-        """Asegura que el saldo restante no sea negativo y cambia el estado cuando sea 0."""
-        if self.remaining_balance < 0:
+        if not self.pk:
+            self.remaining_balance = self.amount
+        
+        if self.remaining_balance <= 0:
             self.remaining_balance = 0
-        if self.remaining_balance == 0:
             self.status = 'PAID'
+        elif self.remaining_balance < self.amount:
+            self.status = 'ONGOING'
+        
         super().save(*args, **kwargs)
 
     def register_payment(self, amount):
-        """Resta el pago al saldo restante y cambia el estado si se paga completamente."""
         if amount > 0:
-            self.remaining_balance -= amount
-            if self.remaining_balance <= 0:
-                self.remaining_balance = 0
-                self.status = 'PAID'
-                self.save()
-                self.generate_certificate()
-            else:
-                self.status = 'ONGOING'
-                self.save()
+            self.remaining_balance = max(0, self.remaining_balance - amount)
+            Payment.objects.create(loan=self, amount=amount)
+            self.save()
 
     def generate_certificate(self):
-        """Genera un certificado de paz y salvo en PDF y lo envía por correo."""
-        context = {
-            'client': self.client,
-            'loan': self,
-            'date': now().date()
-        }
-        pdf_path = f"media/certificates/certificate_{self.id}.pdf"
-        os.makedirs(os.path.dirname(pdf_path), exist_ok=True)  # Crea el directorio si no existe
-        html_string = render_to_string('loan/certificate_template.html', context)
-        pdfkit.from_string(html_string, pdf_path)
-
-        self.send_certificate_email(pdf_path)
+        """Genera un certificado de paz y salvo"""
+        if self.status == 'PAID':
+            try:
+                context = {
+                    'client': self.client,
+                    'loan': self,
+                    'date': now().date()
+                }
+                
+                # Asegúrate de que el directorio existe
+                certificate_dir = os.path.join(settings.MEDIA_ROOT, 'certificates')
+                os.makedirs(certificate_dir, exist_ok=True)
+                
+                pdf_path = os.path.join(certificate_dir, f'certificate_{self.id}.pdf')
+                
+                # Renderiza el template HTML
+                html_string = render_to_string('loan/certificate_template.html', context)
+                
+                # Configuración de pdfkit
+                options = {
+                    'page-size': 'Letter',
+                    'margin-top': '0.75in',
+                    'margin-right': '0.75in',
+                    'margin-bottom': '0.75in',
+                    'margin-left': '0.75in',
+                    'encoding': "UTF-8",
+                    'no-outline': None
+                }
+                
+                # Genera el PDF
+                config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')  # Ajusta esta ruta según tu sistema
+                pdfkit.from_string(html_string, pdf_path, options=options, configuration=config)
+                
+                # Envía el certificado por correo
+                self.send_certificate_email(pdf_path)
+                
+                return pdf_path
+            except Exception as e:
+                print(f"Error generando el certificado: {str(e)}")
+                return None
+        return None
 
     def send_certificate_email(self, pdf_path):
-        """Envía el certificado por correo electrónico al cliente."""
+        """Envía el certificado por correo electrónico"""
+        subject = 'Certificado de Paz y Salvo - Banco El Dorado'
+        message = f'Estimado {self.client.name},\n\nAdjunto encontrará su certificado de paz y salvo.'
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [self.client.email]
+        
         email = EmailMessage(
-            'Certificado de Paz y Salvo',
-            'Adjunto encontrará su certificado de paz y salvo.',
-            'asesoresbancoeldorado@gmail.com',
-            [self.client.email]
+            subject=subject,
+            body=message,
+            from_email=from_email,
+            to=recipient_list
         )
+        
         email.attach_file(pdf_path)
         email.send()
 
@@ -206,4 +227,17 @@ class Loan(models.Model):
         return reverse('blog:loan_detail', args=[str(self.id)])
 
     def __str__(self):
-        return f"Loan for {self.client.name} - ${self.amount}"
+        return f"Préstamo de {self.client.name} - ${self.amount}"
+
+    def get_payment_history(self):
+        """Obtiene el historial de pagos ordenado por fecha"""
+        return self.payments.all().order_by('-payment_date')
+
+# Movemos la clase Payment después de Loan
+class Payment(models.Model):
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, related_name='payments')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Pago de ${self.amount} para préstamo de {self.loan.client.name}"

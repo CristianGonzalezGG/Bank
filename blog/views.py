@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.contrib.auth import logout
 from .models import Client, Account
 import requests
@@ -28,6 +28,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Client, Account
 from .forms import AccountForm
+from .models import Loan
+from .forms import LoanForm
+from django.utils import timezone
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+from django.conf import settings
+import pdfkit
+from decimal import Decimal
 
 @login_required
 def search_client(request):
@@ -181,31 +189,45 @@ def create_client(request):
 
 @csrf_exempt
 def capture_image(request):
-    if request.method == "POST":
-        cam = cv2.VideoCapture(0)
-        if not cam.isOpened():
-            return JsonResponse({'error': 'No se pudo abrir la cámara'})
-        ret, frame = cam.read()
-        cam.release()
-
-        if not ret:
-            return JsonResponse({'error': 'No se pudo capturar la imagen'})
-        
-        _, buffer = cv2.imencode('.jpg', frame)
-        image_data = buffer.tobytes()
-        
-        # Convertir la imagen a base64 para previsualización
-        image_base64 = base64.b64encode(image_data).decode('utf-8')
-
-        # Guardar la imagen en un archivo temporal
-        image_file = ContentFile(image_data, name="captured_image.jpg")
-
-        # Crear un nuevo cliente solo para pruebas (puedes eliminar esto después)
-        client = Client.objects.create(name="Cliente Prueba", imageSave=image_file)
-        
-        return JsonResponse({'image_data': image_base64, 'image_url': client.imageSave.url})
+    if request.method == 'POST':
+        try:
+            # Obtener los datos de la imagen
+            image_data = request.POST.get('imageData')
+            client_id = request.POST.get('clientId')
+            
+            if not image_data or not client_id:
+                return JsonResponse({'error': 'Datos incompletos'}, status=400)
+            
+            # Obtener el cliente
+            client = get_object_or_404(Client, id=client_id)
+            
+            # Convertir la data URI a imagen
+            format, imgstr = image_data.split(';base64,')
+            ext = format.split('/')[-1]
+            
+            # Crear un archivo temporal
+            from django.core.files.base import ContentFile
+            image_content = ContentFile(base64.b64decode(imgstr))
+            
+            # Generar un nombre único para el archivo
+            import uuid
+            file_name = f'client_photo_{uuid.uuid4()}.{ext}'
+            
+            # Guardar la imagen
+            client.imageSave.save(file_name, image_content, save=True)
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Imagen guardada correctamente',
+                'image_url': client.imageSave.url
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'error': str(e)
+            }, status=500)
     
-    return JsonResponse({'error': 'Método no permitido'})
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 @login_required
@@ -275,13 +297,14 @@ def logout_view(request):
     return redirect('blog:home') 
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from .models import Loan
 from .forms import LoanForm
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def loan_list(request):
-    loans = Loan.objects.all()
+    loans = Loan.objects.all().select_related('client')
     return render(request, 'loan/loan_list.html', {'loans': loans})
 
 @login_required
@@ -294,8 +317,9 @@ def loan_create(request):
     if request.method == 'POST':
         form = LoanForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('blog:loan_list')
+            loan = form.save()
+            messages.success(request, 'Préstamo creado exitosamente.')
+            return redirect('blog:loan_detail', id=loan.id)
     else:
         form = LoanForm()
     return render(request, 'loan/loan_form.html', {'form': form})
@@ -306,8 +330,9 @@ def loan_update(request, id):
     if request.method == 'POST':
         form = LoanForm(request.POST, instance=loan)
         if form.is_valid():
-            form.save()
-            return redirect('blog:loan_detail', id=id)
+            loan = form.save()
+            messages.success(request, 'Préstamo actualizado exitosamente.')
+            return redirect('blog:loan_detail', id=loan.id)
     else:
         form = LoanForm(instance=loan)
     return render(request, 'loan/loan_form.html', {'form': form})
@@ -317,34 +342,46 @@ def loan_delete(request, id):
     loan = get_object_or_404(Loan, id=id)
     if request.method == 'POST':
         loan.delete()
+        messages.success(request, 'Préstamo eliminado exitosamente.')
         return redirect('blog:loan_list')
     return render(request, 'loan/loan_confirm_delete.html', {'loan': loan})
 
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
-from reportlab.pdfgen import canvas
-from .models import Prestamo
-
-def generar_paz_y_salvo(request, prestamo_id):
-    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
-
-    if not prestamo.esta_pagado():
-        return HttpResponse("El préstamo aún no está pagado en su totalidad.", status=400)
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="paz_y_salvo_{prestamo.cliente.nombre}.pdf"'
-
-    p = canvas.Canvas(response)
-    p.setFont("Helvetica-Bold", 14)
-    p.drawString(100, 750, "BANCO SIMULADO")
-    p.drawString(100, 730, "CERTIFICADO DE PAZ Y SALVO")
-
-    p.setFont("Helvetica", 12)
-    p.drawString(100, 700, f"Cliente: {prestamo.cliente.nombre}")
-    p.drawString(100, 680, f"Monto Total: ${prestamo.monto_total}")
-    p.drawString(100, 660, f"Fecha de Solicitud: {prestamo.fecha_solicitud}")
-    p.drawString(100, 640, "Estado: PAGADO EN SU TOTALIDAD")
+@login_required
+def generate_paz_y_salvo(request, id):
+    loan = get_object_or_404(Loan, id=id)
+    if loan.status != 'PAID':
+        messages.error(request, 'El préstamo debe estar pagado completamente para generar el paz y salvo.')
+        return redirect('blog:loan_detail', id=loan.id)
     
-    p.showPage()
-    p.save()
-    return response
+    try:
+        pdf_path = loan.generate_certificate()
+        if pdf_path:
+            messages.success(request, 'Certificado generado y enviado por correo exitosamente.')
+        else:
+            messages.error(request, 'No se pudo generar el certificado.')
+    except Exception as e:
+        messages.error(request, f'Error al generar el certificado: {str(e)}')
+    
+    return redirect('blog:loan_detail', id=loan.id)
+
+@login_required
+def loan_payment(request, id):
+    loan = get_object_or_404(Loan, id=id)
+    
+    if request.method == 'POST':
+        payment_amount = Decimal(request.POST.get('payment_amount', 0))
+        
+        if payment_amount <= 0:
+            messages.error(request, 'El monto del pago debe ser mayor a 0.')
+        elif payment_amount > loan.remaining_balance:
+            messages.error(request, 'El monto del pago no puede ser mayor al saldo restante.')
+        else:
+            loan.register_payment(payment_amount)
+            messages.success(request, f'Pago de ${payment_amount} registrado exitosamente.')
+            
+            if loan.status == 'PAID':
+                messages.info(request, 'El préstamo ha sido pagado en su totalidad.')
+            
+            return redirect('blog:loan_detail', id=loan.id)
+    
+    return render(request, 'loan/loan_payment.html', {'loan': loan})

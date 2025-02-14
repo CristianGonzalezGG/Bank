@@ -20,8 +20,18 @@ class LoanForm(forms.ModelForm):
     class Meta:
         model = Loan
         fields = ['client', 'amount', 'interest_rate', 'repayment_term']
-        
-
+        widgets = {
+            'client': forms.Select(attrs={'class': 'form-select'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'interest_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'repayment_term': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'client': 'Cliente',
+            'amount': 'Monto del préstamo',
+            'interest_rate': 'Tasa de interés (%)',
+            'repayment_term': 'Plazo (meses)',
+        }
 
 class ClientForm(forms.ModelForm):
     imageSave = forms.ImageField(required=False)
