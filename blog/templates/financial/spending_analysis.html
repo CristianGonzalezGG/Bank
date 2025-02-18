@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Análisis de Gastos - Banco El Dorado{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">
+        <i class="fas fa-chart-pie me-2"></i>Análisis de Gastos
+    </h2>
+    
+    <!-- Resumen de gastos -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Total Gastado</h6>
+                    <h3 class="mb-0">${{ analysis.total_spent|floatformat:2 }}</h3>
+                    <small>Últimos 30 días</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Transacciones</h6>
+                    <h3 class="mb-0">{{ analysis.transaction_count }}</h3>
+                    <small>Total de movimientos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Mayor Gasto</h6>
+                    <h3 class="mb-0">{{ analysis.biggest_expense|title }}</h3>
+                    <small>${{ analysis.categories|get_item:analysis.biggest_expense|floatformat:2 }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gráfico de gastos -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="spendingChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Desglose por Categoría</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Categoría</th>
+                                    <th class="text-end">Monto</th>
+                                    <th class="text-end">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category, amount in analysis.categories.items %}
+                                    <tr>
+                                        <td>{{ category|title }}</td>
+                                        <td class="text-end">${{ amount|floatformat:2 }}</td>
+                                        <td class="text-end">
+                                            {{ amount|percentage:analysis.total_spent }}%
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Configuración del gráfico
+    const ctx = document.getElementById('spendingChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ categories|safe }},
+            datasets: [{
+                data: {{ amounts|safe }},
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc',
+                    '#f6c23e', '#e74a3b', '#858796'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

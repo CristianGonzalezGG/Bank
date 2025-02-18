@@ -26,7 +26,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Configuración de archivos estáticos (CSS, JavaScript)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'blog', 'static'),
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -128,11 +130,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-
-# settings.py
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'blog', 'static'),
+]
 
 
 # Default primary key field type
@@ -150,14 +151,23 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'asesoresbancoeldorado@gmail.com'
 EMAIL_HOST_PASSWORD = 'pmzy doom zoxu rjfi'
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = 'Banco El Dorado <asesoresbancoeldorado@gmail.com>'
 
-# Configuración para los certificados
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-
-# Configuración de WKHTMLTOPDF
-WKHTMLTOPDF_CMD = '/usr/bin/wkhtmltopdf'  # Ajusta esta ruta según tu sistema
+# Configuración para pdfkit
+WKHTMLTOPDF_CMD = '/usr/bin/wkhtmltopdf'
 WKHTMLTOPDF_CMD_OPTIONS = {
     'quiet': True,
-} 
+    'enable-local-file-access': True,
+    'disable-smart-shrinking': True,
+    'encoding': 'UTF-8',
+    'margin-top': '0.75in',
+    'margin-right': '0.75in',
+    'margin-bottom': '0.75in',
+    'margin-left': '0.75in',
+    'page-size': 'Letter',
+    'dpi': 300,
+}
+
+# Configuración de medios
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 

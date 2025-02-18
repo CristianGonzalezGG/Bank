@@ -1,0 +1,139 @@
+/* Estilos generales */
+.appointment-container {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+/* Estilos de tarjetas */
+.card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+/* Estilos de formularios */
+.form-control {
+    border-radius: 8px;
+    border: 2px solid #e3e6f0;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78,115,223,0.25);
+}
+
+/* Botones personalizados */
+.btn-gradient {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(78,115,223,0.4);
+}
+
+/* Tabla de citas */
+.appointment-table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.appointment-table thead th {
+    background: #f8f9fc;
+    border: none;
+    padding: 15px;
+    font-weight: 600;
+    color: #4e73df;
+}
+
+.appointment-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.appointment-table tbody tr:hover {
+    background-color: #f8f9fc;
+    transform: scale(1.01);
+}
+
+/* Badges personalizados */
+.badge {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.badge-pending {
+    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+    color: #000;
+}
+
+.badge-confirmed {
+    background: linear-gradient(135deg, #36b9cc 0%, #1a8eaa 100%);
+}
+
+.badge-completed {
+    background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+}
+
+.badge-cancelled {
+    background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+}
+
+/* Loader animado */
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #4e73df;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-header {
+        padding: 1rem;
+    }
+    
+    .btn-gradient {
+        padding: 10px 20px;
+    }
+    
+    .appointment-table {
+        font-size: 14px;
+    }
+} 

@@ -4,37 +4,170 @@
 {% block title %}Details: {{ client.name }}{% endblock %}
 
 {% block content %}
-<h1 class="text-3xl font-bold text-gray-800 mb-6">Banco El Dorado</h1>
-<div id="content" class="flex justify-center py-10">
-   <div class="client-detail-container bg-white rounded-lg shadow-lg p-8 max-w-3xl w-full flex flex-col lg:flex-row gap-8">
-      <!-- Client Info Section -->
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    {% if client.image %}
+                        <img src="{{ client.image.url }}" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                    {% else %}
+                        <img src="{% static 'images/default-avatar.png' %}" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                    {% endif %}
+                    <h5 class="my-3">{{ client.name }}</h5>
+                    <p class="text-muted mb-1">Cliente ID: {{ client.cardId }}</p>
+                    <p class="text-muted mb-4">Estado: {{ client.get_status_display }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Nombre Completo</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{ client.name }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Email</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{ client.email }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Teléfono</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{ client.phone_number }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">Dirección</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{ client.address }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Información de la cuenta -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Información de Cuenta</h5>
+                    {% if not model.account %}
+                        <a href="{% url 'blog:create_account' client.id %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Crear Cuenta
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if model.account %}
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Número de Cuenta</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">{{ model.account.numberAccount }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Tipo de Cuenta</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">{{ model.account.account_type }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Saldo Actual</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">${{ model.account.balance|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-piggy-bank fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Este cliente aún no tiene una cuenta bancaria.</p>
+                            <p class="text-muted">Puede crear una nueva cuenta haciendo clic en el botón superior.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
 
-      <!-- Client Image Section -->
-      <div class="client-image flex items-center justify-center">
-         {% if client.imageSave %}
-            <img src="{{ client.imageSave.url }}" alt="Foto del cliente" class="w-40 h-40 rounded-full object-cover shadow-lg" style="max-width: 300px;">
-         {% endif %}
-      </div>
+            <!-- Agrega este botón donde sea apropiado en el template -->
+            <div class="card-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'blog:send_email' client.id %}" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Enviar Correo
+                    </a>
+                </div>
+            </div>
 
-      <!-- Contact Button -->
-      <a href="/send-email" class="relative inline-block px-6 py-3 font-semibold text-white transition duration-300 ease-out transform bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600">
-         <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-800 to-blue-600 opacity-0 transition-opacity duration-300 ease-out rounded-lg hover:opacity-100"></span>
-         <span class="relative z-10">Contactar al cliente</span>
-      </a>
-   </div>
-   
-</div>
-<div class="client-info flex-1">
-   <h2 class="text-xl font-semibold text-gray-700 mb-4">INFORMATION:</h2>
-   <ul class="space-y-2">
-      <li><span class="font-medium text-gray-600">Name:</span> <strong class="text-gray-800">{{ client.name }}</strong></li>
-      <li><span class="font-medium text-gray-600">Email:</span> <strong class="text-gray-800">{{ client.email }}</strong></li>
-      <li><span class="font-medium text-gray-600">Phone Number:</span> <strong class="text-gray-800">{{ client.phone_number }}</strong></li>
-      <li><span class="font-medium text-gray-600">Address:</span> <strong class="text-gray-800">{{ client.address }}</strong></li>
-      <li><span class="font-medium text-gray-600">Status:</span> <strong class="text-gray-800">{{ client.get_status_display }}</strong></li>
-      <li><span class="font-medium text-gray-600">Account Number:</span> <strong class="text-gray-800">{{ client.get_account_number }}</strong></li>
-      <li><span class="font-medium text-gray-600">Account's Type:</span> <strong class="text-gray-800">{{ client.get_type }}</strong></li>
-   </ul>
+            <div class="d-flex gap-2 mt-3">
+                <a href="{% url 'blog:create_appointment' client.id %}" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus me-2"></i>Agendar Cita
+                </a>
+            </div>
+
+            <!-- Sección de Citas -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Citas del Cliente</h5>
+                </div>
+                <div class="card-body">
+                    {% if appointments %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Cita</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Sede</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td>{{ appointment.get_appointment_type_display }}</td>
+                                    <td>{{ appointment.date|date:"d/m/Y" }}</td>
+                                    <td>{{ appointment.time|time:"H:i" }}</td>
+                                    <td>{{ appointment.branch }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ appointment.status|lower }}">
+                                            {{ appointment.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay citas programadas para este cliente.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No hay citas programadas para este cliente.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

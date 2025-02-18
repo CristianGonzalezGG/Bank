@@ -36,6 +36,13 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 import pdfkit
 from decimal import Decimal
+from django.http import StreamingHttpResponse
+from django.db.models import F
+import json
+import time
+from datetime import timedelta
+from .models import Appointment
+from .forms import AppointmentForm
 
 @login_required
 def search_client(request):
@@ -57,20 +64,43 @@ def search_client(request):
 def create_account(request, client_id):
     client = get_object_or_404(Client, id=client_id)
     
+    # Verificar si el cliente ya tiene una cuenta
     if hasattr(client, 'account'):
-        return redirect('blog:search_client')  
+        messages.error(request, "Este cliente ya tiene una cuenta.")
+        return redirect('blog:client_detail', id=client_id)
 
-    if request.method == "POST":
+    if request.method == 'POST':
         form = AccountForm(request.POST)
         if form.is_valid():
             account = form.save(commit=False)
             account.client = client
+            
+            # Establecer la tasa de interés según el tipo de cuenta
+            if account.account_type == 'SAVINGS':
+                account.interest_rate = 2.5
+            elif account.account_type == 'FIXED':
+                account.interest_rate = 4.0
+            else:
+                account.interest_rate = 0.5
+                
+            account.balance = form.cleaned_data['initial_deposit']
             account.save()
-            return redirect('blog:search_client')
+
+            messages.success(
+                request, 
+                f'Cuenta creada exitosamente. Número de cuenta: {account.numberAccount}'
+            )
+            
+            return redirect('blog:client_detail', id=client_id)
+        else:
+            messages.error(request, "Error al crear la cuenta. Por favor, verifique los datos.")
     else:
         form = AccountForm()
 
-    return render(request, 'create_account.html', {'form': form, 'client': client})
+    return render(request, 'account/create_account.html', {
+        'form': form,
+        'client': client
+    })
 
 from django.shortcuts import render
 
@@ -79,44 +109,56 @@ def create_client(request):
 
 
 @login_required
-def send_email_view(request):
+def send_email_view(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    
     if request.method == 'POST':
         form = EmailForm(request.POST)
         if form.is_valid():
-            # Extrae datos del formulario
-            recipient_email = form.cleaned_data['recipient_email']
             subject = form.cleaned_data['subject']
             message = form.cleaned_data['message']
-
-            # URL del logo
-            logo_url = f"{settings.STATIC_URL}images/logo.png"
-
-            # Renderiza el contenido HTML del correo
-            html_content = render_to_string('emails/send_email_template.html', {
-                'logo_url': logo_url,
-                'subject': subject,
-                'message': message,
-            })
-
-            # Configura y envía el correo
-            email = EmailMultiAlternatives(
-                subject=subject,
-                body=message,  # Versión en texto plano
-                from_email=settings.EMAIL_HOST_USER,
-                to=[recipient_email]
-            )
-            email.attach_alternative(html_content, "text/html")
-            email.send()
-
-            return redirect('/email-sent-success/')  # Redirige a la página de éxito
+            
+            try:
+                # Crear el contenido HTML del correo
+                html_content = render_to_string('emails/email_template.html', {
+                    'client': client,
+                    'message': message
+                })
+                
+                # Crear el correo
+                email = EmailMultiAlternatives(
+                    subject=subject,
+                    body=message,  # Versión texto plano
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[client.email]
+                )
+                
+                # Adjuntar versión HTML
+                email.attach_alternative(html_content, "text/html")
+                
+                # Enviar el correo
+                email.send()
+                
+                messages.success(request, 'Correo enviado exitosamente')
+                return redirect('blog:email_sent_success', client_id=client.id)
+            
+            except Exception as e:
+                messages.error(request, f'Error al enviar el correo: {str(e)}')
     else:
         form = EmailForm()
-
-    return render(request, 'send_email_form.html', {'form': form})
+    
+    return render(request, 'emails/send_email_form.html', {
+        'form': form,
+        'client': client
+    })
 
 @login_required
-def sent_email_success(request):
-    return render(request, 'email_sent_success.html')
+def sent_email_success(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    return render(request, 'email_sent_success.html', {
+        'client_email': client.email,
+        'client_id': client_id
+    })
 
 
 def home(request):
@@ -174,8 +216,7 @@ def bin_lookup(request):
 
 @login_required
 def client_list(request):
-    clients = Client.objects.all() #Busca todos los clientes que se encuentren, sin verificar estatus
-    
+    clients = Client.objects.all().prefetch_related('account')
     return render(request, 'client/client_list.html', {'clients': clients})
 def create_client(request):
     if request.method == "POST":
@@ -232,28 +273,32 @@ def capture_image(request):
 
 @login_required
 def client_detail(request, id):
+    client = get_object_or_404(Client, id=id)
+    account_number = client.get_account_number()
+    appointments = client.appointments.all()  # Obtener todas las citas del cliente
+    
+    # Obtener el modelo de la tarjeta si existe
     try:
-        client = Client.objects.get(id=id)
-        # Verificar si el cliente tiene una cuenta asociada
-        if hasattr(client, 'account'):
-            account_number = client.account.numberAccount  # Acceder al número de cuenta correctamente
-            model = client.account.get_account_type_display
-        else:
-            account_number = 'No Account'  # Si no tiene una cuenta
-    except Client.DoesNotExist:
-        raise Http404("Client not found")
-    loans = Loan.objects.filter(client=client)  # Obtener todos los préstamos del cliente
-
-    # Suponiendo que deseas mostrar solo un monto total de deuda
-    total_debt = sum(loan.amount for loan in loans)
+        account = Account.objects.get(client=client)
+        model = {
+            'client': client,
+            'account': account,
+            'account_number': account_number,
+        }
+    except Account.DoesNotExist:
+        model = {
+            'client': client,
+            'account_number': 'No Account',
+        }
 
     context = {
         'client': client,
-        'total_debt': total_debt,
-        'loans': loans,
+        'account_number': account_number,
+        'model': model,
+        'appointments': appointments,  # Pasar las citas al contexto
     }
     
-    return render(request, 'client/client_detail.html', {'client': client, 'account_number': account_number, 'model': model,})
+    return render(request, 'client/client_detail.html', context)
 
 
 # Vista de registro de usuario
@@ -385,3 +430,153 @@ def loan_payment(request, id):
             return redirect('blog:loan_detail', id=loan.id)
     
     return render(request, 'loan/loan_payment.html', {'loan': loan})
+
+@login_required
+def financial_goals(request):
+    if request.method == 'POST':
+        form = FinancialGoalForm(request.POST)
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.client = request.user.client
+            goal.save()
+            return redirect('blog:financial_goals')
+    
+    goals = FinancialGoal.objects.filter(client=request.user.client)
+    form = FinancialGoalForm()
+    return render(request, 'financial/goals.html', {'goals': goals, 'form': form})
+
+@login_required
+def transactions(request):
+    account = request.user.client.account
+    transactions = Transaction.objects.filter(account=account)
+    
+    # Filtros
+    category = request.GET.get('category')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    if category:
+        transactions = transactions.filter(category=category)
+    if date_from:
+        transactions = transactions.filter(date__gte=date_from)
+    if date_to:
+        transactions = transactions.filter(date__lte=date_to)
+        
+    context = {
+        'transactions': transactions,
+        'categories': Transaction.objects.values_list('category', flat=True).distinct(),
+        'total_income': transactions.filter(type='DEPOSIT').aggregate(Sum('amount'))['amount__sum'] or 0,
+        'total_expenses': transactions.filter(type='WITHDRAWAL').aggregate(Sum('amount'))['amount__sum'] or 0
+    }
+    return render(request, 'transactions/list.html', context)
+
+@login_required
+def notifications(request):
+    """Vista para mostrar todas las notificaciones del usuario"""
+    notifications = Notification.objects.filter(client=request.user.client)
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Si es una petición AJAX, devolver JSON
+        data = [{
+            'id': notif.id,
+            'title': notif.title,
+            'message': notif.message,
+            'type': notif.type,
+            'created_at': notif.created_at.strftime('%Y-%m-%d %H:%M'),
+            'read': notif.read
+        } for notif in notifications]
+        return JsonResponse(data, safe=False)
+    
+    # Si no es AJAX, renderizar template
+    return render(request, 'notifications/list.html', {
+        'notifications': notifications
+    })
+
+@login_required
+def notifications_stream(request):
+    """Vista para Stream de notificaciones en tiempo real"""
+    def event_stream():
+        while True:
+            # Verificar nuevas notificaciones
+            notifications = Notification.objects.filter(
+                client=request.user.client,
+                read=False
+            ).order_by('-created_at')[:5]
+            
+            for notification in notifications:
+                data = {
+                    'id': notification.id,
+                    'title': notification.title,
+                    'message': notification.message,
+                    'time': notification.created_at.strftime('%H:%M')
+                }
+                yield f"data: {json.dumps(data)}\n\n"
+            
+            time.sleep(10)  # Esperar 10 segundos antes de la siguiente verificación
+    
+    return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+
+@login_required
+def appointment_search_client(request):
+    if request.method == 'POST':
+        card_id = request.POST.get('card_id')
+        try:
+            client = Client.objects.get(cardId=card_id)
+            return redirect('blog:create_appointment', client_id=client.id)
+        except Client.DoesNotExist:
+            messages.error(request, 'Cliente no encontrado')
+    
+    return render(request, 'appointments/search_client.html')
+
+@login_required
+def create_appointment(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment.client = client
+            appointment.save()
+            
+            messages.success(request, 'Cita agendada exitosamente')
+            return redirect('blog:appointment_list')
+    else:
+        form = AppointmentForm()
+    
+    return render(request, 'appointments/create_appointment.html', {
+        'form': form,
+        'client': client
+    })
+
+@login_required
+def appointment_list(request):
+    appointments = Appointment.objects.all().order_by('date', 'time')
+    return render(request, 'appointments/appointment_list.html', {
+        'appointments': appointments
+    })
+
+@login_required
+def appointment_detail(request, appointment_id):
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST, instance=appointment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cita actualizada exitosamente')
+            return redirect('blog:appointment_list')
+    else:
+        form = AppointmentForm(instance=appointment)
+    
+    return render(request, 'appointments/appointment_detail.html', {
+        'form': form,
+        'appointment': appointment
+    })
+
+@login_required
+def appointment_cancel(request, appointment_id):
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+    appointment.status = 'CANCELLED'
+    appointment.save()
+    messages.success(request, 'Cita cancelada exitosamente')
+    return redirect('blog:appointment_list')

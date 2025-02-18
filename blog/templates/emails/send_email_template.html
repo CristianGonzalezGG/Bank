@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f6f9;
-            color: #333;
+            background-color: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
         }
         .email-container {
             width: 100%;
@@ -18,86 +19,104 @@
             background-color: #ffffff;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e6e9ec;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
         .email-header {
-            background-color: #004080;
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
             color: #ffffff;
-            padding: 20px;
+            padding: 2rem;
             text-align: center;
         }
         .email-header img {
             width: 120px;
-            margin-bottom: 10px;
+            height: 120px;
+            margin-bottom: 1rem;
             border-radius: 50%;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
         }
         .email-header h1 {
             margin: 0;
-            font-size: 24px;
-            font-weight: normal;
+            font-size: 2rem;
+            font-weight: 600;
         }
         .email-body {
-            padding: 30px;
-            color: #333;
-            line-height: 1.6;
+            padding: 2rem;
+            color: #212529;
         }
         .email-body h2 {
-            font-size: 20px;
-            color: #004080;
+            font-size: 1.5rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
         }
         .email-body p {
-            font-size: 16px;
-            margin: 10px 0;
+            font-size: 1rem;
+            margin: 1rem 0;
+            color: #495057;
         }
         .email-footer {
-            background-color: #f4f6f9;
-            padding: 20px;
+            background-color: #f8f9fa;
+            padding: 1.5rem;
             text-align: center;
-            font-size: 14px;
-            color: #888888;
-            border-top: 1px solid #e6e9ec;
+            font-size: 0.875rem;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
         }
         .email-footer a {
-            color: #004080;
+            color: #0d6efd;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
+        }
+        .email-footer a:hover {
+            text-decoration: underline;
         }
         .email-footer p {
-            margin: 5px 0;
+            margin: 0.5rem 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            background-color: #0d6efd;
+            color: #ffffff;
+            border-radius: 0.375rem;
+            margin: 1rem 0;
         }
     </style>
 </head>
 <body>
     <div class="email-container">
-        <!-- Encabezado del correo -->
         <div class="email-header">
             <img src="https://i.postimg.cc/ZnQjmqR9/logo.png" alt="Logo de Banco El Dorado">
             <h1>Banco El Dorado</h1>
         </div>
 
-        <!-- Cuerpo del correo -->
         <div class="email-body">
             <h2>{{ subject }}</h2>
             <p>{{ message }}</p>
+            
+            <p>Estimado cliente:</p>
+            <p>
+                Esperamos que este mensaje le encuentre bien. En Banco El Dorado, nos comprometemos a brindarle un servicio excepcional y a mantenerlo informado sobre nuestros productos y servicios.
+            </p>
+            <p>
+                Le recordamos que puede acceder a su cuenta en línea a través de nuestro portal seguro, donde podrá realizar transacciones, revisar su saldo y consultar sus estados de cuenta de manera fácil y rápida.
+            </p>
+            <p>
+                Si necesita asistencia, no dude en comunicarse con nuestro servicio de atención al cliente al (123) 456-7890 o a través de nuestro correo electrónico soporte@bancoeldorado.com
+            </p>
         </div>
-        <p>Estimado:
 
-            Esperamos que este mensaje le encuentre bien. En Banco El Dorado, nos comprometemos a brindarle un servicio excepcional y a mantenerlo informado sobre nuestros productos y servicios.
-            
-            Le recordamos que puede acceder a su cuenta en línea a través de nuestro portal seguro, donde podrá realizar transacciones, revisar su saldo y consultar sus estados de cuenta de manera fácil y rápida. Si necesita asistencia, no dude en comunicarse con nuestro servicio de atención al cliente al [número de teléfono] o a través de nuestro correo electrónico [correo electrónico de atención al cliente].
-            
-            Además, le invitamos a mantenerse al tanto de nuestras últimas ofertas y promociones visitando nuestra página web o siguiendo nuestras redes sociales.
-            
-            Agradecemos su confianza en Banco El Dorado. Estamos aquí para ayudarle en todo lo que necesite.</p>
-        <!-- Pie de página del correo -->
         <div class="email-footer">
-            <p>Banco El Dorado - Todos los derechos reservados.</p>
+            <p>© 2024 Banco El Dorado - Todos los derechos reservados.</p>
             <p>
                 <a href="https://www.bancoeldorado.com/terminos">Términos y Condiciones</a> |
                 <a href="https://www.bancoeldorado.com/privacidad">Política de Privacidad</a>
             </p>
-            <p>¿Necesitas ayuda? Contacta a nuestro <a href="https://www.bancoeldorado.com/soporte">centro de soporte</a>.</p>
+            <p>¿Necesitas ayuda? Contacta a nuestro <a href="https://www.bancoeldorado.com/soporte">centro de soporte</a></p>
         </div>
     </div>
 </body>

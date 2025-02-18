@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Metas Financieras - Banco El Dorado{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <h2 class="mb-4">
+                <i class="fas fa-bullseye me-2"></i>Metas Financieras
+            </h2>
+            
+            <!-- Lista de metas -->
+            <div class="goals-list">
+                {% for goal in goals %}
+                    <div class="card mb-4 goal-card animate__animated animate__fadeIn">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title">{{ goal.title }}</h5>
+                                <span class="badge bg-{{ goal.get_category_badge }}">
+                                    {{ goal.get_category_display }}
+                                </span>
+                            </div>
+                            
+                            <div class="progress mb-3" style="height: 20px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                     role="progressbar"
+                                     style="width: {{ goal.progress_percentage }}%"
+                                     aria-valuenow="{{ goal.progress_percentage }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                    {{ goal.progress_percentage|floatformat:1 }}%
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <small class="text-muted d-block">Meta</small>
+                                    <strong>${{ goal.target_amount|floatformat:2 }}</strong>
+                                </div>
+                                <div class="col-sm-4">
+                                    <small class="text-muted d-block">Actual</small>
+                                    <strong>${{ goal.current_amount|floatformat:2 }}</strong>
+                                </div>
+                                <div class="col-sm-4">
+                                    <small class="text-muted d-block">Fecha límite</small>
+                                    <strong>{{ goal.deadline|date:"d/m/Y" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aún no has creado ninguna meta financiera
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Formulario para nueva meta -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 2rem;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus me-2"></i>Nueva Meta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">
+                                    {{ field.label }}
+                                </label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ field.errors|join:", " }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>Crear Meta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

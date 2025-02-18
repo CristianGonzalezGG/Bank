@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/appointments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="appointment-container container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header">
+                    <h4 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-search fa-2x me-3"></i>
+                        Buscar Cliente para Cita
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="form-floating mb-4">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="card_id" 
+                                   name="card_id" 
+                                   placeholder="Ingrese identificación"
+                                   required>
+                            <label for="card_id">Número de Identificación</label>
+                            <div class="invalid-feedback">
+                                Por favor ingrese un número de identificación válido
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-gradient">
+                                <i class="fas fa-search me-2"></i>Buscar Cliente
+                            </button>
+                            <a href="{% url 'blog:appointment_list' %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if messages %}
+            <div class="messages mt-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/appointments.js' %}"></script>
+{% endblock %} 

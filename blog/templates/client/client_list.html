@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Client List{% endblock %}
+{% block title %}Clients{% endblock %}
 
 {% block content %}
 
@@ -8,44 +8,85 @@
 <script src="{% static 'javascript/client_filter.js' %}"></script>
 {% endblock %}
 
-<div class="container py-5">
-    <h1 class="display-6 text-primary mb-4">Client List</h1>
-  
-    <a href="{% url 'blog:create_client' %}" class="btn btn-primary">Crear Cliente</a>
-
-
+<div class="container py-4">
     <div class="row">
-        <!-- Lista de Clientes -->
-        <div class="col-md-8">
-            <div id="clientList" class="row gy-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Clientes</h2>
+                <a href="{% url 'blog:create_client' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nuevo Cliente
+                </a>
+            </div>
+            
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 {% for client in clients %}
-                <div class="col-12">
-                    <div class="card client-card shadow-sm border-0 h-100">
-                        <div class="card-body d-flex align-items-start">
-                            <div class="me-3 icon-container">
-                               
-                                <img src="{{ client.image }}" class="card-img-top" alt="{{ client.name }}"> 
-                                
-                                
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex">
+                            <div class="flex-shrink-0 me-3">
+                                {% if client.image %}
+                                    <img src="{{ client.image.url }}" class="rounded-circle" alt="{{ client.name }}" style="width: 64px; height: 64px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" style="width: 64px; height: 64px;">
+                                        <i class="fas fa-user fa-2x"></i>
+                                    </div>
+                                {% endif %}
                             </div>
                             <div>
                                 <h5 class="card-title">
-                                    <a href="{{ client.get_absolute_url }}" class="text-dark text-decoration-none">{{ client.name }}</a>
+                                    <a href="{{ client.get_absolute_url }}" class="text-dark text-decoration-none">
+                                        {{ client.name }}
+                                    </a>
                                 </h5>
                                 <p class="card-text text-muted small">
-                                    
-                                    Created on {{ client.created_at }} by {{ client.account.numberAccount }}
+                                    ID: {{ client.cardId }}<br>
+                                    Creado: {{ client.created_at|date:"d/m/Y" }}
                                 </p>
-                                <span class="badge bg-success">{{ client.account.status }}</span>
+                                <div class="mt-2">
+                                    {% if client.account %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Cuenta Activa
+                                        </span>
+                                        <small class="text-muted d-block mt-1">
+                                            {{ client.account.get_account_type_display }}
+                                        </small>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-exclamation-circle me-1"></i>
+                                            Sin Cuenta
+                                        </span>
+                                        <a href="{% url 'blog:create_account' client.id %}" class="btn btn-sm btn-outline-primary mt-2">
+                                            <i class="fas fa-plus me-1"></i>Crear Cuenta
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="btn-group w-100">
+                                <a href="{{ client.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Ver Detalles
+                                </a>
+                                {% if client.account %}
+                                    <a href="#" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-money-bill-wave me-1"></i>Ver Cuenta
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No hay clientes registrados.
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
-    <
 </div>
 
 <style>

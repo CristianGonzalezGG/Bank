@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Programa de Recompensas - Banco El Dorado{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Nivel {{ rewards.get_level_display }}</h3>
+                    <div class="reward-points mb-4">
+                        <h1 class="display-4">{{ rewards.points }}</h1>
+                        <p class="text-muted">Puntos Acumulados</p>
+                    </div>
+                    
+                    <!-- Barra de progreso al siguiente nivel -->
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar"
+                             style="width: {{ rewards.progress_to_next_level }}%">
+                            {{ rewards.progress_to_next_level }}% al siguiente nivel
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted">
+                        {{ rewards.points_to_next_level }} puntos más para alcanzar el siguiente nivel
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Beneficios del nivel actual -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Beneficios Actuales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for benefit in rewards.current_benefits %}
+                            <div class="col-md-6 mb-3">
+                                <div class="benefit-item p-3 border rounded">
+                                    <i class="{{ benefit.icon }} fa-2x mb-2 text-primary"></i>
+                                    <h6>{{ benefit.title }}</h6>
+                                    <p class="small text-muted mb-0">{{ benefit.description }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial de puntos -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Historial de Puntos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for entry in rewards.point_history %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0">{{ entry.points }} puntos</h6>
+                                    <p class="small text-muted mb-0">
+                                        {{ entry.description }}
+                                    </p>
+                                    <small class="text-muted">
+                                        {{ entry.date|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding: 1rem 0;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 1rem;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 3rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: 0.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: #4e73df;
+        border: 2px solid #fff;
+    }
+    
+    .benefit-item {
+        transition: all 0.3s ease;
+    }
+    
+    .benefit-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %} 

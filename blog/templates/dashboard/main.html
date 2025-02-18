@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Banco El Dorado{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .progress-bar-animated {
+        animation: progress 1s ease-in-out;
+    }
+    
+    @keyframes progress {
+        from { width: 0; }
+    }
+    
+    .notification-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header con información principal -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1 class="h3 mb-0 text-gray-800">Bienvenido, {{ request.user.client.name }}</h1>
+            <p class="text-muted">Última conexión: {{ request.user.last_login|date:"d/m/Y H:i" }}</p>
+        </div>
+        <div class="col-lg-4 text-end">
+            <div class="btn-group">
+                <button class="btn btn-primary btn-animated">
+                    <i class="fas fa-plus me-2"></i>Nueva Transacción
+                </button>
+                <button class="btn btn-outline-primary btn-animated">
+                    <i class="fas fa-download me-2"></i>Descargar Reporte
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de resumen -->
+    <div class="row">
+        <!-- Saldo actual -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card border-left-primary h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Saldo Disponible
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                ${{ request.user.client.account.balance|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-wallet fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Puntos de recompensa -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card border-left-success h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Puntos Acumulados
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ rewards.points }} pts
+                            </div>
+                            <div class="small text-muted">
+                                Nivel {{ rewards.get_level_display }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-star fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Más contenido del dashboard... -->
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Inicializar gráficos
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gráfico de gastos por categoría
+        const ctx = document.getElementById('spendingChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ spending_categories|safe }},
+                datasets: [{
+                    data: {{ spending_amounts|safe }},
+                    backgroundColor: [
+                        '#4e73df', '#1cc88a', '#36b9cc',
+                        '#f6c23e', '#e74a3b', '#858796'
+                    ]
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
+                }
+            }
+        });
+    });
+
+    // Actualización en tiempo real de notificaciones
+    const eventSource = new EventSource("{% url 'blog:notifications_stream' %}");
+    eventSource.onmessage = function(event) {
+        const notification = JSON.parse(event.data);
+        showNotification(notification);
+    };
+
+    function showNotification(notification) {
+        const toast = document.createElement('div');
+        toast.className = 'toast show';
+        toast.innerHTML = `
+            <div class="toast-header">
+                <i class="fas fa-bell text-primary me-2"></i>
+                <strong class="me-auto">${notification.title}</strong>
+                <small>${notification.time}</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                ${notification.message}
+            </div>
+        `;
+        document.getElementById('toastContainer').appendChild(toast);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    }
+</script>
+{% endblock %}
+{% endblock %} 

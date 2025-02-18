@@ -1,44 +1,247 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Crear Cliente{% endblock %}
+{% block title %}Crear Cliente - Banco El Dorado{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">Crear Cliente</h2>
-    <form method="post" enctype="multipart/form-data" class="p-4 border rounded bg-white shadow-sm">
-        {% csrf_token %}
-        {{ form.as_p }}
-        
-        <div class="mb-3">
-            <button type="button" id="capture" class="btn btn-primary">Capturar Imagen</button>
+<div class="container py-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white p-4">
+                    <h2 class="h3 mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Registro de Nuevo Cliente
+                    </h2>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Información Personal -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.cardId.id_for_label }}" class="form-label">
+                                    <i class="fas fa-id-card me-2"></i>Número de Identificación
+                                </label>
+                                {{ form.cardId|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-2"></i>Nombre Completo
+                                </label>
+                                {{ form.name|add_class:"form-control" }}
+                            </div>
+                        </div>
+
+                        <!-- Información de Contacto -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                                </label>
+                                {{ form.email|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                                    <i class="fas fa-phone me-2"></i>Teléfono
+                                </label>
+                                {{ form.phone_number|add_class:"form-control" }}
+                            </div>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="mb-4">
+                            <label for="{{ form.address.id_for_label }}" class="form-label">
+                                <i class="fas fa-map-marker-alt me-2"></i>Dirección
+                            </label>
+                            {{ form.address|add_class:"form-control" }}
+                        </div>
+
+                        <!-- Captura de Imagen -->
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-camera me-2"></i>Fotografía del Cliente
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="video-container mb-3">
+                                            <video id="video" 
+                                                   class="rounded w-100 border" 
+                                                   autoplay 
+                                                   style="max-width: 400px;">
+                                            </video>
+                                        </div>
+                                        <button type="button" 
+                                                id="capture" 
+                                                class="btn btn-primary btn-lg w-100">
+                                            <i class="fas fa-camera me-2"></i>Capturar Foto
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="preview-container text-center">
+                                            <canvas id="canvas" style="display:none;"></canvas>
+                                            <img id="preview" 
+                                                 src="" 
+                                                 class="img-thumbnail mb-3" 
+                                                 style="display:none; max-width: 200px;">
+                                            <input type="hidden" 
+                                                   id="image_input" 
+                                                   name="imageSave">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" 
+                                    class="btn btn-secondary me-md-2" 
+                                    onclick="window.history.back()">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </button>
+                            <button type="submit" 
+                                    class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Guardar Cliente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <div class="mb-3">
-            <img id="preview" src="" width="100" height="100" style="display:none;" class="border rounded">
-            <input type="hidden" id="image_input" name="image">
-        </div>
-        
-        <button type="submit" class="btn btn-success">Guardar Cliente</button>
-    </form>
+    </div>
 </div>
 
+<!-- Estilos -->
+<style>
+    .video-container {
+        position: relative;
+        background: #f8f9fa;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .video-container:hover {
+        transform: scale(1.02);
+    }
+
+    .preview-container {
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-control {
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+</style>
+
+<!-- Script mejorado para la cámara -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const captureButton = document.getElementById('capture');
-    
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => console.error("Error al acceder a la cámara: ", err));
-    
-        captureButton.addEventListener('click', () => {
+document.addEventListener("DOMContentLoaded", function () {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const preview = document.getElementById('preview');
+    const captureButton = document.getElementById('capture');
+    const imageInput = document.getElementById('image_input');
+    let stream = null;
+
+    // Función para iniciar la cámara
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: "user"
+                } 
+            });
+            video.srcObject = stream;
+            video.play();
+            captureButton.disabled = false;
+        } catch (err) {
+            console.error("Error al acceder a la cámara:", err);
+            alert("No se pudo acceder a la cámara. Por favor, verifica los permisos.");
+        }
+    }
+
+    // Función para detener la cámara
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+        }
+    }
+
+    // Iniciar cámara al cargar
+    startCamera();
+
+    // Capturar imagen
+    captureButton.addEventListener('click', () => {
+        if (stream) {
+            // Configurar canvas con las dimensiones del video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Dibujar la imagen en el canvas
             const context = canvas.getContext('2d');
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        });
+            
+            // Convertir a base64 y mostrar vista previa
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            preview.src = imageData;
+            preview.style.display = 'block';
+            imageInput.value = imageData;
+            
+            // Detener la cámara y ocultar el video
+            stopCamera();
+            video.style.display = 'none';
+            
+            // Mostrar mensaje de éxito
+            const successMessage = document.createElement('div');
+            successMessage.className = 'alert alert-success mt-3';
+            successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>Imagen capturada exitosamente';
+            preview.parentNode.appendChild(successMessage);
+        }
     });
-    
 
+    // Limpiar recursos al cerrar la página
+    window.addEventListener('beforeunload', stopCamera);
+});
+</script>
+
+<!-- Incluir animate.css para animaciones -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 {% endblock %}

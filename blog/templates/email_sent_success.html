@@ -1,10 +1,206 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Blog - Banco El Dorado{% endblock %}
+{% block title %}Email Enviado - Banco El Dorado{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-animation {
+        position: relative;
+        height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1a3b5c 0%, #2a5298 100%);
+        overflow: hidden;
+    }
+
+    .success-content {
+        text-align: center;
+        z-index: 2;
+        color: white;
+    }
+
+    .checkmark {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: block;
+        stroke-width: 2;
+        stroke: #4bb71b;
+        stroke-miterlimit: 10;
+        box-shadow: 0 0 30px #4bb71b;
+        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        position: relative;
+        margin: 0 auto 30px auto;
+    }
+
+    .checkmark__circle {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        stroke-width: 2;
+        stroke-miterlimit: 10;
+        stroke: #4bb71b;
+        fill: none;
+        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+
+    .checkmark__check {
+        transform-origin: 50% 50%;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    }
+
+    /* Partículas flotantes */
+    .particles span {
+        position: absolute;
+        pointer-events: none;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: animate 5s linear infinite;
+    }
+
+    @keyframes animate {
+        0% {
+            transform: scale(0) translateY(0) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1) translateY(-1000%) rotate(360deg);
+            opacity: 0;
+        }
+    }
+
+    @keyframes stroke {
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes scale {
+        0%, 100% {
+            transform: none;
+        }
+        50% {
+            transform: scale3d(1.1, 1.1, 1);
+        }
+    }
+
+    @keyframes fill {
+        100% {
+            box-shadow: inset 0 0 0 100px #4bb71b;
+        }
+    }
+
+    .success-message {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 1.5s forwards;
+    }
+
+    .success-details {
+        font-size: 1.2rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 2s forwards;
+    }
+
+    .action-button {
+        margin-top: 2rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 2.5s forwards;
+        transition: all 0.3s ease;
+    }
+
+    .action-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                    <h3 class="card-title">¡Correo Enviado Exitosamente!</h3>
+                    <p class="card-text text-muted">
+                        El correo ha sido enviado correctamente a {{ client_email }}.
+                    </p>
+                    <div class="mt-4">
+                        <a href="{% url 'blog:client_detail' client_id %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver al Detalle del Cliente
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<h2>Email Sent Successfully!</h2>
-<p>Your email has been sent to the recipient.</p>
+<script>
+// Crear partículas flotantes
+function createParticles() {
+    const particlesContainer = document.getElementById('particles');
+    const numberOfParticles = 50;
 
-{% endblock content %}
+    for(let i = 0; i < numberOfParticles; i++) {
+        const particle = document.createElement('span');
+        const size = Math.random() * 5 + 2; // Tamaño aleatorio entre 2 y 7px
+        
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 2 + 's';
+        particle.style.animationDuration = Math.random() * 3 + 2 + 's';
+        
+        particlesContainer.appendChild(particle);
+    }
+}
+
+// Iniciar animación cuando el documento esté listo
+document.addEventListener('DOMContentLoaded', createParticles);
+
+// Efecto de sonido suave al completar
+setTimeout(() => {
+    const audio = new Audio('/static/sounds/success.mp3'); // Asegúrate de tener este archivo
+    audio.volume = 0.2;
+    audio.play().catch(() => {}); // Manejar casos donde el audio esté deshabilitado
+}, 1000);
+
+// Confeti después de la animación del checkmark
+setTimeout(() => {
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
+}, 1500);
+</script>
+
+<!-- Incluir librería de confeti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+{% endblock %}
