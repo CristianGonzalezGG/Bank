@@ -1,0 +1,3 @@
+MIDDLEWARE = [
+    'blog.middleware.TwoFactorMiddleware',
+] 

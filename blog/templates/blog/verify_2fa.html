@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Verificación de dos factores</h2>
+    <p>Se ha enviado un código de verificación a: {{ email }}</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="text" name="code" maxlength="6" required 
+                   class="form-control" placeholder="Ingrese el código de 6 dígitos">
+        </div>
+        <button type="submit" class="btn btn-primary">Verificar</button>
+    </form>
+    
+    <div class="mt-3">
+        <a href="{% url 'blog:login' %}" class="btn btn-secondary">Volver al inicio de sesión</a>
+    </div>
+</div>
+{% endblock %} 

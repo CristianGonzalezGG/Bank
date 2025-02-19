@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Disable Two-Factor Authentication</h2>
+    
+    {% if two_factor_settings.is_enabled %}
+        <div class="alert alert-warning">
+            <strong>Warning!</strong> Disabling two-factor authentication will make your account less secure.
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to disable two-factor authentication?</p>
+            <button type="submit" class="btn btn-danger">
+                Yes, Disable Two-Factor Authentication
+            </button>
+            <a href="{% url 'blog:home' %}" class="btn btn-secondary">
+                No, Keep It Enabled
+            </a>
+        </form>
+    {% else %}
+        <div class="alert alert-info">
+            Two-factor authentication is not currently enabled for your account.
+        </div>
+        <a href="{% url 'blog:enable_2fa' %}" class="btn btn-primary">
+            Enable Two-Factor Authentication
+        </a>
+    {% endif %}
+</div>
+{% endblock %} 

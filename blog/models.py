@@ -277,3 +277,21 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"Cita de {self.client.name} - {self.get_appointment_type_display()} - {self.date}"
+
+class UserTwoFactorSettings(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    is_enabled = models.BooleanField(default=False)
+    backup_codes = models.JSONField(default=list, blank=True)
+    
+    def __str__(self):
+        return f"2FA Settings for {self.user.username}"
+
+class TwoFactorCode(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_verified = models.BooleanField(default=False)
+
+    def is_valid(self):
+        return not self.is_verified and self.expires_at > timezone.now()

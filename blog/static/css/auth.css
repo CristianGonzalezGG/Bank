@@ -1,0 +1,55 @@
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 10px;
+}
+
+.card-title {
+    color: #2c3e50;
+}
+
+.form-control {
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52,152,219,0.25);
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border: none;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    border-color: #95a5a6;
+    color: #95a5a6;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.alert {
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para autenticación */
+.login-section {
+    min-height: calc(100vh - 80px);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-bg) 100%);
+    position: relative;
+    overflow: hidden;
+} 

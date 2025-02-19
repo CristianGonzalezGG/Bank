@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/email_notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="notification-form-container">
+    <div class="form-header">
+        <h1 class="animate-fade-in">{% if form.instance.pk %}Editar{% else %}Nueva{% endif %} Notificación</h1>
+    </div>
+
+    <div class="form-card animate-slide-up">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.recipient.id_for_label }}">Destinatario</label>
+                {{ form.recipient }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.subject.id_for_label }}">Asunto</label>
+                {{ form.subject }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.message.id_for_label }}">Mensaje</label>
+                {{ form.message }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.priority.id_for_label }}">Prioridad</label>
+                {{ form.priority }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.scheduled_for.id_for_label }}">Programar para</label>
+                {{ form.scheduled_for }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.attachments.id_for_label }}">Adjuntos</label>
+                {{ form.attachments }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-animated">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+                <a href="{% url 'blog:email_notification_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

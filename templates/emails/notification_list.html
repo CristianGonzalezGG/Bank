@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/email_notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="notification-dashboard">
+    <div class="dashboard-header">
+        <h1 class="animate-fade-in">Email Notifications Dashboard</h1>
+        <div class="dashboard-actions">
+            <a href="{% url 'blog:email_notification_create' %}" class="btn btn-primary btn-animated">
+                <i class="fas fa-plus"></i> New Notification
+            </a>
+            <button id="bulkSendBtn" class="btn btn-success btn-animated" disabled>
+                <i class="fas fa-paper-plane"></i> Send Selected
+            </button>
+        </div>
+    </div>
+
+    <div class="filters-section animate-slide-up">
+        <form id="filterForm" method="get">
+            <select name="status" class="form-select">
+                <option value="">All Status</option>
+                {% for status in notification.STATUS_CHOICES %}
+                <option value="{{ status.0 }}">{{ status.1 }}</option>
+                {% endfor %}
+            </select>
+            <select name="priority" class="form-select">
+                <option value="">All Priorities</option>
+                {% for priority in notification.PRIORITY_CHOICES %}
+                <option value="{{ priority.0 }}">{{ priority.1 }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+
+    <div class="notifications-list">
+        {% for notification in notifications %}
+        <div class="notification-card animate-fade-in" data-id="{{ notification.id }}">
+            <div class="notification-header">
+                <h3>{{ notification.subject }}</h3>
+                <span class="badge bg-{{ notification.status|lower }}">{{ notification.get_status_display }}</span>
+            </div>
+            <div class="notification-body">
+                <p>{{ notification.message|truncatewords:30 }}</p>
+                <div class="notification-meta">
+                    <span><i class="fas fa-user"></i> {{ notification.recipient.name }}</span>
+                    <span><i class="fas fa-clock"></i> {{ notification.created_at|date:"M d, Y H:i" }}</span>
+                </div>
+            </div>
+            <div class="notification-actions">
+                <button class="btn btn-sm btn-primary send-btn" data-id="{{ notification.id }}">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+                <input type="checkbox" class="notification-checkbox" value="{{ notification.id }}">
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-notifications animate-fade-in">
+            <i class="fas fa-inbox fa-3x"></i>
+            <p>No notifications found</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination-container">
+        {% include "includes/pagination.html" %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/email_notifications.js' %}"></script>
+{% endblock %} 

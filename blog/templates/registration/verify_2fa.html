@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/2fa.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="verification-container">
+    <div class="container">
+        <div class="verification-card animate-fade-in">
+            <div class="text-center mb-4">
+                <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                <h2 class="font-weight-bold">Verificación de dos factores</h2>
+                <p class="text-muted">
+                    Hemos enviado un código de verificación a tu correo electrónico.
+                    Por favor, ingrésalo a continuación.
+                </p>
+            </div>
+
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" id="verificationForm">
+                {% csrf_token %}
+                <div class="code-input-group">
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                    <input type="hidden" name="code" id="completeCode">
+                </div>
+
+                <div class="timer text-center mb-3">
+                    Código válido por: <span id="countdown">10:00</span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <span class="verify-text">Verificar</span>
+                        <span class="verify-loader d-none">
+                            <span class="loader"></span>
+                            Verificando...
+                        </span>
+                    </button>
+                    
+                    <button type="button" class="resend-button" id="resendButton" disabled>
+                        <i class="fas fa-redo-alt"></i>
+                        Reenviar código (<span id="resendTimer">30</span>s)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.code-input');
+    const form = document.getElementById('verificationForm');
+    const completeCode = document.getElementById('completeCode');
+    const resendButton = document.getElementById('resendButton');
+    const countdownElement = document.getElementById('countdown');
+    const resendTimerElement = document.getElementById('resendTimer');
+
+    // Manejar la entrada de código
+    inputs.forEach((input, index) => {
+        input.addEventListener('keyup', (e) => {
+            if (e.key >= 0 && e.key <= 9) {
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                updateCompleteCode();
+            } else if (e.key === 'Backspace') {
+                if (index > 0) {
+                    inputs[index - 1].focus();
+                }
+            }
+        });
+
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').slice(0, 6);
+            if (/^\d+$/.test(pastedData)) {
+                pastedData.split('').forEach((digit, i) => {
+                    if (inputs[i]) {
+                        inputs[i].value = digit;
+                    }
+                });
+                updateCompleteCode();
+            }
+        });
+    });
+
+    function updateCompleteCode() {
+        completeCode.value = Array.from(inputs).map(input => input.value).join('');
+    }
+
+    // Temporizador para el código
+    let timeLeft = 600; // 10 minutos
+    const countdown = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        countdownElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            countdownElement.textContent = 'Código expirado';
+            form.querySelector('button[type="submit"]').disabled = true;
+        }
+        timeLeft--;
+    }, 1000);
+
+    // Temporizador para reenvío
+    let resendTimeLeft = 30;
+    const resendCountdown = setInterval(() => {
+        resendTimerElement.textContent = resendTimeLeft;
+        
+        if (resendTimeLeft <= 0) {
+            clearInterval(resendCountdown);
+            resendButton.disabled = false;
+            resendButton.innerHTML = '<i class="fas fa-redo-alt"></i> Reenviar código';
+        }
+        resendTimeLeft--;
+    }, 1000);
+
+    // Manejar el envío del formulario
+    form.addEventListener('submit', (e) => {
+        const submitButton = form.querySelector('button[type="submit"]');
+        const verifyText = submitButton.querySelector('.verify-text');
+        const verifyLoader = submitButton.querySelector('.verify-loader');
+        
+        verifyText.classList.add('d-none');
+        verifyLoader.classList.remove('d-none');
+        submitButton.disabled = true;
+    });
+
+    // Manejar el reenvío de código
+    resendButton.addEventListener('click', () => {
+        window.location.href = "{% url 'blog:resend_2fa_code' %}";
+    });
+});
+</script>
+{% endblock %} 

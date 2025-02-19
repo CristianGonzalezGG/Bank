@@ -43,4 +43,7 @@ urlpatterns = [
     path('appointments/', views.appointment_list, name='appointment_list'),
     path('appointments/<int:appointment_id>/', views.appointment_detail, name='appointment_detail'),
     path('appointments/<int:appointment_id>/cancel/', views.appointment_cancel, name='appointment_cancel'),
+    path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
+    path('enable-2fa/', views.enable_2fa, name='enable_2fa'),
+    path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
 ]

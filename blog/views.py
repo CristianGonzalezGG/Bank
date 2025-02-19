@@ -43,6 +43,15 @@ import time
 from datetime import timedelta
 from .models import Appointment
 from .forms import AppointmentForm
+import random
+import string
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login
+from .models import UserTwoFactorSettings, TwoFactorCode
+from django.contrib.auth.models import User
 
 @login_required
 def search_client(request):
@@ -324,10 +333,20 @@ def login_view(request):
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
             user = authenticate(username=username, password=password)
+            
             if user is not None:
-                login(request, user)
-                messages.success(request, f"Bienvenido, {username}")
-                return redirect("blog:home")
+                if user.email:  # Si el usuario tiene email, forzar 2FA
+                    # Guardar el usuario en la sesión temporalmente
+                    request.session['temp_user_id'] = user.id
+                    # Generar y enviar código 2FA
+                    send_2fa_code(request, user)
+                    messages.info(request, "Por favor ingrese el código de verificación enviado a su correo.")
+                    return redirect('blog:verify_2fa')
+                else:
+                    # Si no tiene email, login normal
+                    auth_login(request, user)
+                    messages.success(request, f"Bienvenido, {username}")
+                    return redirect("blog:home")
             else:
                 messages.error(request, "Usuario o contraseña incorrectos.")
         else:
@@ -580,3 +599,122 @@ def appointment_cancel(request, appointment_id):
     appointment.save()
     messages.success(request, 'Cita cancelada exitosamente')
     return redirect('blog:appointment_list')
+
+def generate_2fa_code():
+    return ''.join(random.choices(string.digits, k=6))
+
+def send_2fa_code(request, user):
+    # Generate and save the code
+    code = generate_2fa_code()
+    expiry = timezone.now() + timedelta(minutes=10)
+    
+    # Limpiar códigos anteriores no verificados
+    TwoFactorCode.objects.filter(
+        user=user,
+        is_verified=False
+    ).delete()
+    
+    # Crear nuevo código
+    TwoFactorCode.objects.create(
+        user=user,
+        code=code,
+        expires_at=expiry
+    )
+    
+    # Send email with the code
+    send_mail(
+        'Tu código de verificación',
+        f'Tu código de verificación es: {code}\nEste código expirará en 10 minutos.',
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+    )
+
+def verify_2fa(request):
+    # Verificar si hay un usuario temporal en la sesión
+    temp_user_id = request.session.get('temp_user_id')
+    if not temp_user_id:
+        messages.error(request, 'Por favor inicie sesión primero')
+        return redirect('blog:login')
+    
+    try:
+        user = User.objects.get(id=temp_user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'Usuario no encontrado')
+        return redirect('blog:login')
+    
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        
+        valid_code = TwoFactorCode.objects.filter(
+            user=user,
+            code=code,
+            is_verified=False,
+            expires_at__gt=timezone.now()
+        ).first()
+        
+        if valid_code:
+            valid_code.is_verified = True
+            valid_code.save()
+            # Completar el login
+            auth_login(request, user)
+            # Marcar la sesión como verificada con 2FA
+            request.session['2fa_verified'] = True
+            # Limpiar el usuario temporal
+            del request.session['temp_user_id']
+            
+            messages.success(request, '¡Verificación exitosa! Bienvenido.')
+            return redirect('blog:home')
+        else:
+            messages.error(request, 'Código inválido o expirado')
+    
+    return render(request, 'blog/verify_2fa.html', {
+        'email': user.email  # Mostrar el email al que se envió el código
+    })
+
+@login_required
+def enable_2fa(request):
+    # Get or create 2FA settings for user
+    two_factor_settings, created = UserTwoFactorSettings.objects.get_or_create(
+        user=request.user
+    )
+    
+    if request.method == 'POST':
+        # Enable 2FA
+        two_factor_settings.is_enabled = True
+        two_factor_settings.save()
+        
+        # Generate and send initial verification code
+        send_2fa_code(request, request.user)
+        
+        messages.success(request, 'Two-factor authentication has been enabled.')
+        return redirect('blog:verify_2fa')
+    
+    return render(request, 'blog/enable_2fa.html', {
+        'two_factor_settings': two_factor_settings
+    })
+
+@login_required
+def disable_2fa(request):
+    try:
+        two_factor_settings = UserTwoFactorSettings.objects.get(user=request.user)
+        
+        if request.method == 'POST':
+            # Disable 2FA
+            two_factor_settings.is_enabled = False
+            two_factor_settings.save()
+            
+            # Clear 2FA verification from session
+            if '2fa_verified' in request.session:
+                del request.session['2fa_verified']
+            
+            messages.success(request, 'Two-factor authentication has been disabled.')
+            return redirect('blog:home')
+        
+        return render(request, 'blog/disable_2fa.html', {
+            'two_factor_settings': two_factor_settings
+        })
+        
+    except UserTwoFactorSettings.DoesNotExist:
+        messages.error(request, 'Two-factor authentication is not enabled.')
+        return redirect('blog:home')

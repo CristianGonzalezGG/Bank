@@ -1,0 +1,32 @@
+:root {
+  --primary-color: #1a3b5c;
+  --secondary-color: #4e73df;
+  --success-color: #1cc88a;
+  --warning-color: #f6c23e;
+  --danger-color: #e74a3b;
+  --light-bg: #f8f9fc;
+  --border-color: #e3e6f0;
+}
+
+.card {
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border: none;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* ... más estilos comunes ... */

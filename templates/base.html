@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Banco El Dorado{% endblock %}</title>
+    
+    <!-- Core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{% static 'css/common.css' %}" rel="stylesheet">
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Loader -->
+    <div class="page-loader">
+        <div class="loader-content">
+            <img src="{% static 'images/logo.png' %}" alt="Logo" class="loader-logo">
+            <div class="loader-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-glass fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'blog:home' %}">
+                <img src="{% static 'images/logo.png' %}" alt="Logo" class="navbar-logo">
+                <span class="brand-text">Banco El Dorado</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <!-- Menú de Clientes -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle nav-link-effect" href="#" 
+                               data-bs-toggle="dropdown">
+                                <i class="fas fa-users nav-icon"></i>
+                                <span>Clientes</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-animated">
+                                <a class="dropdown-item" href="{% url 'blog:client_list' %}">
+                                    <i class="fas fa-list me-2"></i>Lista de Clientes
+                                </a>
+                                <a class="dropdown-item" href="{% url 'blog:create_client' %}">
+                                    <i class="fas fa-user-plus me-2"></i>Nuevo Cliente
+                                </a>
+                                <a class="dropdown-item" href="{% url 'blog:search_client' %}">
+                                    <i class="fas fa-search me-2"></i>Buscar Cliente
+                                </a>
+                            </div>
+                        </li>
+
+                        <!-- Menú de Préstamos -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle nav-link-effect" href="#" 
+                               data-bs-toggle="dropdown">
+                                <i class="fas fa-money-bill-wave nav-icon"></i>
+                                <span>Préstamos</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-animated">
+                                <a class="dropdown-item" href="{% url 'blog:loan_list' %}">
+                                    <i class="fas fa-list me-2"></i>Lista de Préstamos
+                                </a>
+                                <a class="dropdown-item" href="{% url 'blog:loan_create' %}">
+                                    <i class="fas fa-plus-circle me-2"></i>Nuevo Préstamo
+                                </a>
+                            </div>
+                        </li>
+
+                        <!-- Citas -->
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-effect" href="{% url 'blog:appointment_list' %}">
+                                <i class="fas fa-calendar-alt nav-icon"></i>
+                                <span>Citas</span>
+                            </a>
+                        </li>
+
+                        <!-- Perfil de Usuario -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle nav-link-effect" href="#" 
+                               data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle nav-icon"></i>
+                                <span>{{ user.username }}</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-animated dropdown-menu-end">
+                                <div class="dropdown-header">
+                                    <div class="user-info">
+                                        <i class="fas fa-user-circle fa-3x mb-2"></i>
+                                        <h6 class="mb-0">{{ user.get_full_name }}</h6>
+                                        <small class="text-muted">{{ user.email }}</small>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cog me-2"></i>Configuración
+                                </a>
+                                <a class="dropdown-item" href="{% url 'blog:logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                </a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-effect" href="{% url 'blog:login' %}">
+                                <i class="fas fa-sign-in-alt nav-icon"></i>
+                                <span>Iniciar Sesión</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-effect" href="{% url 'blog:register' %}">
+                                <i class="fas fa-user-plus nav-icon"></i>
+                                <span>Registrarse</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-waves">
+            <div class="wave wave1"></div>
+            <div class="wave wave2"></div>
+            <div class="wave wave3"></div>
+            <div class="wave wave4"></div>
+        </div>
+        
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <img src="{% static 'images/logo.png' %}" alt="Logo" class="footer-logo">
+                        <h5>Banco El Dorado</h5>
+                        <p>Tu seguridad financiera es nuestra prioridad</p>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2">
+                    <h6>Enlaces Rápidos</h6>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'blog:home' %}">Inicio</a></li>
+                        <li><a href="#">Nosotros</a></li>
+                        <li><a href="#">Servicios</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3">
+                    <h6>Servicios</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Cuentas de Ahorro</a></li>
+                        <li><a href="#">Préstamos Personales</a></li>
+                        <li><a href="#">Tarjetas de Crédito</a></li>
+                        <li><a href="#">Inversiones</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3">
+                    <h6>Contacto</h6>
+                    <ul class="footer-contact">
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>123 Calle Principal, Ciudad</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <span>+1 234 567 890</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <span>info@bancoeldorado.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>&copy; {% now "Y" %} Banco El Dorado. Todos los derechos reservados.</p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <p>Diseñado con <i class="fas fa-heart text-danger"></i> por Nuestro Equipo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{% static 'js/base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

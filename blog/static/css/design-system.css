@@ -1,0 +1,204 @@
+/* Sistema de Diseño Banco El Dorado */
+:root {
+  /* Paleta de colores corporativa */
+  --gold-primary: #D4AF37;
+  --gold-secondary: #FFD700;
+  --gold-accent: #B8860B;
+  --navy-dark: #1A3B5C;
+  --navy-light: #2A5298;
+  --white: #FFFFFF;
+  --gray-100: #F8F9FA;
+  --gray-200: #E9ECEF;
+  --gray-800: #343A40;
+  
+  /* Tipografía */
+  --font-primary: 'Montserrat', sans-serif;
+  --font-secondary: 'Playfair Display', serif;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  
+  /* Bordes */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* Animaciones Sofisticadas */
+@keyframes floatIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
+  }
+}
+
+/* Clases de Utilidad */
+.float-in {
+  animation: floatIn 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, 
+    var(--gray-100) 0%, 
+    var(--white) 50%, 
+    var(--gray-100) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s infinite;
+}
+
+/* Componentes Personalizados */
+.btn-eldorado {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+  color: var(--navy-dark);
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-primary);
+  font-weight: 600;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-eldorado::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.2),
+    transparent
+  );
+  transition: var(--transition-normal);
+}
+
+.btn-eldorado:hover::before {
+  left: 100%;
+}
+
+.card-eldorado {
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+  border: 1px solid var(--gray-200);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-eldorado::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold-primary), var(--gold-secondary));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-normal);
+}
+
+.card-eldorado:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-eldorado:hover::after {
+  transform: scaleX(1);
+}
+
+/* Efectos de Texto */
+.text-gradient {
+  background: linear-gradient(135deg, var(--navy-dark), var(--navy-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Loader Personalizado */
+.loader-eldorado {
+  width: 50px;
+  height: 50px;
+  border: 3px solid var(--gray-200);
+  border-radius: 50%;
+  border-top-color: var(--gold-primary);
+  animation: spin 1s infinite ease-in-out;
+  position: relative;
+}
+
+.loader-eldorado::before,
+.loader-eldorado::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  border-top-color: var(--gold-secondary);
+  animation: spin 2s infinite ease-in-out;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .btn-eldorado {
+    padding: 10px 20px;
+  }
+  
+  .card-eldorado {
+    padding: 16px;
+  }
+} 
