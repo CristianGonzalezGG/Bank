@@ -1,21 +1,52 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <h2>Verificación de dos factores</h2>
-    <p>Se ha enviado un código de verificación a: {{ email }}</p>
+<div class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+    <h2 class="text-3xl font-bold text-center mb-6">Verificación de Dos Factores</h2>
+    <p class="text-center text-gray-600">Se ha enviado un código de verificación a: <strong>{{ email }}</strong></p>
     
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <input type="text" name="code" maxlength="6" required 
-                   class="form-control" placeholder="Ingrese el código de 6 dígitos">
+    <div class="flex justify-center mb-4">
+        <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-shield-alt text-white text-3xl"></i>
         </div>
-        <button type="submit" class="btn btn-primary">Verificar</button>
+    </div>
+
+    <form method="post" class="flex justify-center mb-4">
+        {% csrf_token %}
+        <input type="text" name="code" maxlength="6" required 
+               class="w-48 h-12 text-center border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+               placeholder="Ingrese el código de 6 dígitos" 
+               aria-label="Código de verificación" 
+               pattern="\d{6}" 
+               oninput="this.value = this.value.replace(/[^0-9]/g, '');">
     </form>
+
+    <button type="button" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition duration-300" onclick="submitForm()">Verificar</button>
     
-    <div class="mt-3">
-        <a href="{% url 'blog:login' %}" class="btn btn-secondary">Volver al inicio de sesión</a>
+    <div class="mt-4 text-center">
+        <a href="{% url 'blog:login' %}" class="text-blue-600 hover:underline">Volver al inicio de sesión</a>
     </div>
 </div>
+
+<!-- Agregar Tailwind CSS -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<!-- Agregar Font Awesome para el ícono -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Agregar animaciones de Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script>
+    // Función para enviar el formulario
+    function submitForm() {
+        document.querySelector('form').submit();
+    }
+
+    // Animación de bienvenida
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.container');
+        container.classList.add('animate__animated', 'animate__fadeIn');
+        setTimeout(() => {
+            container.classList.add('animate__animated', 'animate__bounce');
+        }, 1000);
+    });
+</script>
 {% endblock %} 
