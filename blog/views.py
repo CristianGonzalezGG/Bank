@@ -181,9 +181,13 @@ def educacion(request):
     return render(request, 'educacion_financiera.html')
 def negocios(request):
     return render(request, 'negocios.html')
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.html import format_html
+from datetime import datetime
 
 def pqr(request):
-    """Vista para mostrar y procesar el formulario de PQR."""
+    """Vista para mostrar y procesar el formulario de PQR con un correo más estilizado."""
     if request.method == 'POST':
         form = PQRForm(request.POST)
         if form.is_valid():
@@ -199,67 +203,54 @@ def pqr(request):
             # Generar número de radicado
             radicado = generate_radicado()
             
-            # Construir el mensaje de correo
-            mensaje = f"""
-            NUEVA SOLICITUD PQR - Banco El Dorado
-            =====================================
-            
-            Número de Radicado: {radicado}
-            Fecha y hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            
-            INFORMACIÓN DEL SOLICITANTE:
-            ----------------------------
-            Nombre completo: {nombre}
-            Correo electrónico: {email}
-            Documento de identidad: {documento}
-            Teléfono de contacto: {telefono}
-            
-            DETALLES DE LA SOLICITUD:
-            ------------------------
-            Tipo de solicitud: {tipo}
-            Asunto: {asunto}
-            
-            DESCRIPCIÓN:
-            -----------
-            {descripcion}
-            
-            =====================================
-            Este correo ha sido generado automáticamente por el sistema de PQR del Banco El Dorado.
-            Por favor no responda a este mensaje.
-            """
-            
+            # Construir el mensaje de correo en HTML
+            mensaje_html = format_html(f"""
+                <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                    <h2 style="color: #2c3e50;">Nueva Solicitud PQR - Banco El Dorado</h2>
+                    <hr style="border: 1px solid #ddd;">
+                    
+                    <p><strong>Número de Radicado:</strong> {radicado}</p>
+                    <p><strong>Fecha y Hora:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+
+                    <h3 style="color: #2980b9;">Información del Solicitante:</h3>
+                    <p><strong>Nombre Completo:</strong> {nombre}</p>
+                    <p><strong>Correo Electrónico:</strong> {email}</p>
+                    <p><strong>Documento de Identidad:</strong> {documento}</p>
+                    <p><strong>Teléfono de Contacto:</strong> {telefono}</p>
+
+                    <h3 style="color: #2980b9;">Detalles de la Solicitud:</h3>
+                    <p><strong>Tipo de Solicitud:</strong> {tipo}</p>
+                    <p><strong>Asunto:</strong> {asunto}</p>
+
+                    <h3 style="color: #c0392b;">Descripción:</h3>
+                    <p style="background: #f8f9fa; padding: 10px; border-left: 4px solid #c0392b;">{descripcion}</p>
+
+                    <hr style="border: 1px solid #ddd;">
+                    <p style="font-size: 12px; color: #7f8c8d;">
+                        Este correo ha sido generado automáticamente por el sistema de PQR del Banco El Dorado.<br>
+                        Por favor, no responda a este mensaje.
+                    </p>
+                </div>
+            """)
+
             try:
                 # Enviar correo
                 send_mail(
-                    f'[PQR-{radicado}] {tipo}: {asunto}',
-                    mensaje,
-                    settings.PQR_RECIPIENT_EMAIL,
-                    [settings.DEFAULT_FROM_EMAIL],
-                    fail_silently=False,
+                    subject=f'[PQR-{radicado}] {tipo}: {asunto}',
+                    message='Este correo no admite formato HTML. Por favor, visualícelo en un cliente de correo compatible.',
+                    html_message=mensaje_html,
+                    from_email=settings.PQR_RECIPIENT_EMAIL,
+                    recipient_list=[settings.DEFAULT_FROM_EMAIL],
                 )
-                
+
                 # Mensaje de éxito y redirección
                 messages.success(request, f'Su solicitud ha sido enviada exitosamente. Su número de radicado es: {radicado}')
-                
-                # Preparar un nuevo formulario vacío
-                form = PQRForm()
-                
-                # Pasar el radicado al contexto para mostrarlo
-                return render(request, 'pqr.html', {
-                    'form': form,
-                    'radicado': radicado,
-                    'envio_exitoso': True
-                })
-                
+                return render(request, 'pqr.html', {'form': PQRForm(), 'radicado': radicado, 'envio_exitoso': True})
+
             except Exception as e:
-                # Registrar el error y mostrar mensaje
-                print(f"Error al enviar correo: {str(e)}")
                 messages.error(request, f'Ocurrió un error al enviar su solicitud: {str(e)}')
-    else:
-        # GET request - mostrar formulario vacío
-        form = PQRForm()
-    
-    return render(request, 'pqr.html', {'form': form})
+
+    return render(request, 'pqr.html', {'form': PQRForm()})
 
 def tramites(request):
     return render(request, 'tramites_digitales.html')
