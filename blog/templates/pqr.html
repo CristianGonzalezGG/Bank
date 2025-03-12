@@ -1,29 +1,787 @@
 {% extends 'base.html' %}
 
-{% block title %}PQR - Banco El Dorado{% endblock %}
+{% block title %}Centro de Atención - Banco El Dorado{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos para la sección héroe */
+    .pqr-hero {
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: white;
+        border-radius: 16px;
+        padding: 3.5rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .pqr-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+        z-index: 0;
+    }
+    
+    .pqr-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -50%;
+        left: -30%;
+        width: 80%;
+        height: 80%;
+        background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, rgba(0,212,255,0) 60%);
+        z-index: 0;
+    }
+    
+    .pqr-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Estilos para tarjetas */
+    .pqr-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        background-color: var(--card-bg);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .pqr-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Estilos para cajas de iconos */
+    .pqr-icon-box {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        transform: rotate(0deg);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(10, 37, 64, 0.15);
+    }
+    
+    .pqr-card:hover .pqr-icon-box {
+        transform: rotate(-10deg) scale(1.1);
+        box-shadow: 0 15px 30px rgba(10, 37, 64, 0.2);
+    }
+    
+    .pqr-icon {
+        font-size: 2.5rem;
+        color: white;
+    }
+    
+    /* Estilos para seguimiento de estados */
+    .status-track {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 3rem 0;
+    }
+    
+    .status-track::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: var(--border);
+        transform: translateY(-50%);
+        z-index: 0;
+    }
+    
+    .status-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .status-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: white;
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.8rem;
+        transition: all 0.3s ease;
+        color: var(--text-light);
+    }
+    
+    .status-step.active .status-dot {
+        background: linear-gradient(135deg, var(--secondary), #66e2ff);
+        border-color: var(--secondary);
+        color: var(--primary);
+        box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+    }
+    
+    .status-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-light);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .status-step.active .status-label {
+        color: var(--primary);
+    }
+    
+    /* Estilos para formularios */
+    .form-control {
+        border: 1px solid var(--border);
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        box-shadow: none;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: var(--secondary);
+        box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: var(--text);
+    }
+    
+    /* Estilos para carga de archivos */
+    .file-upload {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border: 2px dashed var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload:hover {
+        border-color: var(--secondary);
+    }
+    
+    .file-upload input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+    
+    .upload-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background-color: rgba(0, 212, 255, 0.1);
+        color: var(--secondary);
+        font-size: 1.5rem;
+    }
+    
+    /* Estilos para acordeón */
+    .accordion-button {
+        box-shadow: none !important;
+        padding: 1.2rem;
+        font-weight: 500;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        color: var(--primary);
+        background-color: rgba(0, 212, 255, 0.05);
+    }
+    
+    .accordion-button:focus {
+        border-color: var(--border);
+        box-shadow: none;
+    }
+    
+    .accordion-item {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        margin-bottom: 0.75rem;
+    }
+
+    /* Estilos para sección de contacto */
+    .contact-methods {
+        padding-top: 2rem;
+        margin-top: 2rem;
+        border-top: 1px solid var(--border);
+    }
+    
+    .contact-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    /* Estilos para botones */
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        border: none;
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(10, 37, 64, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(10, 37, 64, 0.3);
+    }
+    
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline:hover {
+        background-color: var(--primary);
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    /* Efecto de resaltado en hover */
+    .highlight-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .highlight-hover:hover {
+        background-color: rgba(0, 212, 255, 0.05);
+        transform: translateX(5px);
+    }
+    
+    /* Animación de pulso para elementos importantes */
+    @keyframes pulse-soft {
+        0% {
+            box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(0, 212, 255, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
+        }
+    }
+    
+    .pulse-animation {
+        animation: pulse-soft 2s infinite;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="text-center mb-4 p-4" style="background-color: #f9fafb; border-radius: 8px;">
-        <h2 class="display-5 font-weight-bold animate__animated animate__fadeInDown">Peticiones, Quejas y Reclamos</h2>
-        <p class="lead animate__animated animate__fadeIn animate__delay-1s">Tu opinión es importante para nosotros.</p>
+<div class="container py-5">
+    <div class="pqr-hero" data-aos="fade-up">
+        <div class="pqr-hero-content text-center">
+            <h1 class="display-4 fw-bold mb-4">Centro de Atención al Cliente</h1>
+            <p class="lead mb-4">Tu opinión es valiosa para nosotros. Gestionamos tus peticiones, quejas y reclamos con la mayor prioridad.</p>
+            <a href="#pqr-form" class="btn btn-light btn-lg">
+                <i class="fas fa-paper-plane me-2"></i>Presentar PQR
+            </a>
+        </div>
     </div>
 
-    <h3>¿Cómo presentar un PQR?</h3>
-    <ol>
-        <li><strong>Petición:</strong> Solicita información o servicios específicos.</li>
-        <li><strong>Queja:</strong> Expón tu inconformidad respecto a un servicio recibido.</li>
-        <li><strong>Reclamo:</strong> Solicita la corrección de un error o compensación por un inconveniente.</li>
-    </ol>
+    <div class="row mb-5">
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="pqr-card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="pqr-icon-box">
+                        <i class="fas fa-question-circle pqr-icon"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Petición</h3>
+                    <p class="text-muted">Solicitud de información, documentos o servicios específicos relacionados con nuestros productos.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="pqr-card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="pqr-icon-box">
+                        <i class="fas fa-comment-alt pqr-icon"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Queja</h3>
+                    <p class="text-muted">Manifestación de inconformidad respecto a la atención recibida o alguno de nuestros servicios.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="pqr-card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="pqr-icon-box">
+                        <i class="fas fa-exclamation-circle pqr-icon"></i>
+                    </div>
+                    <h3 class="h4 mb-3">Reclamo</h3>
+                    <p class="text-muted">Solicitud formal para la revisión de una transacción, cobro incorrecto o compensación por un servicio.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <p>Puedes presentar tu PQR de las siguientes formas:</p>
-    <ul class="list-unstyled">
-        <li class="mb-2 animate__animated animate__fadeInRight"><a href="#">Formulario web</a> en línea.</li>
-        <li class="mb-2 animate__animated animate__fadeInRight animate__delay-1s">Llamando a nuestra línea de atención al cliente.</li>
-        <li class="mb-2 animate__animated animate__fadeInRight animate__delay-2s">En cualquiera de nuestras sucursales.</li>
-    </ul>
+    <div class="row mb-5">
+        <div class="col-12" data-aos="fade-up">
+            <div class="pqr-card">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-4">¿Cómo se gestiona tu PQR?</h2>
+                    <div class="status-track">
+                        <div class="status-step active" id="step1">
+                            <div class="status-dot">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                            <div class="status-label">Presentación</div>
+                        </div>
+                        <div class="status-step" id="step2">
+                            <div class="status-dot">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div class="status-label">Recepción</div>
+                        </div>
+                        <div class="status-step" id="step3">
+                            <div class="status-dot">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="status-label">Análisis</div>
+                        </div>
+                        <div class="status-step" id="step4">
+                            <div class="status-dot">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="status-label">Solución</div>
+                        </div>
+                        <div class="status-step" id="step5">
+                            <div class="status-dot">
+                                <i class="fas fa-envelope-open-text"></i>
+                            </div>
+                            <div class="status-label">Respuesta</div>
+                        </div>
+                    </div>
+                    <p class="text-center mb-0">Nos comprometemos a dar respuesta en un plazo máximo de <strong>15 días hábiles</strong>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <p>Nos comprometemos a dar respuesta en un plazo máximo de 15 días hábiles.</p>
+    <div class="row" id="pqr-form">
+        <div class="col-lg-8" data-aos="fade-up">
+            <div class="pqr-card">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-4">Formulario PQR</h2>
+                    <form id="pqrForm" method="post">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="nombre" class="form-label">Nombre completo</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nombre completo" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="correo@ejemplo.com" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="documento" class="form-label">Número de documento</label>
+                                <input type="text" class="form-control" id="documento" placeholder="Número de identificación" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label">Teléfono de contacto</label>
+                                <input type="tel" class="form-control" id="telefono" placeholder="Teléfono de contacto" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tipo" class="form-label">Tipo de solicitud</label>
+                            <select class="form-select" id="tipo" required>
+                                <option value="" selected disabled>Seleccione el tipo de solicitud</option>
+                                <option value="PETICION">Petición</option>
+                                <option value="QUEJA">Queja</option>
+                                <option value="RECLAMO">Reclamo</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="asunto" class="form-label">Asunto</label>
+                            <input type="text" class="form-control" id="asunto" name="asunto" placeholder="Asunto de su solicitud" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción detallada</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="5" placeholder="Describa detalladamente su solicitud" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Adjuntar archivos (opcional)</label>
+                            <div class="file-upload">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-medium">Arrastre sus archivos aquí o haga clic para seleccionar</p>
+                                    <small class="text-muted">Formatos permitidos: PDF, JPG, PNG (máx. 5MB)</small>
+                                </div>
+                                <input type="file" id="archivo_adjunto" accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="autorizacion" required>
+                            <label class="form-check-label" for="autorizacion">Autorizo el tratamiento de mis datos personales según la política de privacidad</label>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-submit pulse-animation">
+                                <i class="fas fa-paper-plane me-2"></i>Enviar Solicitud
+                            </button>
+                        </div>
+                        <input type="hidden" name="destinatario" value="asesoresbancoeldorado@gmail.com">
+                    </form>
+                    
+                    <div class="contact-methods text-center mt-5">
+                        <h4 class="h5 mb-4">Otras formas de contacto</h4>
+                        <div class="row justify-content-center">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="contact-icon me-3">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <strong>Línea Nacional</strong><br>
+                                        01 8000 123 456
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="contact-icon me-3">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <strong>Correo electrónico</strong><br>
+                                        servicio@bancoeldorado.com
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="contact-icon me-3">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <strong>Oficinas</strong><br>
+                                        Lun-Vie: 9am - 4pm
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="pqr-card mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-4">Estado de tu PQR</h2>
+                    <form id="consultaForm">
+                        <div class="mb-3">
+                            <label for="numeroRadicado" class="form-label">Número de radicado</label>
+                            <input type="text" class="form-control" id="numeroRadicado" placeholder="Ingrese el número de radicado">
+                        </div>
+                        <div class="mb-3">
+                            <label for="documentoConsulta" class="form-label">Documento de identidad</label>
+                            <input type="text" class="form-control" id="documentoConsulta" placeholder="Ingrese su documento">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-outline">
+                                <i class="fas fa-search me-2"></i>Consultar Estado
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="pqr-card">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-4">Preguntas Frecuentes</h2>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    ¿Cuál es el tiempo de respuesta para mi PQR?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    El tiempo máximo de respuesta es de 15 días hábiles a partir de la recepción de su solicitud. En casos complejos, este plazo podría extenderse, lo cual será notificado oportunamente.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    ¿Qué información debo tener a mano?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Es importante tener su documento de identidad, números de productos asociados, fechas de transacciones y cualquier soporte documental relacionado con su solicitud.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    ¿Cómo obtengo el número de radicado?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Al completar su solicitud, recibirá inmediatamente un número de radicado por correo electrónico. Este número es importante para realizar seguimiento a su caso.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFour">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    ¿Puedo adjuntar documentos a mi PQR?
+                                </button>
+                            </h2>
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Sí, puede adjuntar hasta 3 archivos con un tamaño máximo de 5MB cada uno. Los formatos permitidos son PDF, JPG y PNG para facilitar la revisión de su caso.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFive">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                    ¿Puedo modificar mi PQR después de enviada?
+                                </button>
+                            </h2>
+                            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Una vez enviada la solicitud no es posible modificarla directamente. Sin embargo, puede comunicarse con nuestra línea de atención y proporcionar el número de radicado para agregar información adicional a su caso.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simulación de activación de pasos (con fines de demostración)
+        const steps = document.querySelectorAll('.status-step');
+        let currentStep = 0;
+        
+        function activateNextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                steps[currentStep].classList.add('active');
+                
+                // Animación sutil de los elementos
+                gsap.to(steps[currentStep].querySelector('.status-dot'), {
+                    scale: 1.2,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1
+                });
+                
+                setTimeout(activateNextStep, 1500);
+            }
+        }
+        
+        setTimeout(activateNextStep, 1500);
+        
+        // Mejora el comportamiento del input de archivo
+        const fileInput = document.querySelector('input[type="file"]');
+        const fileUpload = document.querySelector('.file-upload');
+        
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                fileUpload.classList.add('border-primary');
+                const uploadText = fileUpload.querySelector('p');
+                uploadText.textContent = 'Archivo seleccionado: ' + fileName;
+            }
+        });
+        
+        // Efecto 3D suave para tarjetas
+        document.querySelectorAll('.pqr-card').forEach(card => {
+            card.addEventListener('mousemove', function(e) {
+                const cardRect = card.getBoundingClientRect();
+                const cardCenterX = cardRect.left + cardRect.width / 2;
+                const cardCenterY = cardRect.top + cardRect.height / 2;
+                const mouseX = e.clientX - cardCenterX;
+                const mouseY = e.clientY - cardCenterY;
+                
+                // Cálculo del ángulo de rotación basado en la posición del mouse
+                const rotateX = mouseY * -0.01;
+                const rotateY = mouseX * 0.01;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                card.style.transform = '';
+            });
+        });
+
+        // Actualiza el evento submit del formulario PQR
+        const pqrForm = document.getElementById('pqrForm');
+        if (pqrForm) {
+            pqrForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+                
+                // Recopilar los datos del formulario
+                const formData = new FormData(pqrForm);
+                
+                // Enviar los datos mediante una solicitud AJAX
+                fetch('{% url "blog:pqr_submit" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar mensaje de éxito con el número de radicado
+                        showToast('Solicitud enviada', `Hemos recibido su solicitud correctamente. Su número de radicado es: ${data.radicado}`, 'success');
+                        
+                        // Restablecer formulario
+                        pqrForm.reset();
+                        if (fileUpload) {
+                            fileUpload.classList.remove('border-primary');
+                            const uploadText = fileUpload.querySelector('p');
+                            if (uploadText) {
+                                uploadText.textContent = 'Arrastre sus archivos aquí o haga clic para seleccionar';
+                            }
+                        }
+                    } else {
+                        // Mostrar mensaje de error
+                        showToast('Error', data.message || 'Ha ocurrido un error al procesar su solicitud.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error', 'Ha ocurrido un error al enviar su solicitud. Por favor, inténtelo de nuevo.', 'error');
+                })
+                .finally(() => {
+                    // Restaurar botón
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
+            });
+        }
+        
+        // Formulario de consulta
+        const consultaForm = document.getElementById('consultaForm');
+        if (consultaForm) {
+            consultaForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Consultando...';
+                
+                setTimeout(() => {
+                    // Simulación de respuesta
+                    showToast('Consulta realizada', 'Su solicitud está en proceso de análisis por nuestro equipo.', 'info');
+                    
+                    // Restaurar botón
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }, 1500);
+            });
+        }
+        
+        // Función para mostrar toast (utilizando la función del tema principal)
+        function showToast(title, message, type) {
+            if (typeof window.showToast === 'function') {
+                window.showToast(title, message, type, 5000);
+            } else {
+                console.log(`${type.toUpperCase()}: ${title} - ${message}`);
+                // Implementación básica por si no existe la función global
+                alert(`${title}: ${message}`);
+            }
+        }
+        
+        // Añadir efecto de resplandor a los elementos de contacto
+        document.querySelectorAll('.contact-icon').forEach(icon => {
+            icon.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    boxShadow: '0 0 20px rgba(0, 212, 255, 0.5)',
+                    scale: 1.1,
+                    duration: 0.3
+                });
+            });
+            
+            icon.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    boxShadow: '0 0 0 rgba(0, 212, 255, 0)',
+                    scale: 1,
+                    duration: 0.3
+                });
+            });
+        });
+    });
+</script>
 {% endblock %}

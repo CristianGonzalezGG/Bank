@@ -51,7 +51,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blog.apps.BlogConfig'
+    'blog',
+    'client_portal',
+
 ]
 
 MIDDLEWARE = [
@@ -69,7 +71,12 @@ ROOT_URLCONF = 'mysiteWeb.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'blog/templates'),
+            os.path.join(BASE_DIR, 'formularios/templates'),
+            os.path.join(BASE_DIR, 'client_portal/templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -149,9 +156,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'asesoresbancoeldorado@gmail.com'
-EMAIL_HOST_PASSWORD = 'pmzy doom zoxu rjfi'
-DEFAULT_FROM_EMAIL = 'Banco El Dorado <asesoresbancoeldorado@gmail.com>'
+EMAIL_HOST_USER = 'solicitudeseldorado@gmail.com'
+EMAIL_HOST_PASSWORD = 'lvuu sevn fwxr uyok'
+DEFAULT_FROM_EMAIL = 'Banco El Dorado <solicitudeseldorado@gmail.com>'
 
 # Configuración para pdfkit
 WKHTMLTOPDF_CMD = '/usr/bin/wkhtmltopdf'

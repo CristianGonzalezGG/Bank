@@ -2,32 +2,811 @@
 
 {% block title %}Trámites Digitales - Banco El Dorado{% endblock %}
 
+{% block extra_css %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    .tramites-hero {
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: white;
+        border-radius: 16px;
+        padding: 3.5rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .tramites-hero::before {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -20%;
+        width: 80%;
+        height: 200%;
+        background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+        transform: rotate(-30deg);
+        z-index: 0;
+    }
+    
+    .tramites-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .tramites-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        background-color: var(--card-bg);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease;
+        position: relative;
+        height: 100%;
+    }
+    
+    .tramites-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tramites-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transition: height 0.3s ease;
+        z-index: 1;
+    }
+    
+    .tramites-card:hover::before {
+        height: 8px;
+    }
+    
+    .tramite-icon-wrapper {
+        width: 85px;
+        height: 85px;
+        border-radius: 16px;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .tramite-icon-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        transform: rotate(0deg);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(10, 37, 64, 0.2);
+    }
+    
+    .tramites-card:hover .tramite-icon-bg {
+        transform: rotate(-15deg) scale(1.15);
+    }
+    
+    .tramite-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        color: white;
+        z-index: 2;
+    }
+    
+    .feature-item {
+        display: flex;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-icon {
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background-color: rgba(10, 37, 64, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: var(--primary);
+        transition: all 0.3s ease;
+    }
+    
+    .feature-item:hover .feature-icon {
+        background-color: var(--primary);
+        color: white;
+        transform: rotate(-10deg);
+    }
+    
+    .feature-content {
+        flex-grow: 1;
+    }
+    
+    .process-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+    
+    .process-step::after {
+        content: '';
+        position: absolute;
+        top: 25px;
+        right: -50%;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary-light), var(--secondary));
+        z-index: 0;
+    }
+    
+    .process-step:last-child::after {
+        display: none;
+    }
+    
+    .step-number {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 1.2rem;
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 5px 15px rgba(10, 37, 64, 0.2);
+    }
+    
+    .step-number::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        bottom: -5px;
+        left: -5px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(10, 37, 64, 0.1), rgba(0, 212, 255, 0.1));
+        z-index: -1;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: all 0.3s ease;
+    }
+    
+    .process-step:hover .step-number::before {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    .btn-tramite {
+        position: relative;
+        overflow: hidden;
+        border-radius: 50px;
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+    
+    .btn-tramite::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        z-index: -1;
+        transition: all 0.5s ease;
+    }
+    
+    .btn-tramite:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(10, 37, 64, 0.15);
+    }
+    
+    .btn-outline-tramite {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+    }
+    
+    .btn-outline-tramite::before {
+        opacity: 0;
+    }
+    
+    .btn-outline-tramite:hover {
+        color: white;
+    }
+    
+    .btn-outline-tramite:hover::before {
+        opacity: 1;
+    }
+    
+    .tramite-check {
+        color: var(--success);
+        margin-right: 0.5rem;
+    }
+    
+    .security-section {
+        background: linear-gradient(135deg, rgba(10, 37, 64, 0.02), rgba(0, 212, 255, 0.05));
+        border-radius: 16px;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .security-section::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(0, 212, 255, 0.1), rgba(0, 212, 255, 0));
+        top: -150px;
+        right: -150px;
+        z-index: 0;
+    }
+    
+    .security-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        background-color: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .security-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .security-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transition: height 0.3s ease;
+        z-index: 1;
+    }
+    
+    .security-card:hover::before {
+        height: 8px;
+    }
+    
+    .security-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 16px;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .security-icon-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        transform: rotate(0deg);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(10, 37, 64, 0.2);
+    }
+    
+    .security-card:hover .security-icon-bg {
+        transform: rotate(-15deg) scale(1.15);
+    }
+    
+    .security-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        color: white;
+        z-index: 2;
+    }
+    
+    .security-item {
+        display: flex;
+        margin-bottom: 1.5rem;
+    }
+    
+    .security-item:hover .security-icon {
+        color: var(--primary);
+    }
+    
+    .security-content {
+        flex-grow: 1;
+    }
+    
+    .security-title {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    
+    .security-text {
+        text-align: justify;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="text-center mb-4 p-4" style="background-color: #f9fafb; border-radius: 8px;">
-        <h2 class="display-5 font-weight-bold animate__animated animate__fadeInDown">Trámites Digitales</h2>
-        <p class="lead animate__animated animate__fadeIn animate__delay-1s">Realiza tus operaciones bancarias desde casa.</p>
+<div class="container py-5">
+    <div class="tramites-hero text-center" data-aos="fade-up">
+        <h1 class="display-4 fw-bold mb-4">Trámites Digitales</h1>
+        <p class="lead mb-4">Gestiona tus operaciones bancarias desde cualquier lugar, en cualquier momento, con total seguridad y sin filas.</p>
+        <a href="#tramites-section" class="btn btn-light btn-lg btn-tramite">
+            <i class="fas fa-laptop me-2"></i>Conoce nuestros trámites
+        </a>
     </div>
 
-    <h3>Guía Paso a Paso</h3>
-    
-    <h4>1. Apertura de Cuenta</h4>
-    <p>Abre tu cuenta en solo 5 minutos. <a href="#">Apertura de cuenta en línea</a>.</p>
-    
-    <h4>2. Solicitud de Crédito</h4>
-    <ul>
-        <li>Completar el formulario en línea</li>
-        <li>Subir documentos</li>
-        <li>Recibir aprobación por correo</li>
-    </ul>
-    
-    <h4>3. Transferencias Internacionales</h4>
-    <p>Envía dinero al extranjero de forma segura con tecnología de encriptación avanzada.</p>
-    
-    <h4>4. Actualización de Datos</h4>
-    <p>Actualiza tu información a través de nuestra app o portal web.</p>
-    
-    <p>Para más detalles, visita nuestras <a href="#">FAQs</a> o usa nuestro chat en línea.</p>
+    <div class="row mb-5">
+        <div class="col-md-6" data-aos="fade-right">
+            <h2 class="h3 mb-4">Banca Digital: Tu Sucursal 24/7</h2>
+            <p class="lead text-muted mb-4">En Banco El Dorado hemos digitalizado nuestros principales trámites para brindarte una experiencia bancaria rápida, segura y sin complicaciones.</p>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title h5">Seguridad Avanzada</h3>
+                    <p class="text-muted">Utilizamos protocolos de encriptación y autenticación de dos factores para proteger tus operaciones.</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title h5">Rapidez y Eficiencia</h3>
+                    <p class="text-muted">Completa trámites en minutos que antes requerían múltiples visitas a sucursales.</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title h5">Disponibilidad 24/7</h3>
+                    <p class="text-muted">Accede a nuestros servicios las 24 horas del día, los 7 días de la semana.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6" data-aos="fade-left" data-aos-delay="200">
+            <div class="device-mockup">
+                <img src="https://img.freepik.com/free-vector/banking-app-interface-concept_52683-41892.jpg" alt="Aplicación móvil Banco El Dorado" class="device-screen img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5" id="tramites-section">
+        <div class="col-12 text-center mb-4" data-aos="fade-up">
+            <h2 class="display-5 fw-bold">Nuestros Trámites Digitales</h2>
+            <p class="lead text-muted">Selecciona el trámite que necesitas y comienza ahora mismo.</p>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="tramites-card h-100">
+                <div class="tramites-card-body">
+                    <div class="text-center">
+                        <div class="tramite-icon-wrapper">
+                            <div class="tramite-icon-bg">
+                                <i class="fas fa-piggy-bank"></i>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-3">Apertura de Cuenta</h3>
+                        <p class="text-muted mb-4">Abre tu cuenta de ahorros o corriente en pocos minutos y comienza a disfrutar de los beneficios de ser cliente del Banco El Dorado.</p>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Sin costos de apertura</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Validación de identidad digital</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Activación inmediata</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-tramite">
+                            <i class="fas fa-plus-circle me-2"></i>Abrir Cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="tramites-card h-100">
+                <div class="tramites-card-body">
+                    <div class="text-center">
+                        <div class="tramite-icon-wrapper">
+                            <div class="tramite-icon-bg">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-3">Solicitud de Tarjetas</h3>
+                        <p class="text-muted mb-4">Solicita tu tarjeta de crédito o débito personalizada con los mejores beneficios del mercado financiero.</p>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Pre-aprobación en minutos</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Entrega a domicilio</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Activación por app</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-tramite">
+                            <i class="fas fa-plus-circle me-2"></i>Solicitar Tarjeta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="tramites-card h-100">
+                <div class="tramites-card-body">
+                    <div class="text-center">
+                        <div class="tramite-icon-wrapper">
+                            <div class="tramite-icon-bg">
+                                <i class="fas fa-hand-holding-usd"></i>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-3">Solicitud de Crédito</h3>
+                        <p class="text-muted mb-4">Solicita tu crédito personal, hipotecario o de libre inversión con las mejores tasas del mercado.</p>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Aprobación express</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Tasas preferenciales</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Sin papeleos físicos</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-tramite">
+                            <i class="fas fa-plus-circle me-2"></i>Solicitar Crédito
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mt-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="tramites-card h-100">
+                <div class="tramites-card-body">
+                    <div class="text-center">
+                        <div class="tramite-icon-wrapper">
+                            <div class="tramite-icon-bg">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-3">Certificaciones</h3>
+                        <p class="text-muted mb-4">Genera certificados bancarios, extractos y paz y salvos en formato digital con firma electrónica.</p>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Descarga inmediata</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Firma digital válida</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Envío por correo opcional</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-tramite">
+                            <i class="fas fa-download me-2"></i>Generar Certificado
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mt-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="tramites-card h-100">
+                <div class="tramites-card-body">
+                    <div class="text-center">
+                        <div class="tramite-icon-wrapper">
+                            <div class="tramite-icon-bg">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-3">Actualización de Datos</h3>
+                        <p class="text-muted mb-4">Mantén tu información personal y financiera actualizada para una mejor experiencia bancaria.</p>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Proceso 100% en línea</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Verificación segura</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Biometría facial</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-tramite">
+                            <i class="fas fa-user-edit me-2"></i>Actualizar Datos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mt-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="tramites-card h-100">
+                <div class="tramites-card-body">
+                    <div class="text-center">
+                        <div class="tramite-icon-wrapper">
+                            <div class="tramite-icon-bg">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-3">Inversiones</h3>
+                        <p class="text-muted mb-4">Haz crecer tu dinero con nuestras opciones de inversión digital: CDTs, fondos y más.</p>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Simulador de rentabilidad</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Inversión desde $100.000</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Asesoría personalizada</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="text-center">
+                        <a href="#" class="btn btn-outline-primary btn-tramite">
+                            <i class="fas fa-chart-pie me-2"></i>Invertir Ahora
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tramites-card mb-5" data-aos="fade-up">
+        <div class="tramites-card-header">
+            <h2 class="h4 mb-0">¿Cómo funcionan nuestros trámites digitales?</h2>
+        </div>
+        <div class="tramites-card-body">
+            <div class="row text-center">
+                <div class="col-md-3 position-relative mb-4 mb-md-0">
+                    <div class="step-number mx-auto">1</div>
+                    <h4 class="h5 mb-3">Regístrate</h4>
+                    <p class="text-muted mb-0">Crea tu usuario con datos básicos y verifica tu identidad.</p>
+                    <div class="process-step::after d-none d-md-block"></div>
+                </div>
+                
+                <div class="col-md-3 position-relative mb-4 mb-md-0">
+                    <div class="step-number mx-auto">2</div>
+                    <h4 class="h5 mb-3">Selecciona</h4>
+                    <p class="text-muted mb-0">Elige el trámite que necesitas realizar.</p>
+                    <div class="process-step::after d-none d-md-block"></div>
+                </div>
+                
+                <div class="col-md-3 position-relative mb-4 mb-md-0">
+                    <div class="step-number mx-auto">3</div>
+                    <h4 class="h5 mb-3">Completa</h4>
+                    <p class="text-muted mb-0">Llena los formularios y adjunta documentos si es necesario.</p>
+                    <div class="process-step::after d-none d-md-block"></div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="step-number mx-auto">4</div>
+                    <h4 class="h5 mb-3">¡Listo!</h4>
+                    <p class="text-muted mb-0">Recibe confirmación y gestiona tu trámite en tiempo real.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6" data-aos="fade-right">
+            <div class="position-relative">
+                <img src="https://img.freepik.com/free-vector/tiny-people-sitting-standing-near-secure-online-banking_74855-10981.jpg" alt="Banca digital segura" class="img-fluid rounded-3">
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-10 rounded-3"></div>
+                <div class="position-absolute top-0 end-0 bg-warning text-white p-3 rounded-bottom-start">
+                    <i class="fas fa-shield-alt me-2"></i>Seguridad Avanzada
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mt-4 mt-lg-0" data-aos="fade-left">
+            <h3 class="display-6 fw-bold mb-4">Tu seguridad es nuestra prioridad</h3>
+            <p class="lead mb-4">Todos nuestros trámites digitales cuentan con las más avanzadas medidas de seguridad para proteger tu información y tus operaciones.</p>
+            
+            <ul class="benefits-list list-unstyled mb-4">
+                <li>Encriptación de extremo a extremo</li>
+                <li>Autenticación biométrica</li>
+                <li>Verificación en dos pasos</li>
+                <li>Monitoreo continuo de transacciones</li>
+                <li>Alertas de seguridad en tiempo real</li>
+            </ul>
+            
+            <a href="#" class="btn btn-primary btn-lg btn-tramite">
+                <i class="fas fa-lock me-2"></i>Conoce nuestra política de seguridad
+            </a>
+        </div>
+    </div>
+
+    <div class="tramites-card" data-aos="fade-up">
+        <div class="tramites-card-header">
+            <h2 class="h4 mb-0">Preguntas Frecuentes</h2>
+        </div>
+        <div class="tramites-card-body">
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            ¿Necesito ser cliente del banco para realizar trámites digitales?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Para algunos trámites como apertura de cuenta o solicitud de tarjetas no es necesario ser cliente previo. Para otros servicios como certificaciones o actualizaciones, sí debes tener productos activos con nosotros.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            ¿Qué documentos necesito para realizar trámites en línea?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Principalmente necesitarás tu documento de identidad vigente. Dependiendo del trámite, podrían solicitarse comprobantes de ingresos, extractos bancarios o documentos específicos que se indicarán durante el proceso.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            ¿Cuánto tiempo tardan en procesarse los trámites digitales?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            La mayoría de nuestros trámites se procesan de manera inmediata o en cuestión de minutos. Algunos productos como créditos o tarjetas de crédito pueden requerir un tiempo de aprobación de 24 a 48 horas hábiles.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            ¿Los documentos generados digitalmente tienen validez legal?
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Sí, todos nuestros certificados y documentos digitales cuentan con firma electrónica avalada por entidades certificadoras y tienen plena validez legal de acuerdo con la normativa vigente en Colombia.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5" data-aos="fade-up">
+        <h3 class="h4 mb-4">¿Necesitas ayuda con tus trámites digitales?</h3>
+        <p class="mb-4">Nuestro equipo de soporte está disponible para asistirte en cualquier momento.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="#" class="btn btn-primary btn-tramite">
+                <i class="fas fa-headset me-2"></i>Chat en vivo
+            </a>
+            <a href="#" class="btn btn-outline-primary btn-tramite">
+                <i class="fas fa-book me-2"></i>Guías y tutoriales
+            </a>
+        </div>
+    </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+        
+        // Smooth scroll para anclas
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

@@ -1,5 +1,4 @@
 from django import forms
-from django import forms
 from .models import Client, Account, Loan, Appointment
 import cv2
 import os
@@ -8,6 +7,8 @@ from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django import forms
 from django.utils import timezone
+
+
 
 class EmailForm(forms.Form):
     subject = forms.CharField(
@@ -127,3 +128,4 @@ class AppointmentForm(forms.ModelForm):
                 'placeholder': 'Observaciones adicionales'
             })
         }
+

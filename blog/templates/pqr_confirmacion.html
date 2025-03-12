@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmación PQR - Banco El Dorado{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirmation-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .confirmation-icon {
+        font-size: 5rem;
+        color: #28a745;
+        margin-bottom: 1.5rem;
+    }
+    
+    .radicado-box {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        border: 1px dashed #1a3b5c;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a3b5c;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="confirmation-card p-5 text-center">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1 class="display-6 fw-bold mb-4">¡PQR Enviada Exitosamente!</h1>
+                <p class="lead mb-4">Hemos recibido tu solicitud y nuestro equipo está trabajando para atenderla lo antes posible.</p>
+                
+                <h2 class="h4 mb-3">Tu número de radicado es:</h2>
+                <div class="radicado-box">
+                    {{ pqr.numero_radicado }}
+                </div>
+                
+                <p class="mb-4">Guarda este número para consultar el estado de tu solicitud. Te hemos enviado un correo electrónico con los detalles de tu PQR.</p>
+                
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'consultar_pqr' %}" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Consultar Estado
+                    </a>
+                    <a href="{% url 'pqr' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-file-alt me-2"></i>Nueva PQR
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

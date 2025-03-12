@@ -9,6 +9,7 @@ import pdfkit
 import random
 from django.conf import settings
 from django.utils import timezone
+from decimal import Decimal
 
 class Client(models.Model):
     class Status(models.TextChoices):
@@ -123,17 +124,13 @@ class Loan(models.Model):
         return f"Loan for {self.client.name} - ${self.amount}"
 
     def calculate_monthly_payment(self):
-        r = self.interest_rate / 100 / 12  # Monthly interest rate
-        n = self.repayment_term
-        P = float(self.amount)
+        # Convertir todos los valores a Decimal para asegurar consistencia
+        P = Decimal(str(self.amount))  # Principal (monto del préstamo)
+        r = Decimal(str(self.interest_rate)) / Decimal('100') / Decimal('12')  # Tasa mensual
+        n = Decimal(str(self.repayment_term))  # Número de pagos
         
-        # Monthly payment formula: P * (r * (1 + r)^n) / ((1 + r)^n - 1)
-        if r == 0:
-            monthly_payment = P / n
-        else:
-            monthly_payment = P * (r * (1 + r)**n) / ((1 + r)**n - 1)
-        
-        return round(monthly_payment, 2)
+        monthly_payment = P * (r * (Decimal('1') + r)**n) / ((Decimal('1') + r)**n - Decimal('1'))
+        return monthly_payment
 
     def save(self, *args, **kwargs):
         if not self.pk:  # Only on creation
@@ -144,20 +141,35 @@ class Loan(models.Model):
         super().save(*args, **kwargs)
 
     def register_payment(self, payment_amount):
-        if payment_amount <= self.remaining_balance:
-            self.remaining_balance -= payment_amount
-            if self.remaining_balance == 0:
-                self.status = 'PAID'
-            self.next_payment_date += timedelta(days=30)
-            self.save()
-            
-            # Create payment record
-            Payment.objects.create(
-                loan=self,
-                amount=payment_amount
-            )
-            return True
-        return False
+        # Convertir el monto del pago a Decimal
+        payment_amount = Decimal(str(payment_amount))
+        
+        # Verificar que el pago no sea mayor que el saldo restante
+        if payment_amount > self.remaining_balance:
+            payment_amount = self.remaining_balance
+        
+        # Crear el registro de pago
+        payment = Payment.objects.create(
+            loan=self,
+            amount=payment_amount
+        )
+        
+        # Actualizar el saldo restante
+        self.remaining_balance -= payment_amount
+        
+        # Si el saldo llega a cero, marcar el préstamo como pagado
+        if self.remaining_balance <= Decimal('0'):
+            self.status = 'PAID'
+            self.remaining_balance = Decimal('0')
+        
+        # Actualizar la fecha del próximo pago
+        if self.status != 'PAID':
+            self.next_payment_date = timezone.now() + timedelta(days=30)
+        
+        # Guardar los cambios en el préstamo
+        self.save(update_fields=['remaining_balance', 'status', 'next_payment_date'])
+        
+        return payment
 
     def generate_certificate(self):
         if self.status != 'PAID':

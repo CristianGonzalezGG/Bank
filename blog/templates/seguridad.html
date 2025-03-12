@@ -1,0 +1,721 @@
+{% extends 'base.html' %}
+
+{% block title %}Centro de Seguridad - Banco El Dorado{% endblock %}
+
+{% block extra_css %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    .security-hero {
+        background: linear-gradient(135deg, rgba(13, 20, 45, 0.95) 0%, rgba(26, 59, 92, 0.95) 100%), url('https://images.unsplash.com/photo-1639322537504-6427a16b0a28?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        border-radius: 12px;
+        padding: 3.5rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .security-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+    }
+    
+    .security-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        background: white;
+    }
+    
+    .security-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .security-card-header {
+        font-weight: 600;
+        font-size: 1.25rem;
+        padding: 1.5rem;
+        background: white;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+    }
+    
+    .security-card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(26, 59, 92, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: #1a3b5c;
+        font-size: 1.5rem;
+    }
+    
+    .security-card-body {
+        padding: 1.5rem;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 2rem;
+    }
+    
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        left: -2.5rem;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #1a3b5c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.75rem;
+    }
+    
+    .timeline-content {
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1a3b5c;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-icon {
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        background: rgba(26, 59, 92, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1.5rem;
+        color: #1a3b5c;
+        font-size: 1.5rem;
+    }
+    
+    .feature-content {
+        flex-grow: 1;
+    }
+    
+    .feature-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1a3b5c;
+    }
+    
+    .security-tips-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        height: 100%;
+    }
+    
+    .tips-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        color: #1a3b5c;
+        font-size: 1.75rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .security-level {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+    }
+    
+    .security-level-indicator {
+        flex-grow: 1;
+        height: 10px;
+        background: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 0 1rem;
+        position: relative;
+    }
+    
+    .security-level-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        border-radius: 5px;
+    }
+    
+    .level-low {
+        width: 33.33%;
+        background: linear-gradient(90deg, #e74c3c, #f39c12);
+    }
+    
+    .level-medium {
+        width: 66.66%;
+        background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f);
+    }
+    
+    .level-high {
+        width: 100%;
+        background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f, #2ecc71);
+    }
+    
+    .security-step-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        background: white;
+    }
+    
+    .security-step-header {
+        background: #1a3b5c;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .step-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        color: #1a3b5c;
+        font-weight: 700;
+        margin-right: 1rem;
+    }
+    
+    .security-step-body {
+        padding: 1.5rem;
+    }
+    
+    .cta-section {
+        background: linear-gradient(135deg, #1a3b5c 0%, #3498db 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .report-btn {
+        border-radius: 50px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    
+    .report-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="security-hero text-center" data-aos="fade-up">
+        <h1 class="display-4 fw-bold mb-4">Centro de Seguridad</h1>
+        <p class="lead mb-4">Protegemos tu información y activos financieros con los más altos estándares de seguridad digital.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="#security-tips" class="btn btn-light btn-lg">
+                <i class="fas fa-shield-alt me-2"></i>Consejos de Seguridad
+            </a>
+            <a href="#phishing" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-exclamation-triangle me-2"></i>Alertas de Fraude
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-8" data-aos="fade-up">
+            <div class="security-card">
+                <div class="security-card-header">
+                    <div class="security-card-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h2 class="h3 mb-0">Tecnología de Seguridad</h2>
+                </div>
+                <div class="security-card-body">
+                    <p class="lead mb-4">En Banco El Dorado implementamos múltiples capas de protección para mantener seguras tus transacciones e información personal.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-fingerprint"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h3 class="feature-title h5">Autenticación Biométrica</h3>
+                                    <p class="text-muted">Utilizamos reconocimiento facial y huella digital para verificar tu identidad.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h3 class="feature-title h5">Encriptación Avanzada</h3>
+                                    <p class="text-muted">Toda tu información viaja encriptada con los más altos estándares (SSL/TLS).</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h3 class="feature-title h5">Autenticación de Dos Factores</h3>
+<p class="text-muted">Doble verificación para accesos y transacciones críticas.</p>
+</div>
+</div>
+</div>
+<div class="col-md-6 mb-4">
+<div class="feature-item">
+<div class="feature-icon">
+<i class="fas fa-robot"></i>
+</div>
+<div class="feature-content">
+<h3 class="feature-title h5">IA Anti-Fraude</h3>
+<p class="text-muted">Detectamos patrones inusuales para prevenir fraudes en tiempo real.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="security-level">
+<span class="fw-bold">Tu Nivel de Seguridad:</span>
+<div class="security-level-indicator">
+<div class="security-level-fill level-high"></div>
+</div>
+<span class="fw-bold text-success">Alto</span>
+</div>
+<p class="small text-muted mb-0">Última actualización de seguridad: <span class="fw-bold">Abril 2023</span></p>
+</div>
+</div>
+<div class="security-card" id="security-tips" data-aos="fade-up">
+<div class="security-card-header">
+<div class="security-card-icon">
+<i class="fas fa-lightbulb"></i>
+</div>
+<h2 class="h3 mb-0">Consejos de Seguridad</h2>
+</div>
+<div class="security-card-body">
+<p class="lead mb-4">Protege tu información financiera con estas prácticas recomendadas.</p>
+<div class="row">
+<div class="col-md-6 mb-4">
+<div class="security-tips-card">
+<div class="text-center">
+<div class="tips-icon mx-auto">
+<i class="fas fa-key"></i>
+</div>
+</div>
+<h3 class="h5 text-center mb-3">Contraseñas Robustas</h3>
+<ul class="mb-0">
+<li>Usa al menos 12 caracteres</li>
+<li>Combina letras, números y símbolos</li>
+<li>Evita información personal obvia</li>
+<li>Cambia tus contraseñas cada 3 meses</li>
+<li>No reutilices contraseñas entre servicios</li>
+</ul>
+</div>
+</div>
+<div class="col-md-6 mb-4">
+<div class="security-tips-card">
+<div class="text-center">
+<div class="tips-icon mx-auto">
+<i class="fas fa-wifi"></i>
+</div>
+</div>
+<h3 class="h5 text-center mb-3">Conexiones Seguras</h3>
+<ul class="mb-0">
+<li>Evita redes WiFi públicas para operaciones bancarias</li>
+<li>Verifica que la URL comience con "https://"</li>
+<li>Busca el icono de candado en tu navegador</li>
+<li>Usa una VPN para mayor seguridad</li>
+<li>Mantén tu antivirus actualizado</li>
+</ul>
+</div>
+</div>
+<div class="col-md-6 mb-4">
+<div class="security-tips-card">
+<div class="text-center">
+<div class="tips-icon mx-auto">
+<i class="fas fa-mobile-alt"></i>
+</div>
+</div>
+<h3 class="h5 text-center mb-3">Seguridad Móvil</h3>
+<ul class="mb-0">
+<li>Configura bloqueo biométrico en tu dispositivo</li>
+<li>Descarga solo la app oficial del banco</li>
+<li>Actualiza regularmente el sistema operativo</li>
+<li>No prestes tu teléfono para operaciones bancarias</li>
+<li>Activa las notificaciones de transacciones</li>
+</ul>
+</div>
+</div>
+<div class="col-md-6 mb-4">
+<div class="security-tips-card">
+<div class="text-center">
+<div class="tips-icon mx-auto">
+<i class="fas fa-eye-slash"></i>
+</div>
+</div>
+<h3 class="h5 text-center mb-3">Privacidad</h3>
+<ul class="mb-0">
+<li>No compartas datos personales por teléfono</li>
+<li>Revisa regularmente tus estados de cuenta</li>
+<li>Cierra sesión al finalizar tus operaciones</li>
+<li>Mantén tu información de contacto actualizada</li>
+<li>Destruye documentos con información bancaria</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="security-card" id="phishing" data-aos="fade-up">
+<div class="security-card-header">
+<div class="security-card-icon">
+<i class="fas fa-exclamation-triangle"></i>
+</div>
+<h2 class="h3 mb-0">Protección contra Phishing</h2>
+</div>
+<div class="security-card-body">
+<p class="lead mb-4">Aprende a identificar intentos de phishing y evita ser víctima de fraude electrónico.</p>
+<div class="alert alert-warning mb-4" role="alert">
+<div class="d-flex">
+<div class="me-3">
+<i class="fas fa-exclamation-circle fa-2x"></i>
+</div>
+<div>
+<h4 class="alert-heading">¡Alerta de Seguridad Activa!</h4>
+<p class="mb-0">Hemos detectado una campaña de phishing activa que suplanta la identidad de Banco El Dorado. Los correos fraudulentos solicitan actualización de datos por motivos de "seguridad" o "actualización de plataforma".</p>
+</div>
+</div>
+</div>
+<h3 class="h4 mb-3">Cómo Identificar un Intento de Phishing:</h3>
+<div class="row mb-4">
+<div class="col-md-6">
+<div class="card h-100 border-danger">
+<div class="card-header bg-danger text-white">
+<i class="fas fa-times-circle me-2"></i>Correo Fraudulento
+</div>
+<div class="card-body">
+<p class="fw-bold text-danger">Señales de alerta:</p>
+<ul class="mb-0">
+<li>Errores ortográficos o gramaticales</li>
+<li>Remitente con dominio similar pero incorrecto</li>
+<li>Solicitud urgente para "verificar cuenta"</li>
+<li>Enlaces sospechosos (no oficiales)</li>
+<li>Tono amenazante o de urgencia extrema</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="col-md-6">
+<div class="card h-100 border-success">
+<div class="card-header bg-success text-white">
+<i class="fas fa-check-circle me-2"></i>Comunicación Oficial
+</div>
+<div class="card-body">
+<p class="fw-bold text-success">Características:</p>
+<ul class="mb-0">
+<li>Correos desde dominio @bancodorado.com</li>
+<li>Saludo personalizado con tu nombre</li>
+<li>Sin errores ortográficos</li>
+<li>No solicita datos confidenciales por correo</li>
+<li>Opciones para verificar autenticidad</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-4">
+<h3 class="h4 mb-3">Qué hacer ante un intento de phishing:</h3>
+<div class="timeline">
+<div class="timeline-item">
+<div class="timeline-dot">
+<i class="fas fa-check"></i>
+</div>
+<div class="timeline-content">
+<h4 class="timeline-title">No hagas clic en enlaces sospechosos</h4>
+<p class="mb-0">Si recibes un correo dudoso, no hagas clic en ningún enlace ni descargues archivos adjuntos.</p>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-dot">
+<i class="fas fa-check"></i>
+</div>
+<div class="timeline-content">
+<h4 class="timeline-title">Verifica la autenticidad</h4>
+<p class="mb-0">Contacta directamente al banco a través de los canales oficiales (teléfono en tu tarjeta o sitio web oficial).</p>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-dot">
+<i class="fas fa-check"></i>
+</div>
+<div class="timeline-content">
+<h4 class="timeline-title">Reporta el intento</h4>
+<p class="mb-0">Envía el correo sospechoso a <a href="mailto:seguridad@bancodorado.com">seguridad@bancodorado.com</a> para que nuestro equipo pueda investigarlo.</p>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-dot">
+<i class="fas fa-check"></i>
+</div>
+<div class="timeline-content">
+<h4 class="timeline-title">Cambia tus contraseñas</h4>
+<p class="mb-0">Si has proporcionado información confidencial, cambia inmediatamente tus contraseñas.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+<div class="security-card sticky-lg-top" style="top: 100px; z-index: 10;">
+<div class="security-card-header">
+<div class="security-card-icon">
+<i class="fas fa-tasks"></i>
+</div>
+<h2 class="h3 mb-0">Pasos de Seguridad</h2>
+</div>
+<div class="security-card-body">
+<p class="mb-4">Completa estas 5 acciones para maximizar la seguridad de tu cuenta bancaria.</p>
+<div class="security-step-card">
+<div class="security-step-header">
+<div class="step-number">1</div>
+<h3 class="h5 mb-0">Actualiza tu Información</h3>
+</div>
+<div class="security-step-body">
+<p class="mb-3">Mantén al día tus datos de contacto para recibir alertas de seguridad.</p>
+<a href="#" class="btn btn-outline-primary btn-sm w-100">Actualizar Datos</a>
+</div>
+</div>
+<div class="security-step-card">
+<div class="security-step-header">
+<div class="step-number">2</div>
+<h3 class="h5 mb-0">Activa 2FA</h3>
+</div>
+<div class="security-step-body">
+<p class="mb-3">Configura la autenticación de dos factores para todas tus operaciones.</p>
+<a href="#" class="btn btn-outline-primary btn-sm w-100">Activar 2FA</a>
+</div>
+</div>
+<div class="security-step-card">
+<div class="security-step-header">
+<div class="step-number">3</div>
+<h3 class="h5 mb-0">Configura Notificaciones</h3>
+</div>
+<div class="security-step-body">
+<p class="mb-3">Recibe alertas de todas las operaciones realizadas en tu cuenta.</p>
+<a href="#" class="btn btn-outline-primary btn-sm w-100">Configurar Alertas</a>
+</div>
+</div>
+<div class="security-step-card">
+<div class="security-step-header">
+<div class="step-number">4</div>
+<h3 class="h5 mb-0">Establece Límites</h3>
+</div>
+<div class="security-step-body">
+<p class="mb-3">Define montos máximos para transacciones diarias y por operación.</p>
+<a href="#" class="btn btn-outline-primary btn-sm w-100">Definir Límites</a>
+</div>
+</div>
+<div class="security-step-card">
+<div class="security-step-header">
+<div class="step-number">5</div>
+<h3 class="h5 mb-0">Revisa tus Dispositivos</h3>
+</div>
+<div class="security-step-body">
+<p class="mb-3">Verifica y gestiona los dispositivos autorizados para acceder a tu cuenta.</p>
+<a href="#" class="btn btn-outline-primary btn-sm w-100">Gestionar Dispositivos</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cta-section" data-aos="fade-up">
+<h2 class="h1 fw-bold mb-4">¿Has detectado actividad sospechosa?</h2>
+<p class="lead mb-4">Si notas cualquier operación que no reconoces o has sido víctima de fraude, contáctanos inmediatamente.</p>
+<div class="d-flex flex-wrap justify-content-center gap-3">
+<a href="#" class="btn btn-light btn-lg report-btn">
+<i class="fas fa-headset me-2"></i>Línea de Emergencia
+</a>
+<a href="#" class="btn btn-outline-light btn-lg report-btn">
+<i class="fas fa-file-alt me-2"></i>Reportar Fraude
+</a>
+</div>
+</div>
+<div class="security-card mb-0" data-aos="fade-up">
+<div class="security-card-header">
+<div class="security-card-icon">
+<i class="fas fa-question-circle"></i>
+</div>
+<h2 class="h3 mb-0">Preguntas Frecuentes</h2>
+</div>
+<div class="security-card-body">
+<div class="accordion" id="securityFAQ">
+<div class="accordion-item">
+<h2 class="accordion-header" id="headingOne">
+<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+¿Qué debo hacer si pierdo mi tarjeta o dispositivo móvil?
+</button>
+</h2>
+<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#securityFAQ">
+<div class="accordion-body">
+Si pierdes tu tarjeta, repórtala inmediatamente a través de nuestra app móvil, portal web o llamando al 01 8000 123 456 (disponible 24/7). Para dispositivos móviles, cambia tu contraseña de acceso al portal desde otro dispositivo y contacta a servicio al cliente para desactivar el dispositivo extraviado.
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header" id="headingTwo">
+<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+¿Cómo puedo saber si un correo o mensaje del banco es auténtico?
+</button>
+</h2>
+<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#securityFAQ">
+<div class="accordion-body">
+Nuestras comunicaciones oficiales siempre se envían desde dominios @bancodorado.com y nunca solicitamos información confidencial como contraseñas completas, códigos de seguridad de tarjetas o tokens de autenticación por correo electrónico o mensajes de texto. Ante cualquier duda, contacta directamente a nuestro centro de atención al cliente utilizando los números oficiales que aparecen en tu tarjeta o sitio web oficial.
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header" id="headingThree">
+<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+¿Qué medidas de seguridad implementa el banco para proteger mis transacciones?
+</button>
+</h2>
+<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#securityFAQ">
+<div class="accordion-body">
+Implementamos múltiples capas de seguridad, incluyendo encriptación de extremo a extremo (TLS 1.3), autenticación de dos factores, biometría (huella digital/facial), monitoreo de transacciones en tiempo real con IA para detectar patrones inusuales, y sistemas avanzados de prevención de fraudes. Además, limitamos los intentos de inicio de sesión fallidos y ofrecemos notificaciones instantáneas de operaciones para que puedas verificar todas las actividades en tu cuenta.
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header" id="headingFour">
+<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+¿El banco me reembolsará el dinero en caso de fraude?
+</button>
+</h2>
+<div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#securityFAQ">
+<div class="accordion-body">
+Cada caso se evalúa individualmente. Si la transacción fraudulenta se realizó sin tu consentimiento y has seguido nuestras recomendaciones de seguridad, generalmente procederemos con el reembolso después de completar la investigación correspondiente. Es crucial reportar cualquier actividad sospechosa dentro de las 48 horas para maximizar las posibilidades de recuperación de fondos. Contamos con un seguro contra fraudes que cubre la mayoría de las situaciones cuando se cumplen las políticas de seguridad básicas.
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header" id="headingFive">
+<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+¿Cómo puedo fortalecer la seguridad de mi cuenta bancaria?
+</button>
+</h2>
+<div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#securityFAQ">
+<div class="accordion-body">
+Para maximizar la seguridad de tu cuenta: 1) Activa la autenticación de dos factores; 2) Configura alertas para todas las transacciones; 3) Establece límites diarios para operaciones; 4) Cambia regularmente tu contraseña usando combinaciones complejas; 5) Mantén actualizada la app del banco; 6) No compartas datos confidenciales; 7) Utiliza redes seguras para operaciones bancarias; 8) Revisa periódicamente tus estados de cuenta; y 9) Mantén actualizada tu información de contacto para recibir alertas.
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Inicializar AOS
+AOS.init({
+duration: 800,
+once: true,
+offset: 100
+});
+// Scroll suave para anclas
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+anchor.addEventListener('click', function (e) {
+e.preventDefault();
+const targetId = this.getAttribute('href');
+const targetElement = document.querySelector(targetId);
+if (targetElement) {
+window.scrollTo({
+top: targetElement.offsetTop - 100,
+behavior: 'smooth'
+});
+}
+});
+});
+});
+</script>
+{% endblock %}

@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Dashboard - Portal del Cliente{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'client_portal/css/dashboard.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card welcome-card mb-4" data-aos="fade-up">
+                <div class="card-body d-flex align-items-center">
+                    <div class="welcome-avatar">
+                        {% if client.image %}
+                            <img src="{{ client.image.url }}" alt="{{ client.name }}" class="rounded-circle">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                <i class="fas fa-user-circle fa-4x"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="welcome-content ms-4">
+                        <h2 class="mb-1">Bienvenido, {{ client.name }}</h2>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            <span id="currentDate"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicators Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="card border-left-primary h-100 py-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="font-weight-bold text-primary mb-1">Citas</h6>
+                            <div class="h5 mb-0 font-weight-bold">{{ appointment_requests.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center py-2">
+                    <a href="{% url 'client_portal:my_appointments' %}" class="text-primary">Ver Detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="card border-left-success h-100 py-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="font-weight-bold text-success mb-1">Solicitudes</h6>
+                            <div class="h5 mb-0 font-weight-bold">{{ account_requests.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-check-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center py-2">
+                    <a href="{% url 'client_portal:my_account_requests' %}" class="text-success">Ver Detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="card border-left-info h-100 py-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="font-weight-bold text-info mb-1">Notificaciones</h6>
+                            <div class="h5 mb-0 font-weight-bold">{{ notifications.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bell fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center py-2">
+                    <a href="#" class="text-info">Ver Todas</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="card border-left-warning h-100 py-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="font-weight-bold text-warning mb-1">Acciones Rápidas</h6>
+                            <div class="h5 mb-0 font-weight-bold">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Seleccionar
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url 'client_portal:create_appointment' %}">Agendar Cita</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'client_portal:create_account_request' %}">Solicitar Cuenta</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bolt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center py-2">
+                    <a href="#" class="text-warning">Ver Más</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Cards -->
+    <div class="row">
+        <!-- Upcoming Appointments -->
+        <div class="col-xl-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="card shadow h-100">
+                <div class="card-header bg-transparent py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Próximas Citas</h6>
+                    <a href="{% url 'client_portal:my_appointments' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-calendar-plus me-1"></i> Nueva Cita
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if appointment_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointment_requests %}
+                                        <tr class="appointment-row" data-bs-toggle="tooltip" title="{{ appointment.description }}">
+                                            <td>{{ appointment.get_appointment_type_display }}</td>
+                                            <td>{{ appointment.preferred_date|date:"d/m/Y" }} {{ appointment.preferred_time|time:"H:i" }}</td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if appointment.status == 'PENDING' %}bg-warning
+                                                    {% elif appointment.status == 'APPROVED' %}bg-success
+                                                    {% elif appointment.status == 'REJECTED' %}bg-danger
+                                                    {% elif appointment.status == 'CANCELLED' %}bg-secondary
+                                                    {% elif appointment.status == 'COMPLETED' %}bg-info{% endif %}">
+                                                    {{ appointment.get_status_display }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <img src="{% static 'client_portal/images/empty-calendar.svg' %}" alt="No hay citas" class="img-fluid mb-3" style="max-height: 120px;">
+                            <h5>No tienes citas programadas</h5>
+                            <p class="text-muted">¡Programa tu primera cita ahora!</p>
+                            <a href="{% url 'client_portal:create_appointment' %}" class="btn btn-primary">
+                                <i class="fas fa-calendar-plus me-2"></i>Agendar Cita
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Account Requests -->
+        <div class="col-xl-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="card shadow h-100">
+                <div class="card-header bg-transparent py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-success">Solicitudes de Cuenta</h6>
+                    <a href="{% url 'client_portal:create_account_request' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus-circle me-1"></i> Nueva Solicitud
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if account_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de Cuenta</th>
+                                        <th>Depósito Inicial</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for account_request in account_requests %}
+                                        <tr>
+                                            <td>{{ account_request.get_account_type_display }}</td>
+                                            <td>{{ account_request.initial_deposit }}</td>
+                                            <td>{{ account_request.get_status_display }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <img src="{% static 'client_portal/images/empty-account-requests.svg' %}" alt="No hay solicitudes de cuenta" class="img-fluid mb-3" style="max-height: 120px;">
+                            <h5>No tienes solicitudes de cuenta</h5>
+                            <p class="text-muted">¡Solicita tu primera cuenta ahora!</p>
+                            <a href="{% url 'client_portal:create_account_request' %}" class="btn btn-success">
+                                <i class="fas fa-plus-circle me-2"></i>Solicitar Cuenta
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

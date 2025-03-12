@@ -1,0 +1,1092 @@
+{% extends 'base.html' %}
+
+{% block title %}Inversiones - Banco El Dorado{% endblock %}
+
+{% block extra_css %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.28.0/dist/apexcharts.min.css">
+<style>
+    .investment-hero {
+        background: linear-gradient(145deg, rgba(26, 59, 92, 0.95) 0%, rgba(25, 36, 66, 0.95) 100%), url('https://images.unsplash.com/photo-1534951009808-766178b47a4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        border-radius: 12px;
+        padding: 3.5rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .investment-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0) 70%);
+        animation: rotateGradient 20s infinite linear;
+    }
+    
+    @keyframes rotateGradient {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .stats-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+        background: white;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-card-header {
+        padding: 1.25rem;
+        background: white;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .stats-card-title {
+        font-weight: 600;
+        margin-bottom: 0;
+        color: #1a3b5c;
+    }
+    
+    .stats-card-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .icon-primary {
+        background: linear-gradient(135deg, #1a3b5c 0%, #3498db 100%);
+    }
+    
+    .icon-success {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    }
+    
+    .icon-warning {
+        background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+    }
+    
+    .icon-danger {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    }
+    
+    .stats-card-body {
+        padding: 1.5rem;
+    }
+    
+    .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .stats-trend {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    
+    .trend-up {
+        color: #2ecc71;
+    }
+    
+    .trend-down {
+        color: #e74c3c;
+    }
+    
+    .investment-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        position: relative;
+        background: white;
+    }
+    
+    .investment-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .investment-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100%;
+        background: linear-gradient(to bottom, #1a3b5c, #3498db);
+    }
+    
+    .investment-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .investment-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #1a3b5c;
+    }
+    
+    .investment-subtitle {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .investment-body {
+        padding: 1.5rem;
+    }
+    
+    .investment-feature {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .investment-feature-icon {
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: rgba(26, 59, 92, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: #1a3b5c;
+    }
+    
+    .investment-feature-content {
+        flex-grow: 1;
+    }
+    
+    .feature-title {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        color: #333;
+    }
+    
+    .feature-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .investment-chart {
+        height: 300px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .risk-meter {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+    }
+    
+    .risk-label {
+        flex-basis: 80px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .risk-bar {
+        flex-grow: 1;
+        height: 10px;
+        background: #e9ecef;
+        border-radius: 5px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .risk-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        border-radius: 5px;
+        background: linear-gradient(to right, #2ecc71, #f1c40f, #e74c3c);
+    }
+    
+    .risk-marker {
+        position: absolute;
+        top: -5px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #1a3b5c;
+        transform: translateX(-50%);
+    }
+    
+    .risk-value {
+        flex-basis: 80px;
+        text-align: right;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .btn-invest {
+        border-radius: 50px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-invest:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .testimonial-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        background: white;
+        position: relative;
+        padding: 2.5rem 2rem 2rem;
+    }
+    
+    .testimonial-card::before {
+        content: '\201C';
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        font-size: 4rem;
+        color: rgba(26, 59, 92, 0.1);
+        line-height: 1;
+    }
+    
+    .testimonial-text {
+        font-style: italic;
+        margin-bottom: 1.5rem;
+        color: #333;
+    }
+    
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+    
+    .author-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 1rem;
+    }
+    
+    .author-info h5 {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    
+    .author-info p {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .comparison-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .comparison-table th {
+        background-color: #1a3b5c;
+        color: white;
+        padding: 1.25rem;
+        text-align: center;
+    }
+    
+    .comparison-table th:first-child {
+        text-align: left;
+    }
+    
+    .comparison-table td {
+        padding: 1.25rem;
+        text-align: center;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .comparison-table td:first-child {
+        font-weight: 600;
+        text-align: left;
+    }
+    
+    .comparison-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .comparison-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    
+    .calculator-form {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        background: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .calculator-result {
+        border-radius: 12px;
+        overflow: hidden;
+        background: linear-gradient(145deg, #1a3b5c 0%, #3498db 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .result-value {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .result-label {
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+    
+    .faq-section {
+        padding: 3rem 0;
+    }
+    
+    .cta-section {
+        background: linear-gradient(145deg, #1a3b5c 0%, #3498db 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="investment-hero text-center" data-aos="fade-up">
+        <h1 class="display-4 fw-bold mb-4">Inversiones Inteligentes</h1>
+        <p class="lead mb-4">Haz crecer tu capital con nuestras opciones de inversión diseñadas para cada perfil y objetivo financiero.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="#investment-options" class="btn btn-light btn-lg">
+                <i class="fas fa-chart-line me-2"></i>Opciones de Inversión
+            </a>
+            <a href="#investment-calculator" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-calculator me-2"></i>Calculadora de Rendimientos
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6" data-aos="fade-up">
+            <div class="stats-card">
+                <div class="stats-card-header">
+                    <h3 class="stats-card-title">Rentabilidad CDT</h3>
+                    <div class="stats-card-icon icon-primary">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-value">11.85%</div>
+                    <div class="stats-label">Tasa E.A. a 360 días</div>
+                    <div class="stats-trend trend-up">
+                        <i class="fas fa-arrow-up me-1"></i>
+                        <span>0.5% vs mes anterior</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="stats-card">
+                <div class="stats-card-header">
+                    <h3 class="stats-card-title">Fondos de Inversión</h3>
+                    <div class="stats-card-icon icon-success">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-value">9.42%</div>
+                    <div class="stats-label">Retorno promedio anual</div>
+                    <div class="stats-trend trend-up">
+                        <i class="fas fa-arrow-up me-1"></i>
+                        <span>1.2% vs año anterior</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="stats-card">
+                <div class="stats-card-header">
+                    <h3 class="stats-card-title">Montos Mínimos</h3>
+                    <div class="stats-card-icon icon-warning">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-value">$500K</div>
+                    <div class="stats-label">Inversión inicial</div>
+                    <div class="stats-trend">
+                        <i class="fas fa-equals me-1"></i>
+                        <span>Sin cambios recientes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="stats-card">
+                <div class="stats-card-header">
+                    <h3 class="stats-card-title">Clientes Inversionistas</h3>
+                    <div class="stats-card-icon icon-primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-value">58.250+</div>
+                    <div class="stats-label">Inversionistas activos</div>
+                    <div class="stats-trend trend-up">
+                        <i class="fas fa-arrow-up me-1"></i>
+                        <span>12% vs año anterior</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-8" data-aos="fade-up">
+            <h2 class="h3 mb-4">Comportamiento del Mercado</h2>
+            <div class="stats-card">
+                <div class="stats-card-body p-0">
+                    <div id="marketChart" class="investment-chart"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="h3 mb-4">Rendimiento por Tipo</h2>
+            <div class="stats-card">
+                <div class="stats-card-body p-0">
+                    <div id="performanceChart" class="investment-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="investment-options" class="mb-5">
+        <div class="text-center mb-4" data-aos="fade-up">
+            <h2 class="display-5 fw-bold">Nuestras Opciones de Inversión</h2>
+            <p class="lead text-muted">Selecciona la inversión que mejor se adapte a tus objetivos financieros.</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4" data-aos="fade-up">
+                <div class="investment-card h-100">
+                    <div class="investment-header">
+                        <h3 class="investment-title">CDT Digital</h3>
+                        <p class="investment-subtitle">Certificado de Depósito a Término</p>
+                    </div>
+                    <div class="investment-body">
+                        <p class="mb-4">Inversión a plazo fijo con tasa garantizada desde el primer día, con liquidación al vencimiento.</p>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Rentabilidad</h4>
+                                <p class="feature-text">Hasta 11.85% E.A. según plazo y monto</p>
+                            </div>
+                        </div>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Plazos</h4>
+                                <p class="feature-text">Desde 30 hasta 720 días</p>
+                            </div>
+                        </div>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Monto Mínimo</h4>
+                                <p class="feature-text">Desde $500.000 COP</p>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-meter">
+                            <div class="risk-label">Riesgo:</div>
+                            <div class="risk-bar">
+                                <div class="risk-fill" style="width: 30%;">
+                                    <div class="risk-marker" style="left: 30%;"></div>
+                                </div>
+                            </div>
+                            <div class="risk-value">Bajo</div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-primary btn-invest">
+                                <i class="fas fa-plus-circle me-2"></i>Invertir en CDT
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="investment-card h-100">
+                    <div class="investment-header">
+                        <h3 class="investment-title">Fondos de Inversión</h3>
+                        <p class="investment-subtitle">Portafolios diversificados</p>
+                    </div>
+                    <div class="investment-body">
+                        <p class="mb-4">Inversión colectiva gestionada por expertos para maximizar rentabilidad según tu perfil de riesgo.</p>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Rentabilidad</h4>
+                                <p class="feature-text">Potencial de 8.5% a 15% E.A.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Liquidez</h4>
+                                <p class="feature-text">Disponibilidad desde 1 día hábil</p>
+                            </div>
+                        </div>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Monto Mínimo</h4>
+                                <p class="feature-text">Desde $500.000 COP</p>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-meter">
+                            <div class="risk-label">Riesgo:</div>
+                            <div class="risk-bar">
+                                <div class="risk-fill" style="width: 60%;">
+                                    <div class="risk-marker" style="left: 60%;"></div>
+                                </div>
+                            </div>
+                            <div class="risk-value">Moderado</div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-primary btn-invest">
+                                <i class="fas fa-plus-circle me-2"></i>Invertir en Fondos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="investment-card h-100">
+                    <div class="investment-header">
+                        <h3 class="investment-title">Portafolio Premium</h3>
+                        <p class="investment-subtitle">Gestión activa personalizada</p>
+                    </div>
+                    <div class="investment-body">
+                        <p class="mb-4">Servicio de gestión de inversiones a medida con asesoría financiera personalizada.</p>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Rentabilidad</h4>
+                                <p class="feature-text">Potencial superior al 12% E.A.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Asesoría</h4>
+                                <p class="feature-text">Asesor financiero dedicado</p>
+                            </div>
+                        </div>
+                        
+                        <div class="investment-feature">
+                            <div class="investment-feature-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="investment-feature-content">
+                                <h4 class="feature-title">Monto Mínimo</h4>
+                                <p class="feature-text">Desde $100.000.000 COP</p>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-meter">
+                            <div class="risk-label">Riesgo:</div>
+                            <div class="risk-bar">
+                                <div class="risk-fill" style="width: 80%;">
+                                    <div class="risk-marker" style="left: 80%;"></div>
+                                </div>
+                            </div>
+                            <div class="risk-value">Alto</div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-primary btn-invest">
+                                <i class="fas fa-plus-circle me-2"></i>Solicitar Información
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6" data-aos="fade-right">
+            <h2 class="display-6 fw-bold mb-4">Comparativa de Inversiones</h2>
+            <p class="lead mb-4">Encuentra la opción que mejor se adapte a tus necesidades financieras y objetivos de inversión.</p>
+            
+            <div class="table-responsive">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Características</th>
+                            <th>CDT</th>
+                            <th>Fondos</th>
+                            <th>Premium</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Riesgo</td>
+                            <td>Bajo</td>
+                            <td>Moderado</td>
+                            <td>Variable</td>
+                        </tr>
+                        <tr>
+                            <td>Rentabilidad</td>
+                            <td>Fija</td>
+                            <td>Variable</td>
+                            <td>Variable</td>
+                        </tr>
+                        <tr>
+                            <td>Liquidez</td>
+                            <td>Al vencimiento</td>
+                            <td>1-3 días</td>
+                            <td>Personalizable</td>
+                        </tr>
+                        <tr>
+                            <td>Monto mínimo</td>
+                            <td>$500.000</td>
+                            <td>$500.000</td>
+                            <td>$100.000.000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mt-4 mt-lg-0" data-aos="fade-left">
+            <div id="investment-calculator" class="calculator-form">
+                <h2 class="h4 mb-4">Calculadora de Inversión</h2>
+                <div class="mb-3">
+                    <label for="investmentAmount" class="form-label">Monto a invertir</label>
+                    <input type="range" class="form-range" id="investmentAmount" min="500000" max="100000000" step="500000" value="5000000">
+                    <div class="d-flex justify-content-between">
+                        <span>$500.000</span>
+                        <span id="amountValue">$5.000.000</span>
+                        <span>$100.000.000</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="investmentTerm" class="form-label">Plazo (meses)</label>
+                    <input type="range" class="form-range" id="investmentTerm" min="1" max="60" step="1" value="12">
+                    <div class="d-flex justify-content-between">
+                        <span>1 mes</span>
+                        <span id="termValue">12 meses</span>
+                        <span>60 meses</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="investmentType" class="form-label">Tipo de inversión</label>
+                    <select class="form-select" id="investmentType">
+                        <option value="cdt">CDT (11.85% E.A.)</option>
+                        <option value="fund">Fondo Conservador (9.42% E.A.)</option>
+                        <option value="balanced">Fondo Balanceado (12.60% E.A.)</option>
+                        <option value="aggressive">Fondo Agresivo (15.20% E.A.)</option>
+                    </select>
+                </div>
+                
+                <div class="calculator-result">
+                    <h3 class="h5 mb-3">Rendimiento estimado al finalizar el periodo</h3>
+                    <div class="result-value" id="calculatedResult">$5.592.500</div>
+                    <div class="result-label" id="profitResult">Ganancia: $592.500</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-5" data-aos="fade-up">
+        <h2 class="text-center display-6 fw-bold mb-4">Testimonios de Nuestros Inversionistas</h2>
+        <div class="row">
+            <div class="col-lg-4" data-aos="fade-up">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">Llevo 5 años invirtiendo con el Banco El Dorado y los rendimientos siempre han sido consistentes. El portafolio diversificado me ha permitido afrontar periodos de volatilidad sin preocupaciones.</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Carlos Rodríguez" class="img-fluid">
+                        </div>
+                        <div class="author-info">
+                            <h5>Carlos Rodríguez</h5>
+                            <p>Inversionista desde 2019</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">Lo que más valoro es la transparencia y el asesoramiento personalizado. Mi asesora financiera me ha guiado para ajustar mi estrategia según mis objetivos a largo plazo.</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Mariana Gómez" class="img-fluid">
+                        </div>
+                        <div class="author-info">
+                            <h5>Mariana Gómez</h5>
+                            <p>Inversionista desde 2021</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">Comencé con montos pequeños en CDTs y ahora gestiono un portafolio diversificado. La app móvil me permite monitorear mis inversiones fácilmente y tomar decisiones informadas.</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/62.jpg" alt="Fernando Martínez" class="img-fluid">
+                        </div>
+                        <div class="author-info">
+                            <h5>Fernando Martínez</h5>
+                            <p>Inversionista desde 2020</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-section" data-aos="fade-up">
+        <h2 class="text-center display-6 fw-bold mb-4">Preguntas Frecuentes</h2>
+        <div class="accordion" id="investmentFAQ">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        ¿Cuál es la diferencia entre un CDT y un Fondo de Inversión?
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#investmentFAQ">
+                    <div class="accordion-body">
+                        Un CDT ofrece una tasa fija garantizada durante un plazo determinado con liquidación al vencimiento. Los Fondos de Inversión, por otro lado, son colectivos donde el capital se invierte en diversos activos (acciones, bonos, etc.) con rentabilidad variable y mayor liquidez, pero también mayor riesgo.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        ¿Cómo puedo retirar mi inversión antes del vencimiento?
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#investmentFAQ">
+                    <div class="accordion-body">
+                        Para CDTs, generalmente implica una penalización en la tasa de interés si se cancela anticipadamente. En Fondos de Inversión, puedes solicitar retiros parciales o totales en cualquier momento, teniendo en cuenta que los recursos estarán disponibles en 1-3 días hábiles según el fondo. Las inversiones Premium tienen condiciones personalizadas que se acordarán en el contrato de inversión.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        ¿Qué impuestos aplican a mis inversiones?
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#investmentFAQ">
+                    <div class="accordion-body">
+                        Los rendimientos financieros están sujetos a retención en la fuente, que varía según el tipo de inversión y el plazo. Para CDTs, la retención es del 4% para plazos mayores a 365 días y 7% para plazos menores. Para Fondos de Inversión, la retención dependerá de la composición del portafolio. Te recomendamos consultar con tu asesor fiscal para conocer las implicaciones tributarias específicas de tu caso.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        ¿Qué documentos necesito para comenzar a invertir?
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#investmentFAQ">
+                    <div class="accordion-body">
+                        Si ya eres cliente del banco, solo necesitas tu documento de identidad. Si eres nuevo, necesitarás documento de identidad, certificados de ingresos, declaración de renta (si aplica) y completar el formulario de conocimiento del cliente. Todo el proceso puede realizarse digitalmente a través de nuestra app o portal web.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section" data-aos="fade-up">
+        <h2 class="h1 fw-bold mb-4">Comienza a invertir hoy mismo</h2>
+        <p class="lead mb-4">Da el primer paso hacia tu libertad financiera con inversiones inteligentes que hacen crecer tu capital.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="#" class="btn btn-light btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Abrir Cuenta de Inversión
+            </a>
+            <a href="#" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-calendar-alt me-2"></i>Agendar Asesoría
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.28.0/dist/apexcharts.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+        
+        // Gráfico de comportamiento del mercado
+        const marketOptions = {
+            series: [{
+                name: "CDT",
+                data: [9.2, 9.5, 10.1, 10.8, 11.2, 11.5, 11.7, 11.85]
+            }, {
+                name: "Fondo Conservador",
+                data: [8.2, 8.6, 8.9, 9.1, 9.3, 9.4, 9.42, 9.5]
+            }, {
+                name: "Fondo Balanceado",
+                data: [10.2, 10.5, 11.0, 11.5, 11.9, 12.2, 12.4, 12.6]
+            }],
+            chart: {
+                type: 'line',
+                height: 300,
+                toolbar: {
+                    show: false
+                }
+            },
+            colors: ['#1a3b5c', '#3498db', '#f39c12'],
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            grid: {
+                borderColor: '#e0e0e0',
+                row: {
+                    colors: ['#f3f3f3', 'transparent'],
+                    opacity: 0.5
+                },
+            },
+            markers: {
+                size: 4
+            },
+            xaxis: {
+                categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'],
+                title: {
+                    text: 'Meses (2023)'
+                }
+            },
+            yaxis: {
+                title: {
+                    text: 'Rendimiento (%)'
+                },
+                min: 8,
+                max: 14
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                floating: true,
+                offsetY: -25,
+                offsetX: -5
+            },
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: function (y) {
+                        if (typeof y !== "undefined") {
+                            return y.toFixed(2) + "%";
+                        }
+                        return y;
+                    }
+                }
+            }
+        };
+
+        const marketChart = new ApexCharts(document.querySelector("#marketChart"), marketOptions);
+        marketChart.render();
+        
+        // Gráfico de rendimiento por tipo
+        const performanceOptions = {
+            series: [11.85, 9.42, 12.6, 15.2],
+            chart: {
+                type: 'donut',
+                height: 300
+            },
+            labels: ['CDT', 'Fondo Conservador', 'Fondo Balanceado', 'Fondo Agresivo'],
+            colors: ['#1a3b5c', '#3498db', '#f39c12', '#e74c3c'],
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }],
+            tooltip: {
+                y: {
+                    formatter: function(value) {
+                        return value + "% E.A.";
+                    }
+                }
+            }
+        };
+
+        const performanceChart = new ApexCharts(document.querySelector("#performanceChart"), performanceOptions);
+        performanceChart.render();
+        
+        // Calculadora de inversión
+        const amountSlider = document.getElementById('investmentAmount');
+        const termSlider = document.getElementById('investmentTerm');
+        const typeSelect = document.getElementById('investmentType');
+        const amountValue = document.getElementById('amountValue');
+        const termValue = document.getElementById('termValue');
+        const calculatedResult = document.getElementById('calculatedResult');
+        const profitResult = document.getElementById('profitResult');
+        
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value);
+        }
+        
+        function calculateInvestment() {
+            const amount = parseFloat(amountSlider.value);
+            const term = parseFloat(termSlider.value);
+            const type = typeSelect.value;
+            
+            let rate;
+            switch(type) {
+                case 'cdt':
+                    rate = 0.1185;
+                    break;
+                case 'fund':
+                    rate = 0.0942;
+                    break;
+                case 'balanced':
+                    rate = 0.126;
+                    break;
+                case 'aggressive':
+                    rate = 0.152;
+                    break;
+                default:
+                    rate = 0.1185;
+            }
+            
+            // Convertir tasa efectiva anual a mensual
+            const monthlyRate = Math.pow(1 + rate, 1/12) - 1;
+            const finalAmount = amount * Math.pow(1 + monthlyRate, term);
+            const profit = finalAmount - amount;
+            
+            calculatedResult.textContent = formatCurrency(finalAmount);
+            profitResult.textContent = `Ganancia: ${formatCurrency(profit)}`;
+        }
+        
+        amountSlider.addEventListener('input', function() {
+            amountValue.textContent = formatCurrency(this.value);
+            calculateInvestment();
+        });
+        
+        termSlider.addEventListener('input', function() {
+            termValue.textContent = this.value === '1' ? '1 mes' : `${this.value} meses`;
+            calculateInvestment();
+        });
+        
+        typeSelect.addEventListener('change', calculateInvestment);
+        
+        // Inicializar calculadora
+        amountValue.textContent = formatCurrency(amountSlider.value);
+        calculateInvestment();
+    });
+</script>
+{% endblock %}

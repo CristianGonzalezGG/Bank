@@ -2,6 +2,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.shortcuts import redirect
 from .views import (
     create_client, capture_image, search_client,
     loan_list, loan_detail, loan_create, loan_update, loan_delete
@@ -16,7 +17,8 @@ urlpatterns = [
     path('register/', views.register_view, name='register'), 
     path('blog/', views.blog, name='blog'),
     path('tramites/', views.tramites, name='tramites'),
-    path('pqr/', views.pqr, name="pqr"),
+    path('tramites/', views.tramites_digitales, name='tramites_digitales'),
+    
     path('negocios/', views.negocios, name='negocios'),
     path('educacion/', views.educacion, name='educacion'),
     path('asesores/', views.asesores, name='asesores'),
@@ -46,4 +48,8 @@ urlpatterns = [
     path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
     path('enable-2fa/', views.enable_2fa, name='enable_2fa'),
     path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
+    path('inversiones/', views.inversiones_view, name='inversiones'),
+    path('seguridad/', views.seguridad_view, name='seguridad'),
+    path('pqr/', views.pqr_view, name='pqr'),
+    path('pqr/submit/', views.pqr_submit, name='pqr_submit'),
 ]

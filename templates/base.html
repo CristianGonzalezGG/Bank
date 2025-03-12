@@ -6,32 +6,976 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Banco El Dorado{% endblock %}</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    
     <!-- Core CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Custom CSS -->
-    <link href="{% static 'css/common.css' %}" rel="stylesheet">
-    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a2540;
+            --primary-light: #193b64;
+            --secondary: #00d4ff;
+            --accent: #fb923c;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --bg: #ffffff;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text);
+            line-height: 1.5;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* App Shell Animation */
+        .app-shell {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg);
+            z-index: 9999;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+
+        .app-shell.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .logo-loader {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-img {
+            width: 60px;
+            height: 60px;
+            z-index: 2;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: pulseLogo 1.5s ease-in-out forwards;
+        }
+
+        @keyframes pulseLogo {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .logo-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--secondary);
+            animation: logoSpin 2s linear infinite;
+        }
+
+        .logo-circle:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .logo-circle:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            border-top-color: var(--primary);
+            animation-delay: -0.4s;
+            animation-duration: 1.5s;
+        }
+
+        .logo-circle:nth-child(3) {
+            width: 60%;
+            height: 60%;
+            border-top-color: var(--accent);
+            animation-delay: -0.8s;
+            animation-duration: 1.2s;
+        }
+
+        @keyframes logoSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .lead-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        /* Navbar */
+        .navbar {
+            padding: 0.8rem 0;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            padding: 0.6rem 0;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-logo {
+            height: 36px;
+            width: auto;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover .navbar-logo {
+            transform: rotate(10deg);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text);
+            margin: 0 0.2rem;
+            padding: 0.5rem 0.8rem;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+            transform: translateX(-100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link:hover::before {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            padding: 0.8rem 0;
+            min-width: 14rem;
+            transform: translateY(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: block;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dropdown-item {
+            padding: 0.8rem 1.5rem;
+            font-weight: 500;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            margin: 0 0.5rem;
+            width: calc(100% - 1rem);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover, .dropdown-item:focus {
+            background-color: rgba(10, 37, 64, 0.04);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .dropdown-item i {
+            margin-right: 0.8rem;
+            color: var(--primary-light);
+            opacity: 0.75;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover i {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .dropdown-divider {
+            margin: 0.5rem 1rem;
+            opacity: 0.1;
+        }
+
+        /* Main Content Wrapper */
+        .main-content {
+            min-height: calc(100vh - 70px);
+            padding-top: 80px;
+            padding-bottom: 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Layout Components */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            background-color: var(--card-bg);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border: none;
+            color: white;
+            box-shadow: 0 4px 12px rgba(10, 37, 64, 0.15);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            box-shadow: 0 6px 16px rgba(10, 37, 64, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--secondary), #66e2ff);
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-accent:hover {
+            background: linear-gradient(135deg, #00bce3, var(--secondary));
+            box-shadow: 0 6px 16px rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Badge & Tags */
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .badge-new {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            padding: 0.25rem 0.6rem;
+            background: linear-gradient(135deg, var(--accent), #ffb474);
+            color: #fff;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(251, 146, 60, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(251, 146, 60, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(251, 146, 60, 0.4);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 8px rgba(251, 146, 60, 0.3);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--primary);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 60px 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before,
+        .footer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .footer::before {
+            left: -50%;
+            background: radial-gradient(circle at top right, rgba(0, 212, 255, 0.1), transparent 60%);
+        }
+
+        .footer::after {
+            right: -50%;
+            background: radial-gradient(circle at top left, rgba(251, 146, 60, 0.05), transparent 60%);
+        }
+
+        .footer .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand h5 {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-brand p {
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-logo {
+            height: 40px;
+            margin-bottom: 1rem;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer h6 {
+            color: white;
+            margin-bottom: 1.2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer h6::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-link {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background-color: var(--secondary);
+            color: var(--primary);
+            transform: translateY(-3px) rotate(10deg);
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        .footer-contact {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-contact li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .footer-contact i {
+            margin-right: 12px;
+            color: var(--secondary);
+            font-size: 17px;
+            margin-top: 3px;
+        }
+
+        .footer-bottom {
+            padding-top: 20px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        /* Floating Action Buttons */
+        .floating-btn {
+            position: fixed;
+            z-index: 99;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .help-btn {
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--secondary), #66e2ff);
+            color: var(--primary);
+        }
+
+        .help-btn:hover {
+            transform: translateY(-5px) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .help-btn i {
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .help-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        .role-switch {
+            bottom: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .role-switch:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .role-switch i {
+            font-size: 1rem;
+            transition: transform 0.5s ease;
+        }
+
+        .role-switch:hover i {
+            animation: spin 1s ease;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 320px;
+        }
+
+        .toast {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideIn 0.3s forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+            margin-right: 12px;
+        }
+
+        .toast-icon.success {
+            background-color: var(--success);
+        }
+
+        .toast-icon.info {
+            background-color: var(--info);
+        }
+
+        .toast-icon.warning {
+            background-color: var(--warning);
+        }
+
+        .toast-icon.danger {
+            background-color: var(--danger);
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            line-height: 1;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .toast-close:hover {
+            color: var(--text);
+        }
+
+        .toast-body {
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .toast-progress {
+            height: 3px;
+            background-color: #e2e8f0;
+        }
+
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--info);
+            animation: shrink 5s linear forwards;
+        }
+
+        @keyframes shrink {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                background-color: var(--bg);
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+                margin-top: 1rem;
+            }
+
+            .dropdown-menu {
+                position: static;
+                float: none;
+                box-shadow: none;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                padding: 0 0 0 1rem;
+                margin: 0;
+                border-left: 2px solid var(--border);
+            }
+
+            .dropdown-item {
+                padding: 0.5rem 1rem;
+            }
+
+            .nav-link::before {
+                display: none;
+            }
+
+            .nav-link {
+                padding: 0.5rem 0;
+            }
+
+            .help-btn, .role-switch {
+                transform: scale(0.85);
+                bottom: 20px;
+            }
+
+            .help-btn {
+                right: 20px;
+            }
+
+            .role-switch {
+                left: 20px;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .footer {
+                padding-bottom: 100px;
+            }
+            
+            .footer-logo {
+                height: 30px;
+            }
+            
+            .footer h6 {
+                margin-top: 25px;
+            }
+        }
+
+        /* Animations & Motion Effects */
+        .fade-in {
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .smooth-move {
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .smooth-move:hover {
+            transform: translateY(-10px);
+        }
+
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* 3D Card Effect */
+        .tilt-card {
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+            transition: transform 0.3s ease;
+        }
+
+        .tilt-card .card-content {
+            transform: translateZ(20px);
+        }
+
+        /* Glitch Effect */
+        .glitch-hover {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glitch-hover::before,
+        .glitch-hover::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip: rect(0, 0, 0, 0);
+        }
+
+        .glitch-hover:hover::before {
+            clip: rect(0, 900px, 0, 0);
+            text-shadow: -1px 0 #ff00c1;
+            animation: glitch-animation 1s infinite linear alternate-reverse;
+        }
+
+        .glitch-hover:hover::after {
+            clip: rect(0, 900px, 0, 0);
+            text-shadow: 1px 0 #0094ff;
+            animation: glitch-animation 0.7s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-animation {
+            0% {
+                clip: rect(44px, 9999px, 56px, 0);
+            }
+            5% {
+                clip: rect(19px, 9999px, 33px, 0);
+            }
+            10% {
+                clip: rect(78px, 9999px, 98px, 0);
+            }
+            15% {
+                clip: rect(12px, 9999px, 25px, 0);
+            }
+            20% {
+                clip: rect(54px, 9999px, 95px, 0);
+            }
+        }
+    </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Loader -->
-    <div class="page-loader">
-        <div class="loader-content">
-            <img src="{% static 'images/logo.png' %}" alt="Logo" class="loader-logo">
-            <div class="loader-spinner"></div>
+    <!-- App Shell Loading Animation -->
+    <div class="app-shell">
+        <div class="logo-loader">
+            <div class="logo-circle"></div>
+            <div class="logo-circle"></div>
+            <div class="logo-circle"></div>
+            <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo-img">
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-glass fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand" href="{% url 'blog:home' %}">
                 <img src="{% static 'images/logo.png' %}" alt="Logo" class="navbar-logo">
-                <span class="brand-text">Banco El Dorado</span>
+                <span class="text-gradient fw-bold">Banco El Dorado</span>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -41,108 +985,124 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
-                        <!-- Menú de Clientes -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle nav-link-effect" href="#" 
-                               data-bs-toggle="dropdown">
-                                <i class="fas fa-users nav-icon"></i>
-                                <span>Clientes</span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-animated">
-                                <a class="dropdown-item" href="{% url 'blog:client_list' %}">
-                                    <i class="fas fa-list me-2"></i>Lista de Clientes
+                        {% if user_role == 'ADVISOR' %}
+                            <!-- MENÚ DE ASESOR -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" href="#" id="clientesDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-users me-1"></i> Clientes
                                 </a>
-                                <a class="dropdown-item" href="{% url 'blog:create_client' %}">
-                                    <i class="fas fa-user-plus me-2"></i>Nuevo Cliente
-                                </a>
-                                <a class="dropdown-item" href="{% url 'blog:search_client' %}">
-                                    <i class="fas fa-search me-2"></i>Buscar Cliente
-                                </a>
-                            </div>
-                        </li>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'blog:client_list' %}">
+                                        <i class="fas fa-list"></i>Lista de Clientes
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'blog:create_client' %}">
+                                        <i class="fas fa-user-plus"></i>Nuevo Cliente
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'blog:search_client' %}">
+                                        <i class="fas fa-search"></i>Buscar Cliente
+                                    </a></li>
+                                </ul>
+                            </li>
 
-                        <!-- Menú de Préstamos -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle nav-link-effect" href="#" 
-                               data-bs-toggle="dropdown">
-                                <i class="fas fa-money-bill-wave nav-icon"></i>
-                                <span>Préstamos</span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-animated">
-                                <a class="dropdown-item" href="{% url 'blog:loan_list' %}">
-                                    <i class="fas fa-list me-2"></i>Lista de Préstamos
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" href="#" id="cuentasDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-piggy-bank me-1"></i> Cuentas
                                 </a>
-                                <a class="dropdown-item" href="{% url 'blog:loan_create' %}">
-                                    <i class="fas fa-plus-circle me-2"></i>Nuevo Préstamo
-                                </a>
-                            </div>
-                        </li>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'blog:client_list' %}">
+                                        <i class="fas fa-cog"></i>Gestionar Cuentas
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'blog:bin_lookup' %}">
+                                        <i class="fas fa-credit-card"></i>Verificar Tarjeta
+                                    </a></li>
+                                </ul>
+                            </li>
 
-                        <!-- Citas -->
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-effect" href="{% url 'blog:appointment_list' %}">
-                                <i class="fas fa-calendar-alt nav-icon"></i>
-                                <span>Citas</span>
-                            </a>
-                        </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" href="#" id="prestamosDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-money-bill-wave me-1"></i> Préstamos
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'blog:loan_list' %}">
+                                        <i class="fas fa-list-alt"></i>Lista de Préstamos
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'blog:loan_create' %}">
+                                        <i class="fas fa-plus-circle"></i>Nuevo Préstamo
+                                    </a></li>
+                                </ul>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}" 
+                                   href="{% url 'blog:appointment_list' %}">
+                                    <i class="fas fa-calendar-alt me-1"></i> Citas
+                                </a>
+                            </li>
+                        {% else %}
+                            <!-- MENU CLIENTE (vacío por ahora) -->
+                        {% endif %}
 
-                        <!-- Perfil de Usuario -->
+                        <!-- Usuario (común para ambos roles) -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle nav-link-effect" href="#" 
-                               data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle nav-icon"></i>
-                                <span>{{ user.username }}</span>
+                            <a class="nav-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i> {{ user.username }}
                             </a>
-                            <div class="dropdown-menu dropdown-menu-animated dropdown-menu-end">
-                                <div class="dropdown-header">
-                                    <div class="user-info">
-                                        <i class="fas fa-user-circle fa-3x mb-2"></i>
-                                        <h6 class="mb-0">{{ user.get_full_name }}</h6>
-                                        <small class="text-muted">{{ user.email }}</small>
-                                    </div>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cog me-2"></i>Configuración
-                                </a>
-                                <a class="dropdown-item" href="{% url 'blog:logout' %}">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
-                                </a>
-                            </div>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </a></li>
+                            </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link nav-link-effect" href="{% url 'blog:login' %}">
-                                <i class="fas fa-sign-in-alt nav-icon"></i>
-                                <span>Iniciar Sesión</span>
+                            <a class="nav-link" href="{% url 'blog:login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Ingresar
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link nav-link-effect" href="{% url 'blog:register' %}">
-                                <i class="fas fa-user-plus nav-icon"></i>
-                                <span>Registrarse</span>
+                            <a class="nav-link" href="{% url 'blog:login' %}">
+                                <i class="fas fa-user-tie me-1"></i> Portal Asesor
                             </a>
                         </li>
                     {% endif %}
+                    
+                    <!-- Servicios (accesible para todos) -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-concierge-bell me-1"></i> Servicios
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'blog:inversiones' %}">
+                                <i class="fas fa-chart-line"></i> Inversiones
+                                <span class="badge-new">Nuevo</span>
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:tramites_digitales' %}">
+                                <i class="fas fa-laptop-code"></i> Trámites Digitales
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:negocios' %}">
+                                <i class="fas fa-briefcase"></i> Negocios
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:pqr' %}">
+                                <i class="fas fa-headset"></i> Centro de Atención
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:seguridad' %}">
+                                <i class="fas fa-shield-alt"></i> Centro de Seguridad
+                            </a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Contenido Principal -->
+    <!-- Main Content -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-waves">
-            <div class="wave wave1"></div>
-            <div class="wave wave2"></div>
-            <div class="wave wave3"></div>
-            <div class="wave wave4"></div>
-        </div>
-        
         <div class="container">
             <div class="row">
                 <div class="col-lg-4">
@@ -175,7 +1135,8 @@
                         <li><a href="#">Cuentas de Ahorro</a></li>
                         <li><a href="#">Préstamos Personales</a></li>
                         <li><a href="#">Tarjetas de Crédito</a></li>
-                        <li><a href="#">Inversiones</a></li>
+                        <li><a href="{% url 'blog:inversiones' %}"><i class="fas fa-chart-line me-1"></i>Inversiones</a></li>
+                        <li><a href="{% url 'blog:seguridad' %}"><i class="fas fa-shield-alt me-1"></i>Centro de Seguridad</a></li>
                     </ul>
                 </div>
                 
@@ -211,10 +1172,482 @@
         </div>
     </footer>
 
+    <!-- Floating Help Button -->
+    <a href="https://www.userlike.com/umc/#/inbox/81431049" target="_blank" rel="noopener noreferrer" class="floating-btn help-btn">
+        <i class="fas fa-headset"></i>
+    </a>
+
+    <!-- Role Switch Button (visible only if authenticated) -->
+    {% if user.is_authenticated %}
+    <a href="{% url 'blog:login' %}" class="floating-btn role-switch">
+        <i class="fas fa-exchange-alt"></i>
+        <span>Cambiar de Sesión</span>
+    </a>
+    {% endif %}
+
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="{% static 'js/base.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.2/dist/vanilla-tilt.min.js"></script>
+    
+    <script>
+        // Inicialización y configuración de la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== ANIMACIÓN DE CARGA INICIAL =====
+            setTimeout(() => {
+                document.querySelector('.app-shell').classList.add('loaded');
+            }, 1500);
+
+            // ===== EFECTOS DE NAVBAR =====
+            const navbar = document.getElementById('mainNav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // ===== ANIMACIONES GSAP =====
+            if (typeof gsap !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+                
+                // Animación de elementos al entrar en viewport
+                function setupScrollAnimations() {
+                    // Fade in y slide up
+                    gsap.utils.toArray('.fade-in').forEach(element => {
+                        gsap.fromTo(element, 
+                            { y: 50, opacity: 0 }, 
+                            {
+                                y: 0,
+                                opacity: 1,
+                                duration: 0.8,
+                                ease: "power2.out",
+                                scrollTrigger: {
+                                    trigger: element,
+                                    start: "top 85%",
+                                    toggleActions: "play none none none"
+                                }
+                            }
+                        );
+                    });
+                    
+                    // Escalado de elementos
+                    gsap.utils.toArray('.scale-in').forEach(element => {
+                        gsap.fromTo(element, 
+                            { scale: 0.8, opacity: 0 }, 
+                            {
+                                scale: 1,
+                                opacity: 1,
+                                duration: 0.6,
+                                ease: "back.out(1.7)",
+                                scrollTrigger: {
+                                    trigger: element,
+                                    start: "top 85%",
+                                    toggleActions: "play none none none"
+                                }
+                            }
+                        );
+                    });
+                    
+                    // Animación secuencial de listas
+                    gsap.utils.toArray('.stagger-list').forEach(list => {
+                        const items = list.querySelectorAll('li, .item');
+                        gsap.fromTo(items, 
+                            { y: 20, opacity: 0 }, 
+                            {
+                                y: 0,
+                                opacity: 1,
+                                stagger: 0.1,
+                                duration: 0.6,
+                                ease: "power2.out",
+                                scrollTrigger: {
+                                    trigger: list,
+                                    start: "top 85%",
+                                    toggleActions: "play none none none"
+                                }
+                            }
+                        );
+                    });
+                    
+                    // Efecto de revelación de texto
+                    gsap.utils.toArray('.reveal-text').forEach(text => {
+                        const splitText = new SplitText(text, { type: "chars, words" });
+                        gsap.fromTo(splitText.chars, 
+                            { opacity: 0, y: 20 }, 
+                            {
+                                opacity: 1,
+                                y: 0,
+                                stagger: 0.02,
+                                duration: 0.5,
+                                ease: "power2.out",
+                                scrollTrigger: {
+                                    trigger: text,
+                                    start: "top 85%",
+                                    toggleActions: "play none none none"
+                                }
+                            }
+                        );
+                    });
+                }
+                
+                // Iniciar animaciones cuando GSAP está disponible
+                setupScrollAnimations();
+                
+                // Parallax effect para fondos
+                gsap.utils.toArray('.parallax-bg').forEach(section => {
+                    const bg = section.querySelector('.background');
+                    
+                    gsap.to(bg, {
+                        y: () => section.offsetHeight * 0.35,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: true
+                        }
+                    });
+                });
+            }
+
+            // ===== EFECTOS 3D PARA TARJETAS =====
+            if (typeof VanillaTilt !== 'undefined') {
+                VanillaTilt.init(document.querySelectorAll(".tilt-card"), {
+                    max: 10,
+                    speed: 400,
+                    glare: true,
+                    "max-glare": 0.2,
+                });
+            }
+
+            // ===== CONTADORES ANIMADOS =====
+            function animateCounter(el) {
+                const target = parseInt(el.getAttribute('data-target'));
+                const duration = 2000; // 2 segundos
+                const stepTime = 20; // actualizar cada 20ms
+                const steps = duration / stepTime;
+                const increment = target / steps;
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        el.innerText = numberWithCommas(target);
+                        clearInterval(timer);
+                    } else {
+                        el.innerText = numberWithCommas(Math.floor(current));
+                    }
+                }, stepTime);
+            }
+            
+            function numberWithCommas(x) {
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+            
+            // Inicializar contadores cuando son visibles
+            const counterObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCounter(entry.target);
+                        counterObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            document.querySelectorAll('.counter-value').forEach(counter => {
+                counterObserver.observe(counter);
+            });
+
+            // ===== EFECTO DE MÁQUINA DE ESCRIBIR =====
+            function typeWriter(element, text, speed = 50, delay = 0) {
+                if (!element) return;
+                
+                element.textContent = '';
+                
+                setTimeout(() => {
+                    let i = 0;
+                    const timer = setInterval(() => {
+                        if (i < text.length) {
+                            element.textContent += text.charAt(i);
+                            i++;
+                        } else {
+                            clearInterval(timer);
+                            // Agregar cursor parpadeante al final
+                            element.classList.add('typing-done');
+                        }
+                    }, speed);
+                }, delay);
+            }
+            
+            // Observer para iniciar efecto typing
+            const typingObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const text = entry.target.getAttribute('data-text') || entry.target.textContent;
+                        const speed = parseInt(entry.target.getAttribute('data-speed')) || 50;
+                        const delay = parseInt(entry.target.getAttribute('data-delay')) || 0;
+                        
+                        typeWriter(entry.target, text, speed, delay);
+                        typingObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            document.querySelectorAll('[data-typing]').forEach(elem => {
+                typingObserver.observe(elem);
+            });
+
+            // ===== SISTEMA DE NOTIFICACIONES =====
+            window.showToast = function(title, message, type = 'info', duration = 5000) {
+                const toastContainer = document.getElementById('toastContainer');
+                
+                // Crear estructura del toast
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                
+                // Crear contenido
+                const toastHeader = document.createElement('div');
+                toastHeader.className = 'toast-header';
+                
+                const icon = document.createElement('div');
+                icon.className = `toast-icon ${type}`;
+                
+                // Determinar icono según tipo
+                let iconClass = 'fa-info-circle';
+                switch(type) {
+                    case 'success': iconClass = 'fa-check-circle'; break;
+                    case 'warning': iconClass = 'fa-exclamation-triangle'; break;
+                    case 'danger': iconClass = 'fa-times-circle'; break;
+                }
+                
+                icon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+                
+                const titleEl = document.createElement('div');
+                titleEl.className = 'toast-title';
+                titleEl.textContent = title;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'toast-close';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.onclick = function() {
+                    removeToast(toast);
+                };
+                
+                const toastBody = document.createElement('div');
+                toastBody.className = 'toast-body';
+                toastBody.textContent = message;
+                
+                const progress = document.createElement('div');
+                progress.className = 'toast-progress';
+                
+                const progressBar = document.createElement('div');
+                progressBar.className = 'toast-progress-bar';
+                progressBar.style.backgroundColor = getColorByType(type);
+                progress.appendChild(progressBar);
+                
+                // Ensamblar toast
+                toastHeader.appendChild(icon);
+                toastHeader.appendChild(titleEl);
+                toastHeader.appendChild(closeBtn);
+                
+                toast.appendChild(toastHeader);
+                toast.appendChild(toastBody);
+                toast.appendChild(progress);
+                
+                // Agregar al contenedor
+                toastContainer.appendChild(toast);
+                
+                // Configurar tiempo de desaparición
+                setTimeout(() => {
+                    removeToast(toast);
+                }, duration);
+                
+                // Función para remover toast
+                function removeToast(toast) {
+                    toast.style.transform = 'translateX(100%)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }
+                
+                // Obtener color según tipo
+                function getColorByType(type) {
+                    switch(type) {
+                        case 'success': return 'var(--success)';
+                        case 'warning': return 'var(--warning)';
+                        case 'danger': return 'var(--danger)';
+                        default: return 'var(--info)';
+                    }
+                }
+            };
+
+            // ===== EFECTOS DE PARTÍCULAS =====
+            function createParticleCanvas() {
+                if (typeof THREE === 'undefined') return;
+                
+                const canvasContainer = document.querySelector('.particle-container');
+                if (!canvasContainer) return;
+                
+                // Configuración de Three.js
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, canvasContainer.offsetWidth / canvasContainer.offsetHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true });
+                
+                renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+                renderer.setClearColor(0x000000, 0);
+                canvasContainer.appendChild(renderer.domElement);
+                
+                // Crear partículas
+                const particlesGeometry = new THREE.BufferGeometry();
+                const particlesCount = 1500;
+                
+                const posArray = new Float32Array(particlesCount * 3);
+                
+                for (let i = 0; i < particlesCount * 3; i++) {
+                    posArray[i] = (Math.random() - 0.5) * 5;
+                }
+                
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                
+                // Material de partículas
+                const particlesMaterial = new THREE.PointsMaterial({
+                    size: 0.02,
+                    transparent: true,
+                    color: 0x6e8cb6,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                // Crear mesh de partículas
+                const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+                scene.add(particlesMesh);
+                
+                camera.position.z = 2;
+                
+                // Variables de animación
+                let mouseX = 0;
+                let mouseY = 0;
+                
+                document.addEventListener('mousemove', (event) => {
+                    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                });
+                
+                // Animación
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    
+                    particlesMesh.rotation.y += 0.001;
+                    particlesMesh.rotation.x = mouseY * 0.1;
+                    particlesMesh.rotation.y = mouseX * 0.1;
+                    
+                    renderer.render(scene, camera);
+                };
+                
+                animate();
+                
+                // Ajustar tamaño al cambiar dimensiones de ventana
+                window.addEventListener('resize', () => {
+                    camera.aspect = canvasContainer.offsetWidth / canvasContainer.offsetHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+                });
+            }
+            
+            // Iniciar efecto de partículas si existe el contenedor
+            createParticleCanvas();
+
+            // ===== EFECTOS DE CURSOR PERSONALIZADO =====
+            function createCustomCursor() {
+                const cursorDot = document.createElement('div');
+                cursorDot.className = 'cursor-dot';
+                cursorDot.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 8px;
+                    height: 8px;
+                    background-color: var(--primary);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 9999;
+                    transform: translate(-50%, -50%);
+                    transition: transform 0.1s ease;
+                `;
+                
+                const cursorRing = document.createElement('div');
+                cursorRing.className = 'cursor-ring';
+                cursorRing.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 30px;
+                    height: 30px;
+                    border: 1px solid var(--primary);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 9998;
+                    transform: translate(-50%, -50%);
+                    transition: width 0.3s, height 0.3s, transform 0.2s ease;
+                `;
+                
+                document.body.appendChild(cursorDot);
+                document.body.appendChild(cursorRing);
+                
+                document.addEventListener('mousemove', (e) => {
+                    gsap.to(cursorDot, { 
+                        x: e.clientX,
+                        y: e.clientY,
+                        duration: 0.1,
+                        ease: "power2.out"
+                    });
+                    
+                    gsap.to(cursorRing, { 
+                        x: e.clientX,
+                        y: e.clientY,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+                
+                // Efecto hover en enlaces y botones
+                const interactiveElements = document.querySelectorAll('a, button, .btn, .nav-link, .dropdown-item');
+                
+                interactiveElements.forEach(el => {
+                    el.addEventListener('mouseenter', () => {
+                        cursorRing.style.width = '50px';
+                        cursorRing.style.height = '50px';
+                        cursorRing.style.borderColor = 'var(--secondary)';
+                        cursorDot.style.backgroundColor = 'var(--secondary)';
+                    });
+                    
+                    el.addEventListener('mouseleave', () => {
+                        cursorRing.style.width = '30px';
+                        cursorRing.style.height = '30px';
+                        cursorRing.style.borderColor = 'var(--primary)';
+                        cursorDot.style.backgroundColor = 'var(--primary)';
+                    });
+                });
+            }
+            
+            // Activar cursor personalizado solo en pantallas grandes
+            if (window.innerWidth > 1024) {
+                // Desactivado por defecto para no interferir con la usabilidad
+                // createCustomCursor();
+            }
+
+            // ===== DEMO DE NOTIFICACIÓN =====
+            // Mostrar notificación de bienvenida
+            setTimeout(() => {
+                showToast('¡Bienvenido!', 'Banco El Dorado a tu servicio.', 'success', 5000);
+            }, 3000);
+        });
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
-</html> 
+</html>

@@ -53,6 +53,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from .models import UserTwoFactorSettings, TwoFactorCode
 from django.contrib.auth.models import User
 
+
 @login_required
 def search_client(request):
     query = request.GET.get('cardId', '')  
@@ -175,16 +176,13 @@ def home(request):
 @login_required
 def asesores(request):
     return render(request, 'asesores.html')
-@login_required
 def educacion(request):
     return render(request, 'educacion_financiera.html')
-@login_required
 def negocios(request):
     return render(request, 'negocios.html')
 
 def pqr(request):
     return render(request, 'pqr.html')
-@login_required
 def tramites(request):
     return render(request, 'tramites_digitales.html')
 def blog(request):
@@ -433,107 +431,30 @@ def loan_payment(request, id):
     loan = get_object_or_404(Loan, id=id)
     
     if request.method == 'POST':
-        payment_amount = Decimal(request.POST.get('payment_amount', 0))
-        
-        if payment_amount <= 0:
-            messages.error(request, 'El monto del pago debe ser mayor a 0.')
-        elif payment_amount > loan.remaining_balance:
-            messages.error(request, 'El monto del pago no puede ser mayor al saldo restante.')
-        else:
-            loan.register_payment(payment_amount)
-            messages.success(request, f'Pago de ${payment_amount} registrado exitosamente.')
+        payment_amount = request.POST.get('payment_amount')
+        try:
+            # Asegurar que el pago se procese como Decimal
+            from decimal import Decimal
+            payment_amount = Decimal(str(payment_amount))
             
-            if loan.status == 'PAID':
-                messages.info(request, 'El préstamo ha sido pagado en su totalidad.')
+            # Registrar el pago
+            payment = loan.register_payment(payment_amount)
             
+            # Verificar que payment sea un objeto Payment
+            if hasattr(payment, 'amount'):
+                messages.success(request, f'Pago de ${payment.amount} registrado correctamente.')
+            else:
+                # Por si acaso payment no es un objeto Payment
+                messages.success(request, f'Pago de ${payment_amount} registrado correctamente.')
+                
             return redirect('blog:loan_detail', id=loan.id)
+        except Exception as e:
+            messages.error(request, f'Error al procesar el pago: {str(e)}')
     
     return render(request, 'loan/loan_payment.html', {'loan': loan})
 
-@login_required
-def financial_goals(request):
-    if request.method == 'POST':
-        form = FinancialGoalForm(request.POST)
-        if form.is_valid():
-            goal = form.save(commit=False)
-            goal.client = request.user.client
-            goal.save()
-            return redirect('blog:financial_goals')
-    
-    goals = FinancialGoal.objects.filter(client=request.user.client)
-    form = FinancialGoalForm()
-    return render(request, 'financial/goals.html', {'goals': goals, 'form': form})
 
-@login_required
-def transactions(request):
-    account = request.user.client.account
-    transactions = Transaction.objects.filter(account=account)
-    
-    # Filtros
-    category = request.GET.get('category')
-    date_from = request.GET.get('date_from')
-    date_to = request.GET.get('date_to')
-    
-    if category:
-        transactions = transactions.filter(category=category)
-    if date_from:
-        transactions = transactions.filter(date__gte=date_from)
-    if date_to:
-        transactions = transactions.filter(date__lte=date_to)
-        
-    context = {
-        'transactions': transactions,
-        'categories': Transaction.objects.values_list('category', flat=True).distinct(),
-        'total_income': transactions.filter(type='DEPOSIT').aggregate(Sum('amount'))['amount__sum'] or 0,
-        'total_expenses': transactions.filter(type='WITHDRAWAL').aggregate(Sum('amount'))['amount__sum'] or 0
-    }
-    return render(request, 'transactions/list.html', context)
 
-@login_required
-def notifications(request):
-    """Vista para mostrar todas las notificaciones del usuario"""
-    notifications = Notification.objects.filter(client=request.user.client)
-    
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Si es una petición AJAX, devolver JSON
-        data = [{
-            'id': notif.id,
-            'title': notif.title,
-            'message': notif.message,
-            'type': notif.type,
-            'created_at': notif.created_at.strftime('%Y-%m-%d %H:%M'),
-            'read': notif.read
-        } for notif in notifications]
-        return JsonResponse(data, safe=False)
-    
-    # Si no es AJAX, renderizar template
-    return render(request, 'notifications/list.html', {
-        'notifications': notifications
-    })
-
-@login_required
-def notifications_stream(request):
-    """Vista para Stream de notificaciones en tiempo real"""
-    def event_stream():
-        while True:
-            # Verificar nuevas notificaciones
-            notifications = Notification.objects.filter(
-                client=request.user.client,
-                read=False
-            ).order_by('-created_at')[:5]
-            
-            for notification in notifications:
-                data = {
-                    'id': notification.id,
-                    'title': notification.title,
-                    'message': notification.message,
-                    'time': notification.created_at.strftime('%H:%M')
-                }
-                yield f"data: {json.dumps(data)}\n\n"
-            
-            time.sleep(10)  # Esperar 10 segundos antes de la siguiente verificación
-    
-    return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
 
 @login_required
 def appointment_search_client(request):
@@ -718,3 +639,99 @@ def disable_2fa(request):
     except UserTwoFactorSettings.DoesNotExist:
         messages.error(request, 'Two-factor authentication is not enabled.')
         return redirect('blog:home')
+
+def inversiones_view(request):
+    return render(request, 'inversiones.html')
+
+def seguridad_view(request):
+    return render(request, 'seguridad.html')
+
+def tramites_digitales(request):
+    return render(request, 'tramites_digitales.html')
+
+def pqr_view(request):
+    """Vista para renderizar el formulario de PQR."""
+    return render(request, 'pqr.html')
+
+def generate_radicado():
+    """Genera un número de radicado único para la solicitud PQR."""
+    prefix = "PQR"
+    timestamp = datetime.now().strftime('%Y%m%d')
+    random_chars = ''.join(random.choices(string.digits, k=6))
+    return f"{prefix}{timestamp}{random_chars}"
+
+def pqr_submit(request):
+    """Vista para procesar el envío del formulario PQR y enviar el correo."""
+    if request.method == 'POST':
+        try:
+            # Obtener datos del formulario
+            nombre = request.POST.get('nombre', '')
+            email = request.POST.get('email', '')
+            documento = request.POST.get('documento', '')
+            telefono = request.POST.get('telefono', '')
+            tipo = request.POST.get('tipo', '')
+            asunto = request.POST.get('asunto', '')
+            descripcion = request.POST.get('descripcion', '')
+            
+            # Dirección de correo destinatario fija
+            email_destinatario = 'solicitudesbancoeldorado@gmail.com'
+            
+            # Generar número de radicado
+            radicado = generate_radicado()
+            
+            # Construir el mensaje de correo con toda la información
+            mensaje = f"""
+            NUEVA SOLICITUD PQR - Banco El Dorado
+            =====================================
+            
+            Número de Radicado: {radicado}
+            Fecha y hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            
+            INFORMACIÓN DEL SOLICITANTE:
+            ----------------------------
+            Nombre completo: {nombre}
+            Correo electrónico: {email}
+            Documento de identidad: {documento}
+            Teléfono de contacto: {telefono}
+            
+            DETALLES DE LA SOLICITUD:
+            ------------------------
+            Tipo de solicitud: {tipo}
+            Asunto: {asunto}
+            
+            DESCRIPCIÓN:
+            -----------
+            {descripcion}
+            
+            =====================================
+            Este correo ha sido generado automáticamente por el sistema de PQR del Banco El Dorado.
+            Por favor no responda a este mensaje.
+            """
+            
+            # Enviar correo desde la cuenta fija a la cuenta de destino
+            send_mail(
+                f'[PQR-{radicado}] {tipo}: {asunto}',
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,  # Usa el remitente configurado en settings
+                [email_destinatario],  # Destinatario fijo
+                fail_silently=False,
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'radicado': radicado,
+                'message': 'Solicitud enviada correctamente'
+            })
+        
+        except Exception as e:
+            print(f"Error al enviar correo: {str(e)}")  # Para depuración en la consola del servidor
+            return JsonResponse({
+                'success': False,
+                'message': f'Error al procesar la solicitud: {str(e)}'
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Método no permitido'
+    })
+
