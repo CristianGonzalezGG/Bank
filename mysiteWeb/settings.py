@@ -156,9 +156,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'solicitudeseldorado@gmail.com'
-EMAIL_HOST_PASSWORD = 'lvuu sevn fwxr uyok'
-DEFAULT_FROM_EMAIL = 'Banco El Dorado <solicitudeseldorado@gmail.com>'
+EMAIL_HOST_USER = 'asesoresbancoeldorado@gmail.com'
+EMAIL_HOST_PASSWORD = 'pmzy doom zoxu rjfi'
+DEFAULT_FROM_EMAIL = 'Banco El Dorado <asesoresbancoeldorado@gmail.com>'
+
+# Configuración alternativa (para recepción)
+PQR_RECIPIENT_EMAIL = 'solicitudeseldorado@gmail.com'
+PQR_RECIPIENT_PASSWORD = 'lvuu sevn fwxr uyok'
 
 # Configuración para pdfkit
 WKHTMLTOPDF_CMD = '/usr/bin/wkhtmltopdf'

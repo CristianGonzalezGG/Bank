@@ -306,6 +306,35 @@
     .pulse-animation {
         animation: pulse-soft 2s infinite;
     }
+
+    /* Estilos adicionales para mensajes */
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        border-left: 4px solid #28a745;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-left: 4px solid #dc3545;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    
+    .radicado-box {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        border: 1px dashed #1a3b5c;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a3b5c;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
 </style>
 {% endblock %}
 
@@ -320,6 +349,39 @@
             </a>
         </div>
     </div>
+
+    <!-- Mostrar mensajes del sistema -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Mostrar el bloque de radicado si el envío fue exitoso -->
+    {% if envio_exitoso and radicado %}
+    <div class="row mb-5">
+        <div class="col-12" data-aos="fade-up">
+            <div class="pqr-card">
+                <div class="card-body p-4 text-center">
+                    <div style="font-size: 4rem; color: #28a745; margin-bottom: 1rem;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2 class="h3 mb-4">¡Solicitud Enviada Exitosamente!</h2>
+                    <p class="lead mb-3">Hemos recibido su PQR y nuestro equipo está trabajando para atenderla lo antes posible.</p>
+                    
+                    <h3 class="h5 mb-3">Su número de radicado es:</h3>
+                    <div class="radicado-box">
+                        {{ radicado }}
+                    </div>
+                    
+                    <p class="mb-4">Guarde este número para consultar el estado de su solicitud. Nos comunicaremos a través del correo proporcionado.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="row mb-5">
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
@@ -407,48 +469,67 @@
             <div class="pqr-card">
                 <div class="card-body p-4">
                     <h2 class="h4 mb-4">Formulario PQR</h2>
-                    <form id="pqrForm" method="post">
+                    
+                    <!-- NUEVO FORMULARIO usando Django forms -->
+                    <form method="post" action="{% url 'blog:pqr' %}">
                         {% csrf_token %}
-                        <div class="row mb-3">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <label for="nombre" class="form-label">Nombre completo</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nombre completo" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="email" class="form-label">Correo electrónico</label>
-                                <input type="email" class="form-control" id="email" name="email" placeholder="correo@ejemplo.com" required>
-                            </div>
-                        </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3 mb-md-0">
-                                <label for="documento" class="form-label">Número de documento</label>
-                                <input type="text" class="form-control" id="documento" placeholder="Número de identificación" required>
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre completo</label>
+                                {{ form.nombre }}
+                                {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">{{ form.nombre.errors }}</div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6">
-                                <label for="telefono" class="form-label">Teléfono de contacto</label>
-                                <input type="tel" class="form-control" id="telefono" placeholder="Teléfono de contacto" required>
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Correo electrónico</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="{{ form.documento.id_for_label }}" class="form-label">Número de documento</label>
+                                {{ form.documento }}
+                                {% if form.documento.errors %}
+                                <div class="invalid-feedback d-block">{{ form.documento.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono de contacto</label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                <div class="invalid-feedback d-block">{{ form.telefono.errors }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="tipo" class="form-label">Tipo de solicitud</label>
-                            <select class="form-select" id="tipo" required>
-                                <option value="" selected disabled>Seleccione el tipo de solicitud</option>
-                                <option value="PETICION">Petición</option>
-                                <option value="QUEJA">Queja</option>
-                                <option value="RECLAMO">Reclamo</option>
-                            </select>
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo de solicitud</label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                            <div class="invalid-feedback d-block">{{ form.tipo.errors }}</div>
+                            {% endif %}
                         </div>
                         
                         <div class="mb-3">
-                            <label for="asunto" class="form-label">Asunto</label>
-                            <input type="text" class="form-control" id="asunto" name="asunto" placeholder="Asunto de su solicitud" required>
+                            <label for="{{ form.asunto.id_for_label }}" class="form-label">Asunto</label>
+                            {{ form.asunto }}
+                            {% if form.asunto.errors %}
+                            <div class="invalid-feedback d-block">{{ form.asunto.errors }}</div>
+                            {% endif %}
                         </div>
                         
                         <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción detallada</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="5" placeholder="Describa detalladamente su solicitud" required></textarea>
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción detallada</label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                            <div class="invalid-feedback d-block">{{ form.descripcion.errors }}</div>
+                            {% endif %}
                         </div>
                         
                         <div class="mb-3">
@@ -466,8 +547,13 @@
                         </div>
                         
                         <div class="mb-4 form-check">
-                            <input type="checkbox" class="form-check-input" id="autorizacion" required>
-                            <label class="form-check-label" for="autorizacion">Autorizo el tratamiento de mis datos personales según la política de privacidad</label>
+                            {{ form.autorizacion }}
+                            <label class="form-check-label" for="{{ form.autorizacion.id_for_label }}">
+                                Autorizo el tratamiento de mis datos personales según la política de privacidad
+                            </label>
+                            {% if form.autorizacion.errors %}
+                            <div class="invalid-feedback d-block">{{ form.autorizacion.errors }}</div>
+                            {% endif %}
                         </div>
                         
                         <div class="text-center">
@@ -475,7 +561,6 @@
                                 <i class="fas fa-paper-plane me-2"></i>Enviar Solicitud
                             </button>
                         </div>
-                        <input type="hidden" name="destinatario" value="asesoresbancoeldorado@gmail.com">
                     </form>
                     
                     <div class="contact-methods text-center mt-5">
@@ -616,8 +701,11 @@
 
 {% block extra_js %}
 <script>
+    // Store Django template variables as JavaScript variables
+    
+    
     document.addEventListener('DOMContentLoaded', function() {
-        // Simulación de activación de pasos (con fines de demostración)
+        // Mantener el código para activar los pasos
         const steps = document.querySelectorAll('.status-step');
         let currentStep = 0;
         
@@ -627,12 +715,14 @@
                 steps[currentStep].classList.add('active');
                 
                 // Animación sutil de los elementos
-                gsap.to(steps[currentStep].querySelector('.status-dot'), {
-                    scale: 1.2,
-                    duration: 0.3,
-                    yoyo: true,
-                    repeat: 1
-                });
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(steps[currentStep].querySelector('.status-dot'), {
+                        scale: 1.2,
+                        duration: 0.3,
+                        yoyo: true,
+                        repeat: 1
+                    });
+                }
                 
                 setTimeout(activateNextStep, 1500);
             }
@@ -640,20 +730,29 @@
         
         setTimeout(activateNextStep, 1500);
         
-        // Mejora el comportamiento del input de archivo
+        // Activar todos los pasos si se ha enviado exitosamente
+        if (envioExitoso) {
+            document.querySelectorAll('.status-step').forEach(step => {
+                step.classList.add('active');
+            });
+        }
+        
+        // Mantener el código para el input de archivo
         const fileInput = document.querySelector('input[type="file"]');
         const fileUpload = document.querySelector('.file-upload');
         
-        fileInput.addEventListener('change', function() {
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                fileUpload.classList.add('border-primary');
-                const uploadText = fileUpload.querySelector('p');
-                uploadText.textContent = 'Archivo seleccionado: ' + fileName;
-            }
-        });
+        if (fileInput && fileUpload) {
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length > 0) {
+                    const fileName = fileInput.files[0].name;
+                    fileUpload.classList.add('border-primary');
+                    const uploadText = fileUpload.querySelector('p');
+                    uploadText.textContent = 'Archivo seleccionado: ' + fileName;
+                }
+            });
+        }
         
-        // Efecto 3D suave para tarjetas
+        // Mantener el código para el efecto 3D de las tarjetas
         document.querySelectorAll('.pqr-card').forEach(card => {
             card.addEventListener('mousemove', function(e) {
                 const cardRect = card.getBoundingClientRect();
@@ -673,64 +772,8 @@
                 card.style.transform = '';
             });
         });
-
-        // Actualiza el evento submit del formulario PQR
-        const pqrForm = document.getElementById('pqrForm');
-        if (pqrForm) {
-            pqrForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const submitBtn = this.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
-                
-                // Recopilar los datos del formulario
-                const formData = new FormData(pqrForm);
-                
-                // Enviar los datos mediante una solicitud AJAX
-                fetch('{% url "blog:pqr_submit" %}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Mostrar mensaje de éxito con el número de radicado
-                        showToast('Solicitud enviada', `Hemos recibido su solicitud correctamente. Su número de radicado es: ${data.radicado}`, 'success');
-                        
-                        // Restablecer formulario
-                        pqrForm.reset();
-                        if (fileUpload) {
-                            fileUpload.classList.remove('border-primary');
-                            const uploadText = fileUpload.querySelector('p');
-                            if (uploadText) {
-                                uploadText.textContent = 'Arrastre sus archivos aquí o haga clic para seleccionar';
-                            }
-                        }
-                    } else {
-                        // Mostrar mensaje de error
-                        showToast('Error', data.message || 'Ha ocurrido un error al procesar su solicitud.', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('Error', 'Ha ocurrido un error al enviar su solicitud. Por favor, inténtelo de nuevo.', 'error');
-                })
-                .finally(() => {
-                    // Restaurar botón
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                });
-            });
-        }
         
-        // Formulario de consulta
+        // Mantener el código para el formulario de consulta
         const consultaForm = document.getElementById('consultaForm');
         if (consultaForm) {
             consultaForm.addEventListener('submit', function(e) {
@@ -744,7 +787,7 @@
                 
                 setTimeout(() => {
                     // Simulación de respuesta
-                    showToast('Consulta realizada', 'Su solicitud está en proceso de análisis por nuestro equipo.', 'info');
+                    alert('Su solicitud está en proceso de análisis por nuestro equipo.');
                     
                     // Restaurar botón
                     submitBtn.disabled = false;
@@ -753,33 +796,32 @@
             });
         }
         
-        // Función para mostrar toast (utilizando la función del tema principal)
-        function showToast(title, message, type) {
-            if (typeof window.showToast === 'function') {
-                window.showToast(title, message, type, 5000);
-            } else {
-                console.log(`${type.toUpperCase()}: ${title} - ${message}`);
-                // Implementación básica por si no existe la función global
-                alert(`${title}: ${message}`);
-            }
-        }
-        
         // Añadir efecto de resplandor a los elementos de contacto
         document.querySelectorAll('.contact-icon').forEach(icon => {
             icon.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    boxShadow: '0 0 20px rgba(0, 212, 255, 0.5)',
-                    scale: 1.1,
-                    duration: 0.3
-                });
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(this, {
+                        boxShadow: '0 0 20px rgba(0, 212, 255, 0.5)',
+                        scale: 1.1,
+                        duration: 0.3
+                    });
+                } else {
+                    this.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.5)';
+                    this.style.transform = 'scale(1.1)';
+                }
             });
             
             icon.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    boxShadow: '0 0 0 rgba(0, 212, 255, 0)',
-                    scale: 1,
-                    duration: 0.3
-                });
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(this, {
+                        boxShadow: '0 0 0 rgba(0, 212, 255, 0)',
+                        scale: 1,
+                        duration: 0.3
+                    });
+                } else {
+                    this.style.boxShadow = '';
+                    this.style.transform = '';
+                }
             });
         });
     });

@@ -50,6 +50,5 @@ urlpatterns = [
     path('disable-2fa/', views.disable_2fa, name='disable_2fa'),
     path('inversiones/', views.inversiones_view, name='inversiones'),
     path('seguridad/', views.seguridad_view, name='seguridad'),
-    path('pqr/', views.pqr_view, name='pqr'),
-    path('pqr/submit/', views.pqr_submit, name='pqr_submit'),
+    path('pqr/', views.pqr, name='pqr'),
 ]

@@ -40,7 +40,7 @@ from django.http import StreamingHttpResponse
 from django.db.models import F
 import json
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime
 from .models import Appointment
 from .forms import AppointmentForm
 import random
@@ -52,6 +52,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from .models import UserTwoFactorSettings, TwoFactorCode
 from django.contrib.auth.models import User
+from .forms import PQRForm
 
 
 @login_required
@@ -182,7 +183,84 @@ def negocios(request):
     return render(request, 'negocios.html')
 
 def pqr(request):
-    return render(request, 'pqr.html')
+    """Vista para mostrar y procesar el formulario de PQR."""
+    if request.method == 'POST':
+        form = PQRForm(request.POST)
+        if form.is_valid():
+            # Obtener datos validados del formulario
+            nombre = form.cleaned_data['nombre']
+            email = form.cleaned_data['email']
+            documento = form.cleaned_data['documento']
+            telefono = form.cleaned_data['telefono']
+            tipo = form.cleaned_data['tipo']
+            asunto = form.cleaned_data['asunto']
+            descripcion = form.cleaned_data['descripcion']
+            
+            # Generar número de radicado
+            radicado = generate_radicado()
+            
+            # Construir el mensaje de correo
+            mensaje = f"""
+            NUEVA SOLICITUD PQR - Banco El Dorado
+            =====================================
+            
+            Número de Radicado: {radicado}
+            Fecha y hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            
+            INFORMACIÓN DEL SOLICITANTE:
+            ----------------------------
+            Nombre completo: {nombre}
+            Correo electrónico: {email}
+            Documento de identidad: {documento}
+            Teléfono de contacto: {telefono}
+            
+            DETALLES DE LA SOLICITUD:
+            ------------------------
+            Tipo de solicitud: {tipo}
+            Asunto: {asunto}
+            
+            DESCRIPCIÓN:
+            -----------
+            {descripcion}
+            
+            =====================================
+            Este correo ha sido generado automáticamente por el sistema de PQR del Banco El Dorado.
+            Por favor no responda a este mensaje.
+            """
+            
+            try:
+                # Enviar correo
+                send_mail(
+                    f'[PQR-{radicado}] {tipo}: {asunto}',
+                    mensaje,
+                    settings.PQR_RECIPIENT_EMAIL,
+                    [settings.DEFAULT_FROM_EMAIL],
+                    fail_silently=False,
+                )
+                
+                # Mensaje de éxito y redirección
+                messages.success(request, f'Su solicitud ha sido enviada exitosamente. Su número de radicado es: {radicado}')
+                
+                # Preparar un nuevo formulario vacío
+                form = PQRForm()
+                
+                # Pasar el radicado al contexto para mostrarlo
+                return render(request, 'pqr.html', {
+                    'form': form,
+                    'radicado': radicado,
+                    'envio_exitoso': True
+                })
+                
+            except Exception as e:
+                # Registrar el error y mostrar mensaje
+                print(f"Error al enviar correo: {str(e)}")
+                messages.error(request, f'Ocurrió un error al enviar su solicitud: {str(e)}')
+    else:
+        # GET request - mostrar formulario vacío
+        form = PQRForm()
+    
+    return render(request, 'pqr.html', {'form': form})
+
 def tramites(request):
     return render(request, 'tramites_digitales.html')
 def blog(request):
@@ -649,89 +727,10 @@ def seguridad_view(request):
 def tramites_digitales(request):
     return render(request, 'tramites_digitales.html')
 
-def pqr_view(request):
-    """Vista para renderizar el formulario de PQR."""
-    return render(request, 'pqr.html')
-
 def generate_radicado():
     """Genera un número de radicado único para la solicitud PQR."""
     prefix = "PQR"
     timestamp = datetime.now().strftime('%Y%m%d')
     random_chars = ''.join(random.choices(string.digits, k=6))
     return f"{prefix}{timestamp}{random_chars}"
-
-def pqr_submit(request):
-    """Vista para procesar el envío del formulario PQR y enviar el correo."""
-    if request.method == 'POST':
-        try:
-            # Obtener datos del formulario
-            nombre = request.POST.get('nombre', '')
-            email = request.POST.get('email', '')
-            documento = request.POST.get('documento', '')
-            telefono = request.POST.get('telefono', '')
-            tipo = request.POST.get('tipo', '')
-            asunto = request.POST.get('asunto', '')
-            descripcion = request.POST.get('descripcion', '')
-            
-            # Dirección de correo destinatario fija
-            email_destinatario = 'solicitudesbancoeldorado@gmail.com'
-            
-            # Generar número de radicado
-            radicado = generate_radicado()
-            
-            # Construir el mensaje de correo con toda la información
-            mensaje = f"""
-            NUEVA SOLICITUD PQR - Banco El Dorado
-            =====================================
-            
-            Número de Radicado: {radicado}
-            Fecha y hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            
-            INFORMACIÓN DEL SOLICITANTE:
-            ----------------------------
-            Nombre completo: {nombre}
-            Correo electrónico: {email}
-            Documento de identidad: {documento}
-            Teléfono de contacto: {telefono}
-            
-            DETALLES DE LA SOLICITUD:
-            ------------------------
-            Tipo de solicitud: {tipo}
-            Asunto: {asunto}
-            
-            DESCRIPCIÓN:
-            -----------
-            {descripcion}
-            
-            =====================================
-            Este correo ha sido generado automáticamente por el sistema de PQR del Banco El Dorado.
-            Por favor no responda a este mensaje.
-            """
-            
-            # Enviar correo desde la cuenta fija a la cuenta de destino
-            send_mail(
-                f'[PQR-{radicado}] {tipo}: {asunto}',
-                mensaje,
-                settings.DEFAULT_FROM_EMAIL,  # Usa el remitente configurado en settings
-                [email_destinatario],  # Destinatario fijo
-                fail_silently=False,
-            )
-            
-            return JsonResponse({
-                'success': True,
-                'radicado': radicado,
-                'message': 'Solicitud enviada correctamente'
-            })
-        
-        except Exception as e:
-            print(f"Error al enviar correo: {str(e)}")  # Para depuración en la consola del servidor
-            return JsonResponse({
-                'success': False,
-                'message': f'Error al procesar la solicitud: {str(e)}'
-            })
-    
-    return JsonResponse({
-        'success': False,
-        'message': 'Método no permitido'
-    })
 

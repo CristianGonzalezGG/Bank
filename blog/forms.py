@@ -129,3 +129,48 @@ class AppointmentForm(forms.ModelForm):
             })
         }
 
+class PQRForm(forms.Form):
+    TIPOS_PQR = [
+        ('PETICION', 'Petición'),
+        ('QUEJA', 'Queja'),
+        ('RECLAMO', 'Reclamo'),
+    ]
+    
+    nombre = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su nombre completo'})
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'})
+    )
+    documento = forms.CharField(
+        max_length=20,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de identificación'})
+    )
+    telefono = forms.CharField(
+        max_length=15,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono de contacto'})
+    )
+    tipo = forms.ChoiceField(
+        choices=TIPOS_PQR,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    asunto = forms.CharField(
+        max_length=200,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Asunto de su solicitud'})
+    )
+    descripcion = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Describa detalladamente su solicitud'})
+    )
+    autorizacion = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
