@@ -1,35 +1,267 @@
 {% extends 'base.html' %}
 
-{% block title %}Negocios - Banco El Dorado{% endblock %}
+{% block title %}Futuro Digital - Banco El Dorado{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="text-center mb-4 p-4" style="background-color: #f9fafb; border-radius: 8px;">
-        <h2 class="display-5 font-weight-bold animate__animated animate__fadeInDown">Negocios y Emprendimientos</h2>
-        <p class="lead animate__animated animate__fadeIn animate__delay-1s">
-            Banco El Dorado, tu aliado en el crecimiento empresarial. Conoce nuestros emprendimientos y asociaciones estratégicas.
+<div class="min-vh-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);">
+    <!-- Fondo animado de redes neuronales -->
+    <div class="position-absolute w-100 h-100" id="neuralNetworkBackground"></div>
+
+    <!-- Hero Section -->
+    <div class="container py-5 text-center position-relative z-index-1">
+        <h1 class="display-1 fw-bold animate__animated animate__fadeInDown">
+            <span class="text-gradient" style="background: linear-gradient(90deg, #ff7e5f, #feb47b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">El Futuro</span> es Digital
+        </h1>
+        <p class="lead fs-4 animate__animated animate__fadeIn animate__delay-1s" style="color: #e0e0e0;">
+            Banco El Dorado lidera la revolución financiera con tecnología blockchain, criptomonedas y soluciones innovadoras.
         </p>
-        <button class="btn btn-primary btn-lg mt-3 animate__animated animate__fadeInUp animate__delay-2s">Descubre Más</button>
+        <button class="btn btn-lg mt-4 animate__animated animate__fadeInUp animate__delay-2s" style="background: linear-gradient(90deg, #ff7e5f, #feb47b); border: none; color: #fff;">
+            Explora el Futuro
+        </button>
     </div>
 
-    <h3>Nuevos Emprendimientos</h3>
-    <ul class="list-unstyled">
-        <li class="mb-3 animate__animated animate__fadeInLeft">
-            <strong>DoradoTech:</strong> Innovación en soluciones tecnológicas para PYMES.
-        </li>
-        <li class="mb-3 animate__animated animate__fadeInLeft animate__delay-1s">
-            <strong>EcoFuturo:</strong> Financiamiento de proyectos ecológicos que promuevan la sostenibilidad.
-        </li>
-        <li class="mb-3 animate__animated animate__fadeInLeft animate__delay-2s">
-            <strong>Comercio Global:</strong> Plataforma de comercio para la expansión internacional.
-        </li>
-    </ul>
+    <!-- Estadísticas de Criptomonedas -->
+    <div class="container py-5 position-relative z-index-1">
+        <h2 class="text-center display-4 fw-bold mb-5 animate__animated animate__fadeIn" style="color: #fff;">
+            Estadísticas de Criptomonedas
+        </h2>
+        <div class="row g-4">
+            <!-- Bitcoin -->
+            <div class="col-md-4 animate__animated animate__fadeInLeft">
+                <div class="card h-100 card-hover-rotate" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold" style="color: #ff7e5f;">Bitcoin (BTC)</h3>
+                        <canvas id="bitcoinChart" class="w-100 h-100"></canvas>
+                        <p class="card-text mt-3" style="color: #e0e0e0;">
+                            Bitcoin sigue siendo la criptomoneda líder con un crecimiento del 120% en 2023.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Ethereum -->
+            <div class="col-md-4 animate__animated animate__fadeInUp">
+                <div class="card h-100 card-hover-rotate" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold" style="color: #627eea;">Ethereum (ETH)</h3>
+                        <canvas id="ethereumChart" class="w-100 h-100"></canvas>
+                        <p class="card-text mt-3" style="color: #e0e0e0;">
+                            Ethereum impulsa los contratos inteligentes y DeFi con un crecimiento del 80%.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Solana -->
+            <div class="col-md-4 animate__animated animate__fadeInRight">
+                <div class="card h-100 card-hover-rotate" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold" style="color: #14f195;">Solana (SOL)</h3>
+                        <canvas id="solanaChart" class="w-100 h-100"></canvas>
+                        <p class="card-text mt-3" style="color: #e0e0e0;">
+                            Solana destaca por su velocidad y bajas comisiones, con un crecimiento del 150%.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <p>Para más información, visita nuestra sección de <a href="#">Negocios</a>.</p>
+    <!-- Tecnología Blockchain -->
+    <div class="container py-5 position-relative z-index-1">
+        <h2 class="text-center display-4 fw-bold mb-5 animate__animated animate__fadeIn" style="color: #fff;">
+            Tecnología Blockchain
+        </h2>
+        <div class="row g-4">
+            <div class="col-md-6 animate__animated animate__fadeInLeft">
+                <div class="card h-100 card-hover-rotate" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold" style="color: #ff7e5f;">¿Qué es Blockchain?</h3>
+                        <p class="card-text" style="color: #e0e0e0;">
+                            Blockchain es una tecnología de registro distribuido que garantiza la seguridad y transparencia de las transacciones.
+                        </p>
+                        <button class="btn mt-3" style="background: linear-gradient(90deg, #ff7e5f, #feb47b); border: none; color: #fff;">Aprende Más</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 animate__animated animate__fadeInRight">
+                <div class="card h-100 card-hover-rotate" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold" style="color: #627eea;">Aplicaciones de Blockchain</h3>
+                        <ul class="list-unstyled" style="color: #e0e0e0;">
+                            <li>Finanzas descentralizadas (DeFi)</li>
+                            <li>Contratos inteligentes</li>
+                            <li>Gestión de identidad digital</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planes de Negocio -->
+    <div class="container py-5 position-relative z-index-1">
+        <h2 class="text-center display-4 fw-bold mb-5 animate__animated animate__fadeIn" style="color: #fff;">
+            Planes de Negocio
+        </h2>
+        <div class="row g-4">
+            <div class="col-md-4 animate__animated animate__fadeInLeft">
+                <div class="card h-100 card-hover-rotate" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold" style="color: #ff7e5f;">Plan Básico</h3>
+                        <p class="card-text" style="color: #e0e0e0;">
+                            Ideal para pequeñas empresas. Incluye acceso a herramientas básicas de blockchain.
+                        </p>
+                        <button class="btn mt-3" style="background: linear-gradient(90deg, #ff7e5f, #feb47b); border: none; color: #fff;">Más Información</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 animate__animated animate__fadeInUp">
+                <div class="card h-100 card-hover-rotate" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold" style="color: #627eea;">Plan Avanzado</h3>
+                        <p class="card-text" style="color: #e0e0e0;">
+                            Para empresas medianas. Incluye acceso a contratos inteligentes y DeFi.
+                        </p>
+                        <button class="btn mt-3" style="background: linear-gradient(90deg, #627eea, #a2b6df); border: none; color: #fff;">Más Información</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 animate__animated animate__fadeInRight">
+                <div class="card h-100 card-hover-rotate" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold" style="color: #14f195;">Plan Premium</h3>
+                        <p class="card-text" style="color: #e0e0e0;">
+                            Para grandes empresas. Incluye soluciones personalizadas y soporte 24/7.
+                        </p>
+                        <button class="btn mt-3" style="background: linear-gradient(90deg, #14f195, #00c9a7); border: none; color: #fff;">Más Información</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 position-relative z-index-1" style="background: rgba(0, 0, 0, 0.5);">
+        <div class="container text-center">
+            <p style="color: #e0e0e0;">&copy; 2023 Banco El Dorado. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 </div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    // Fondo animado de redes neuronales
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('neuralNetworkBackground').appendChild(renderer.domElement);
+
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    camera.position.z = 5;
+
+    const animate = function () {
+        requestAnimationFrame(animate);
+
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+
+        renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // Gráficos de Criptomonedas
+    const bitcoinChart = new Chart(document.getElementById('bitcoinChart'), {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Precio BTC',
+                data: [20000, 25000, 30000, 28000, 32000, 35000],
+                borderColor: '#ff7e5f',
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    const ethereumChart = new Chart(document.getElementById('ethereumChart'), {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Precio ETH',
+                data: [1500, 1800, 2000, 1900, 2200, 2500],
+                borderColor: '#627eea',
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    const solanaChart = new Chart(document.getElementById('solanaChart'), {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Precio SOL',
+                data: [20, 30, 40, 35, 50, 60],
+                borderColor: '#14f195',
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Animaciones con GSAP
+    gsap.from(".animate__fadeInDown", { opacity: 0, y: -50, duration: 1, delay: 0.5 });
+    gsap.from(".animate__fadeIn", { opacity: 0, y: 50, duration: 1, delay: 1 });
+    gsap.from(".animate__fadeInLeft", { opacity: 0, x: -50, duration: 1, delay: 1.5 });
+    gsap.from(".animate__fadeInRight", { opacity: 0, x: 50, duration: 1, delay: 1.5 });
+    gsap.from(".animate__fadeInUp", { opacity: 0, y: 50, duration: 1, delay: 1.5 });
+
+    // Efecto de rotación en las tarjetas
+    document.querySelectorAll('.card-hover-rotate').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+        });
+    });
+</script>
+
+<!-- Animaciones -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<style>
-    .btn-primary { transition: transform 0.3s ease; }
-    .btn-primary:hover { transform: scale(1.05); background-color: #0056b3; }
-</style>
 {% endblock %}

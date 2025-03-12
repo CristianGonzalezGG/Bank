@@ -986,80 +986,54 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
-                        {% if user_role == 'ADVISOR' %}
-                            <!-- MENÚ DE ASESOR -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link" href="#" id="clientesDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-users me-1"></i> Clientes
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{% url 'blog:client_list' %}">
-                                        <i class="fas fa-list"></i>Lista de Clientes
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="{% url 'blog:create_client' %}">
-                                        <i class="fas fa-user-plus"></i>Nuevo Cliente
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="{% url 'blog:search_client' %}">
-                                        <i class="fas fa-search"></i>Buscar Cliente
-                                    </a></li>
-                                </ul>
-                            </li>
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link" href="#" id="cuentasDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-piggy-bank me-1"></i> Cuentas
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{% url 'blog:client_list' %}">
-                                        <i class="fas fa-cog"></i>Gestionar Cuentas
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="{% url 'blog:bin_lookup' %}">
-                                        <i class="fas fa-credit-card"></i>Verificar Tarjeta
-                                    </a></li>
-                                </ul>
-                            </li>
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link" href="#" id="prestamosDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-money-bill-wave me-1"></i> Préstamos
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{% url 'blog:loan_list' %}">
-                                        <i class="fas fa-list-alt"></i>Lista de Préstamos
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="{% url 'blog:loan_create' %}">
-                                        <i class="fas fa-plus-circle"></i>Nuevo Préstamo
-                                    </a></li>
-                                </ul>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}" 
-                                   href="{% url 'blog:appointment_list' %}">
-                                    <i class="fas fa-calendar-alt me-1"></i> Citas
-                                </a>
-                            </li>
-                        {% else %}
-                            <!-- MENU CLIENTE (vacío por ahora) -->
-                        {% endif %}
-
-                        <!-- Usuario (común para ambos roles) -->
+                        <!-- MENÚ DE ASESOR -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="#" id="clientesDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-users me-1"></i> Clientes
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:client_list' %}"><i class="fas fa-list"></i> Lista de Clientes</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:create_client' %}"><i class="fas fa-user-plus"></i> Nuevo Cliente</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:search_client' %}"><i class="fas fa-search"></i> Buscar Cliente</a></li>
+                            </ul>
+                        </li>
+            
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="#" id="cuentasDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-piggy-bank me-1"></i> Cuentas
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:client_list' %}"><i class="fas fa-cog"></i> Gestionar Cuentas</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:bin_lookup' %}"><i class="fas fa-credit-card"></i> Verificar Tarjeta</a></li>
+                            </ul>
+                        </li>
+            
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="#" id="prestamosDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-money-bill-wave me-1"></i> Préstamos
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'blog:loan_list' %}"><i class="fas fa-list-alt"></i> Lista de Préstamos</a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:loan_create' %}"><i class="fas fa-plus-circle"></i> Nuevo Préstamo</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}" href="{% url 'blog:appointment_list' %}">
+                                <i class="fas fa-calendar-alt me-1"></i> Citas
+                            </a>
+                        </li>
+            
+                        <!-- Usuario -->
                         <li class="nav-item dropdown">
                             <a class="nav-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle me-1"></i> {{ user.username }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'blog:logout' %}">
-                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'blog:logout' %}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'blog:login' %}">
-                                <i class="fas fa-sign-in-alt me-1"></i> Ingresar
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'blog:login' %}">
                                 <i class="fas fa-user-tie me-1"></i> Portal Asesor
@@ -1073,23 +1047,12 @@
                             <i class="fas fa-concierge-bell me-1"></i> Servicios
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'blog:inversiones' %}">
-                                <i class="fas fa-chart-line"></i> Inversiones
-                                <span class="badge-new">Nuevo</span>
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'blog:tramites_digitales' %}">
-                                <i class="fas fa-laptop-code"></i> Trámites Digitales
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'blog:negocios' %}">
-                                <i class="fas fa-briefcase"></i> Negocios
-                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:inversiones' %}"><i class="fas fa-chart-line"></i> Inversiones <span class="badge-new">Nuevo</span></a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:tramites_digitales' %}"><i class="fas fa-laptop-code"></i> Trámites Digitales</a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:negocios' %}"><i class="fas fa-briefcase"></i> Negocios</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'blog:pqr' %}">
-                                <i class="fas fa-headset"></i> Centro de Atención
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'blog:seguridad' %}">
-                                <i class="fas fa-shield-alt"></i> Centro de Seguridad
-                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:pqr' %}"><i class="fas fa-headset"></i> Centro de Atención</a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:seguridad' %}"><i class="fas fa-shield-alt"></i> Centro de Seguridad</a></li>
                         </ul>
                     </li>
                 </ul>

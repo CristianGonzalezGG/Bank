@@ -1,59 +1,67 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}
 Inicio | Banco el Dorado
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-5">Nuestros Servicios</h2>
-    <div class="hero-section text-center p-5" style="background-color: #f1f3f5; border-radius: 8px;">
-        <h1 class="display-4 font-weight-bold animate__animated animate__fadeInDown">Bienvenido a Banco El Dorado</h1>
-        <p class="lead animate__animated animate__fadeIn animate__delay-1s">Tu aliado financiero para alcanzar tus metas y construir un futuro próspero.</p>
-        <button class="btn btn-primary btn-lg mt-3 animate__animated animate__fadeInUp animate__delay-2s">Conoce Nuestros Servicios</button>
+    <!-- Hero Section -->
+    <div class="hero-section text-center p-5 mb-5" style="background-color: #f0f8ff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+        <h1 class="display-4 font-weight-bold" style="color: #00468b;">Bienvenido a Banco El Dorado</h1>
+        <p class="lead" style="color: #4d4d4d;">Tu aliado financiero para alcanzar tus metas y construir un futuro próspero.</p>
+        <button class="btn btn-primary btn-lg mt-3">
+            Conoce Nuestros Servicios
+            <i class="fas fa-arrow-right ms-2"></i>
+        </button>
     </div>
 
     <!-- Servicios Section -->
     <section class="mt-5">
-        <h2 class="mb-4">Nuestros Servicios</h2>
-        <div class="row">
+        <h2 class="text-center mb-4" style="color: #00468b; position: relative;">
+            Nuestros Servicios
+            <span style="height: 3px; width: 80px; background-color: #d4af37; display: block; margin: 10px auto;"></span>
+        </h2>
+        <div class="row mt-4">
             <!-- Servicio 1 -->
-            <div class="col-md-4">
-                <div class="card animate__animated animate__fadeIn">
-                    <img src="{% static 'images/servicio1.jpg' %}" class="card-img-top" alt="Servicio 1">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100" style="border-radius: 8px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <img src="{% static 'images/servicio1.jpg' %}" class="card-img-top" alt="Cuentas de Ahorro" style="height: 200px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px;">
                     <div class="card-body">
-                        <h5 class="card-title">Cuentas de Ahorro</h5>
+                        <h5 class="card-title" style="color: #00468b; border-bottom: 2px solid #d4af37; padding-bottom: 8px;">Cuentas de Ahorro</h5>
                         <p class="card-text">Abre tu cuenta de ahorro y disfruta de beneficios exclusivos como tasas de interés preferenciales.</p>
                         <a href="#" class="btn btn-outline-primary">Más información</a>
                     </div>
                 </div>
             </div>
             <!-- Servicio 2 -->
-            <div class="col-md-4">
-                <div class="card animate__animated animate__fadeIn animate__delay-1s">
-                    <img src="{% static 'images/servicio2.jpg' %}" class="card-img-top" alt="Servicio 2">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100" style="border-radius: 8px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <img src="{% static 'images/servicio2.jpg' %}" class="card-img-top" alt="Préstamos Personales" style="height: 200px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px;">
                     <div class="card-body">
-                        <h5 class="card-title">Préstamos Personales</h5>
+                        <h5 class="card-title" style="color: #00468b; border-bottom: 2px solid #d4af37; padding-bottom: 8px;">Préstamos Personales</h5>
                         <p class="card-text">Solicita un préstamo con condiciones flexibles para cubrir todas tus necesidades.</p>
                         <a href="#" class="btn btn-outline-primary">Más información</a>
                     </div>
                 </div>
             </div>
             <!-- Servicio 3 -->
-            <div class="col-md-4">
-                <div class="card animate__animated animate__fadeIn animate__delay-2s">
-                    <img src="{% static 'images/servicio3.png' %}" class="card-img-top" alt="Servicio 3">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100" style="border-radius: 8px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <img src="{% static 'images/servicio3.png' %}" class="card-img-top" alt="Tarjetas de Crédito" style="height: 200px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px;">
                     <div class="card-body">
-                        <h5 class="card-title">Tarjetas de Crédito</h5>
+                        <h5 class="card-title" style="color: #00468b; border-bottom: 2px solid #d4af37; padding-bottom: 8px;">Tarjetas de Crédito</h5>
                         <p class="card-text">Elige la tarjeta que más te convenga y obtén beneficios exclusivos.</p>
                         <a href="#" class="btn btn-outline-primary">Más información</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm">
+            <!-- Servicio 4 -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100" style="border-radius: 8px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
-                        <h5 class="card-title">
+                        <h5 class="card-title" style="color: #00468b; border-bottom: 2px solid #d4af37; padding-bottom: 8px;">
                             <i class="fas fa-calendar-alt text-primary me-2"></i>
                             Gestión de Citas
                         </h5>
@@ -68,78 +76,105 @@ Inicio | Banco el Dorado
             </div>
         </div>
     </section>
+
+    <!-- Secciones de servicios detallados -->
     <!-- Sección Cuentas de Ahorro -->
-    <section class="service-section bg-light-blue">
+    <section class="p-4 mt-4 mb-4" style="background-color: #f0f8ff; border-radius: 8px; border-left: 4px solid #d4af37;">
         <div class="row">
             <div class="col-md-12">
-                <h3>Cuentas de Ahorro</h3>
-                <p>Disfruta de los beneficios de nuestras cuentas de ahorro, con tasas preferenciales y fácil acceso en nuestras plataformas digitales.</p>
+                <h3 style="color: #00468b; font-weight: 600;">Cuentas de Ahorro</h3>
+                <p style="color: #4d4d4d;">Disfruta de los beneficios de nuestras cuentas de ahorro, con tasas preferenciales y fácil acceso en nuestras plataformas digitales.</p>
+                <button class="btn btn-primary">
+                    <i class="fas fa-piggy-bank me-2"></i>
+                    Abrir una Cuenta
+                </button>
             </div>
         </div>
     </section>
 
     <!-- Sección Préstamos Personales -->
-    <section class="service-section bg-light-gray">
+    <section class="p-4 mt-4 mb-4" style="background-color: #f7f7f7; border-radius: 8px; border-left: 4px solid #d4af37;">
         <div class="row">
             <div class="col-md-12">
-                <h3>Préstamos Personales</h3>
-                <p>Obtén un préstamo personal con condiciones flexibles y aprobación rápida para que puedas alcanzar tus objetivos.</p>
+                <h3 style="color: #00468b; font-weight: 600;">Préstamos Personales</h3>
+                <p style="color: #4d4d4d;">Obtén un préstamo personal con condiciones flexibles y aprobación rápida para que puedas alcanzar tus objetivos.</p>
+                <button class="btn btn-primary">
+                    <i class="fas fa-hand-holding-usd me-2"></i>
+                    Solicitar Préstamo
+                </button>
             </div>
         </div>
     </section>
 
     <!-- Sección Tarjetas de Crédito -->
-    <section class="service-section bg-light-blue">
+    <section class="p-4 mt-4 mb-4" style="background-color: #f0f8ff; border-radius: 8px; border-left: 4px solid #d4af37;">
         <div class="row">
             <div class="col-md-12">
-                <h3>Tarjetas de Crédito</h3>
-                <p>Elige entre nuestras tarjetas de crédito y disfruta de beneficios exclusivos y flexibilidad en tus pagos.</p>
+                <h3 style="color: #00468b; font-weight: 600;">Tarjetas de Crédito</h3>
+                <p style="color: #4d4d4d;">Elige entre nuestras tarjetas de crédito y disfruta de beneficios exclusivos y flexibilidad en tus pagos.</p>
+                <button class="btn btn-primary">
+                    <i class="fas fa-credit-card me-2"></i>
+                    Comparar Tarjetas
+                </button>
             </div>
         </div>
     </section>
 
     <!-- Sección Citas -->
-    <section class="service-section bg-light-gray">
+    <section class="p-4 mt-4 mb-4" style="background-color: #f7f7f7; border-radius: 8px; border-left: 4px solid #d4af37;">
         <div class="row">
             <div class="col-md-12">
-                <h3>Agenda una Cita</h3>
-                <p>Programa una cita con uno de nuestros asesores financieros para obtener asesoramiento personalizado.</p>
-                <button class="btn btn-primary">Agendar Cita</button>
+                <h3 style="color: #00468b; font-weight: 600;">Agenda una Cita</h3>
+                <p style="color: #4d4d4d;">Programa una cita con uno de nuestros asesores financieros para obtener asesoramiento personalizado.</p>
+                <button class="btn btn-primary" id="btnCita">
+                    <i class="fas fa-calendar-check me-2"></i>
+                    Agendar Cita
+                </button>
             </div>
         </div>
     </section>
 
     <!-- Sección Sedes -->
-    <section class="service-section bg-light-blue">
+    <section class="p-4 mt-4 mb-4" style="background-color: #f0f8ff; border-radius: 8px; border-left: 4px solid #d4af37;">
         <div class="row">
             <div class="col-md-12">
-                <h3>Nuestras Sedes</h3>
-                <p>Visita cualquiera de nuestras sedes a nivel nacional. Encuentra la más cercana a ti.</p>
-                <button class="btn btn-primary">Ubicaciones</button>
+                <h3 style="color: #00468b; font-weight: 600;">Nuestras Sedes</h3>
+                <p style="color: #4d4d4d;">Visita cualquiera de nuestras sedes a nivel nacional. Encuentra la más cercana a ti.</p>
+                <button class="btn btn-primary">
+                    <i class="fas fa-location-dot me-2"></i>
+                    Ver Ubicaciones
+                </button>
             </div>
         </div>
     </section>
 </div>
+{% endblock %}
 
-<style>
-    /* Estilos diferenciados y minimalistas para cada sección */
-    .service-section {
-        padding: 30px;
-        border-radius: 8px;
-        margin-bottom: 30px;
-    }
-    .bg-light-blue {
-        background-color: #f0f8ff; /* Azul claro */
-    }
-    .bg-light-gray {
-        background-color: #f7f7f7; /* Gris claro */
-    }
-    .service-section h3 {
-        font-weight: bold;
-        color: #2a4d69;
-    }
-    .service-section p {
-        color: #4d4d4d;
-    }
-</style>
+{% block extrajs %}
+<script>
+    // Script sencillo para efectos de hover en las tarjetas
+    document.addEventListener('DOMContentLoaded', function() {
+        // Efecto hover para cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+                this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.2)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            });
+        });
+        
+        // Botón de cita
+        const btnCita = document.getElementById('btnCita');
+        if (btnCita) {
+            btnCita.addEventListener('click', function() {
+                alert('¡Aquí se mostraría un formulario para agendar una cita!');
+            });
+        }
+    });
+</script>
 {% endblock %}

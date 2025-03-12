@@ -3,64 +3,111 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/2fa.css' %}">
+<style>
+    .verification-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+    }
+    .verification-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .code-input-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    .code-input {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        text-align: center;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+    }
+    .code-input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
+    }
+    .timer {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #dc3545;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        border: none;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #6610f2, #0d6efd);
+    }
+    .loader {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="verification-container">
-    <div class="container">
-        <div class="verification-card animate-fade-in">
-            <div class="text-center mb-4">
-                <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
-                <h2 class="font-weight-bold">Verificación de dos factores</h2>
-                <p class="text-muted">
-                    Hemos enviado un código de verificación a tu correo electrónico.
-                    Por favor, ingrésalo a continuación.
-                </p>
-            </div>
-
-            {% if messages %}
-            <div class="messages mb-4">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <form method="post" id="verificationForm">
-                {% csrf_token %}
-                <div class="code-input-group">
-                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
-                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
-                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
-                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
-                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
-                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
-                    <input type="hidden" name="code" id="completeCode">
-                </div>
-
-                <div class="timer text-center mb-3">
-                    Código válido por: <span id="countdown">10:00</span>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <span class="verify-text">Verificar</span>
-                        <span class="verify-loader d-none">
-                            <span class="loader"></span>
-                            Verificando...
-                        </span>
-                    </button>
-                    
-                    <button type="button" class="resend-button" id="resendButton" disabled>
-                        <i class="fas fa-redo-alt"></i>
-                        Reenviar código (<span id="resendTimer">30</span>s)
-                    </button>
-                </div>
-            </form>
+    <div class="verification-card">
+        <div class="text-center mb-4">
+            <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+            <h2 class="fw-bold">Verificación de dos factores</h2>
+            <p class="text-muted">Hemos enviado un código a tu correo. Ingrésalo a continuación.</p>
         </div>
+
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" id="verificationForm">
+            {% csrf_token %}
+            <div class="code-input-group">
+                {% for i in "123456" %}
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                {% endfor %}
+                <input type="hidden" name="code" id="completeCode">
+            </div>
+            <div class="timer text-center my-3">Código válido por: <span id="countdown">10:00</span></div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <span class="verify-text">Verificar</span>
+                    <span class="verify-loader d-none">
+                        <div class="loader"></div> Verificando...
+                    </span>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="resendButton" disabled>
+                    <i class="fas fa-redo-alt"></i> Reenviar código (<span id="resendTimer">30</span>s)
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
@@ -69,38 +116,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputs = document.querySelectorAll('.code-input');
-    const form = document.getElementById('verificationForm');
     const completeCode = document.getElementById('completeCode');
-    const resendButton = document.getElementById('resendButton');
+    const form = document.getElementById('verificationForm');
     const countdownElement = document.getElementById('countdown');
+    const resendButton = document.getElementById('resendButton');
     const resendTimerElement = document.getElementById('resendTimer');
 
-    // Manejar la entrada de código
     inputs.forEach((input, index) => {
-        input.addEventListener('keyup', (e) => {
-            if (e.key >= 0 && e.key <= 9) {
-                if (index < inputs.length - 1) {
-                    inputs[index + 1].focus();
-                }
-                updateCompleteCode();
-            } else if (e.key === 'Backspace') {
-                if (index > 0) {
-                    inputs[index - 1].focus();
-                }
+        input.addEventListener('input', () => {
+            if (input.value.match(/\d/)) {
+                if (index < inputs.length - 1) inputs[index + 1].focus();
+            } else {
+                input.value = '';
             }
-        });
-
-        input.addEventListener('paste', (e) => {
-            e.preventDefault();
-            const pastedData = e.clipboardData.getData('text').slice(0, 6);
-            if (/^\d+$/.test(pastedData)) {
-                pastedData.split('').forEach((digit, i) => {
-                    if (inputs[i]) {
-                        inputs[i].value = digit;
-                    }
-                });
-                updateCompleteCode();
-            }
+            updateCompleteCode();
         });
     });
 
@@ -108,49 +137,24 @@ document.addEventListener('DOMContentLoaded', function() {
         completeCode.value = Array.from(inputs).map(input => input.value).join('');
     }
 
-    // Temporizador para el código
-    let timeLeft = 600; // 10 minutos
-    const countdown = setInterval(() => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
+    let timeLeft = 600;
+    setInterval(() => {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
         countdownElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (timeLeft <= 0) {
-            clearInterval(countdown);
-            countdownElement.textContent = 'Código expirado';
-            form.querySelector('button[type="submit"]').disabled = true;
-        }
-        timeLeft--;
+        if (timeLeft-- <= 0) form.querySelector('button[type="submit"]').disabled = true;
     }, 1000);
 
-    // Temporizador para reenvío
     let resendTimeLeft = 30;
-    const resendCountdown = setInterval(() => {
+    setInterval(() => {
         resendTimerElement.textContent = resendTimeLeft;
-        
-        if (resendTimeLeft <= 0) {
-            clearInterval(resendCountdown);
-            resendButton.disabled = false;
-            resendButton.innerHTML = '<i class="fas fa-redo-alt"></i> Reenviar código';
-        }
-        resendTimeLeft--;
+        if (resendTimeLeft-- <= 0) resendButton.disabled = false;
     }, 1000);
 
-    // Manejar el envío del formulario
-    form.addEventListener('submit', (e) => {
-        const submitButton = form.querySelector('button[type="submit"]');
-        const verifyText = submitButton.querySelector('.verify-text');
-        const verifyLoader = submitButton.querySelector('.verify-loader');
-        
-        verifyText.classList.add('d-none');
-        verifyLoader.classList.remove('d-none');
-        submitButton.disabled = true;
-    });
-
-    // Manejar el reenvío de código
-    resendButton.addEventListener('click', () => {
-        window.location.href = "{% url 'blog:resend_2fa_code' %}";
+    form.addEventListener('submit', () => {
+        form.querySelector('.verify-text').classList.add('d-none');
+        form.querySelector('.verify-loader').classList.remove('d-none');
     });
 });
 </script>
-{% endblock %} 
+{% endblock %}
