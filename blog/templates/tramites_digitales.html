@@ -409,7 +409,58 @@
             </div>
         </div>
     </div>
-
+    <div class="container py-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white p-4">
+                <h2 class="h3 mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Solicitud de Apertura de Cuenta
+                </h2>
+            </div>
+    
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" action="{% url 'blog:apertura_cuenta' %}" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Datos Personales -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-user me-2"></i>Nombre Completo</label>
+                            <input type="text" name="nombre" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-id-card me-2"></i>Número de Identificación</label>
+                            <input type="text" name="identificacion" class="form-control" required>
+                        </div>
+                    </div>
+    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-envelope me-2"></i>Correo Electrónico</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-phone me-2"></i>Teléfono</label>
+                            <input type="text" name="telefono" class="form-control" required>
+                        </div>
+                    </div>
+    
+                    <!-- Captura de Foto -->
+                    <div class="mb-4">
+                        <label class="form-label"><i class="fas fa-camera me-2"></i>Foto Tipo Banco</label>
+                        <input type="file" name="foto" accept="image/*" class="form-control" required>
+                    </div>
+    
+                    <!-- Botón de Envío -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Enviar Solicitud
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <div class="row mb-5" id="tramites-section">
         <div class="col-12 text-center mb-4" data-aos="fade-up">
             <h2 class="display-5 fw-bold">Nuestros Trámites Digitales</h2>

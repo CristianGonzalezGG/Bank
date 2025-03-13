@@ -54,6 +54,63 @@ from .models import UserTwoFactorSettings, TwoFactorCode
 from django.contrib.auth.models import User
 from .forms import PQRForm
 from django.utils.html import strip_tags
+from django.core.mail import EmailMessage
+from django.shortcuts import render, redirect
+from django.conf import settings
+import os
+import uuid
+def apertura_cuenta(request):
+    if request.method == "POST":
+        nombre = request.POST.get('nombre')
+        identificacion = request.POST.get('identificacion')
+        email = request.POST.get('email')
+        telefono = request.POST.get('telefono')
+        foto = request.FILES.get('foto')
+
+        if not (nombre and identificacion and email and telefono and foto):
+            return render(request, 'tramites_digitales.html', {'error': 'Todos los campos son obligatorios'})
+
+        # Crear la carpeta si no existe
+        folder_path = os.path.join(settings.MEDIA_ROOT, "solicitudes")
+        os.makedirs(folder_path, exist_ok=True)
+
+        # Generar un nombre único para la imagen
+        file_extension = foto.name.split('.')[-1]  # Obtener la extensión (png, jpg, etc.)
+        filename = f"{uuid.uuid4().hex}.{file_extension}"  # Nombre aleatorio único
+        foto_path = os.path.join(folder_path, filename)
+
+        # Guardar la imagen en la carpeta
+        with open(foto_path, 'wb+') as destination:
+            for chunk in foto.chunks():
+                destination.write(chunk)
+
+        # Enviar correo con la imagen adjunta
+        subject = "Nueva Solicitud de Apertura de Cuenta"
+        message = f"""
+        Se ha recibido una nueva solicitud de apertura de cuenta.
+
+        🏦 Banco El Dorado 🏦
+        
+        📌 Nombre: {nombre}
+        📌 Identificación: {identificacion}
+        📌 Correo Electrónico: {email}
+        📌 Teléfono: {telefono}
+
+        📎 Se adjunta la foto del solicitante.
+        """
+        
+        email_message = EmailMessage(
+            subject,
+            message,
+            settings.PQR_RECIPIENT_EMAIL,
+            [settings.EMAIL_HOST_USER],
+        )
+        email_message.attach_file(foto_path)
+        email_message.send()
+
+        return render(request, 'tramites_digitales.html', {'success': 'Solicitud enviada correctamente'})
+
+    return render(request, 'tramites_digitales.html')
 
 
 @login_required
@@ -116,8 +173,31 @@ def create_account(request, client_id):
 
 from django.shortcuts import render
 
+import base64
+from django.core.files.base import ContentFile
+from django.shortcuts import render, redirect
+from .forms import ClientForm
+from .models import Client
+
+from django.shortcuts import render, redirect
+from .forms import ClientForm
+from django.shortcuts import render, redirect
+from .forms import ClientForm
+
 def create_client(request):
-    return render(request, 'create_client.html')
+    if request.method == "POST":
+        form = ClientForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:client_list')  # Redirige a la lista de clientes
+
+    else:
+        form = ClientForm()
+
+    return render(request, 'create_client.html', {'form': form})  # Asegúrate de que se está llamando al template correcto
+
+
+
 
 
 @login_required
@@ -295,57 +375,9 @@ def bin_lookup(request):
 def client_list(request):
     clients = Client.objects.all().prefetch_related('account')
     return render(request, 'client/client_list.html', {'clients': clients})
-def create_client(request):
-    if request.method == "POST":
-        form = ClientForm(request.POST, request.FILES)  # Si capturas imagen, usa request.FILES
-        if form.is_valid():
-            form.save()
-            return redirect('blog:client_list')  # Redirigir a la lista de clientes
-    else:
-        form = ClientForm()
-    return render(request, 'create_client.html', {'form': form})
 
-@csrf_exempt
-def capture_image(request):
-    if request.method == 'POST':
-        try:
-            # Obtener los datos de la imagen
-            image_data = request.POST.get('imageData')
-            client_id = request.POST.get('clientId')
-            
-            if not image_data or not client_id:
-                return JsonResponse({'error': 'Datos incompletos'}, status=400)
-            
-            # Obtener el cliente
-            client = get_object_or_404(Client, id=client_id)
-            
-            # Convertir la data URI a imagen
-            format, imgstr = image_data.split(';base64,')
-            ext = format.split('/')[-1]
-            
-            # Crear un archivo temporal
-            from django.core.files.base import ContentFile
-            image_content = ContentFile(base64.b64decode(imgstr))
-            
-            # Generar un nombre único para el archivo
-            import uuid
-            file_name = f'client_photo_{uuid.uuid4()}.{ext}'
-            
-            # Guardar la imagen
-            client.imageSave.save(file_name, image_content, save=True)
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Imagen guardada correctamente',
-                'image_url': client.imageSave.url
-            })
-            
-        except Exception as e:
-            return JsonResponse({
-                'error': str(e)
-            }, status=500)
-    
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
 
 
 @login_required

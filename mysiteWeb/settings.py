@@ -178,7 +178,7 @@ WKHTMLTOPDF_CMD_OPTIONS = {
     'page-size': 'Letter',
     'dpi': 300,
 }
+import os
 
-# Configuración de medios
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

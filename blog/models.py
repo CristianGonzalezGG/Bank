@@ -11,22 +11,26 @@ from django.conf import settings
 from django.utils import timezone
 from decimal import Decimal, ROUND_HALF_UP
 
+
+
 class Client(models.Model):
-    class Status(models.TextChoices):
-        OWE = 'O', 'OWE'
-        NODEBT = 'ND', 'NODEBT'
-    cardId = models.CharField(max_length= 10, null= True, blank = True)       
+    cardId = models.CharField(max_length=20, unique=True, null=True)  # Asegúrate de que exista este campo
     name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='client_photos/', blank=True, null=True)
-    imageSave = models.ImageField(upload_to='client_photos/', blank=True, null=True)
     email = models.EmailField()
     phone_number = models.CharField(max_length=15)
     address = models.CharField(max_length=200)
+    imageSave = models.ImageField(upload_to='client_photos/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=2, 
-                              choices=Status.choices,
-                              default=Status.NODEBT)
+
+
+
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('blog:client_detail', args=[self.id])
+
     
     class Meta:
         ordering = ['-created_at']
@@ -34,11 +38,7 @@ class Client(models.Model):
             models.Index(fields=['-created_at']),
         ]
     
-    def __str__(self):
-        return self.name
-    
-    def get_absolute_url(self):
-        return reverse('blog:client_detail', args=[self.id])
+
     
     def get_account_number(self):
         try:

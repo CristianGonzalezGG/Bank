@@ -45,34 +45,91 @@ class LoanForm(forms.ModelForm):
             'interest_rate': 'Tasa de interés (%)',
             'repayment_term': 'Plazo (meses)',
         }
+from django import forms
+from .models import Client
+from django.core.exceptions import ValidationError
 
 class ClientForm(forms.ModelForm):
+    name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control input-hover',
+            'placeholder': 'Ingrese el nombre completo'
+        }),
+        error_messages={
+            'required': 'Este campo es obligatorio.',
+            'max_length': 'Máximo 100 caracteres permitidos.'
+        }
+    )
+
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control input-hover',
+            'placeholder': 'Correo electrónico'
+        }),
+        error_messages={
+            'invalid': 'Ingrese un correo electrónico válido.',
+            'required': 'El correo es obligatorio.'
+        }
+    )
+
+    phone_number = forms.CharField(
+        max_length=15,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control input-hover',
+            'placeholder': 'Número de teléfono'
+        }),
+        error_messages={
+            'required': 'El número de teléfono es obligatorio.',
+            'max_length': 'Máximo 15 caracteres permitidos.'
+        }
+    )
+
+    address = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control input-hover',
+            'placeholder': 'Dirección'
+        }),
+        error_messages={
+            'required': 'La dirección es obligatoria.',
+            'max_length': 'Máximo 200 caracteres permitidos.'
+        }
+    )
+
+    imageSave = forms.ImageField(
+        required=True,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control input-hover',
+            'accept': 'image/*'
+        }),
+        error_messages={
+            'required': 'Debe subir una imagen del cliente.'
+        }
+    )
+
     class Meta:
         model = Client
-        fields = ['cardId', 'name', 'email', 'phone_number', 'address', 'imageSave']
-        widgets = {
-            'cardId': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ingrese el número de identificación'
-            }),
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Nombre completo del cliente'
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'correo@ejemplo.com'
-            }),
-            'phone_number': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '+XX XXX XXX XXXX'
-            }),
-            'address': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Dirección completa'
-            }),
-            'imageSave': forms.HiddenInput()
-        }
+        fields = ['name', 'email', 'phone_number', 'address', 'imageSave']
+
+    def clean_phone_number(self):
+        phone = self.cleaned_data.get('phone_number')
+        if not phone.isdigit():
+            raise ValidationError("El número de teléfono solo debe contener dígitos.")
+        if len(phone) < 7 or len(phone) > 15:
+            raise ValidationError("El número debe tener entre 7 y 15 dígitos.")
+        return phone
+
+    def clean_imageSave(self):
+        image = self.cleaned_data.get('imageSave')
+        if image:
+            if image.size > 5 * 1024 * 1024:  # 5MB
+                raise ValidationError("La imagen no debe superar los 5MB.")
+            if not image.content_type.startswith('image'):
+                raise ValidationError("El archivo debe ser una imagen válida.")
+        return image
+
+
 
 from django import forms
 from .models import Account

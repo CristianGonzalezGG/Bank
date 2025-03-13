@@ -1,12 +1,13 @@
-# urls.py
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect
 from .views import (
-    create_client, capture_image, search_client,
+    create_client, search_client,
     loan_list, loan_detail, loan_create, loan_update, loan_delete
 )
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = 'blog'
 
@@ -18,7 +19,7 @@ urlpatterns = [
     path('blog/', views.blog, name='blog'),
     path('tramites/', views.tramites, name='tramites'),
     path('tramites/', views.tramites_digitales, name='tramites_digitales'),
-    
+    path('apertura-cuenta/', views.apertura_cuenta, name='apertura_cuenta'),
     path('negocios/', views.negocios, name='negocios'),
     path('educacion/', views.educacion, name='educacion'),
     path('asesores/', views.asesores, name='asesores'),
@@ -35,7 +36,6 @@ urlpatterns = [
     path('loan/<int:id>/certificate/', views.generate_paz_y_salvo, name='generate_paz_y_salvo'),
     path('loan/<int:id>/payment/', views.loan_payment, name='loan_payment'),
     path('create-client/', views.create_client, name='create_client'),
-    path('capture-image/', views.capture_image, name='capture_image'),
     path('search-client/', views.search_client, name='search_client'),
     path('create-account/<int:client_id>/', views.create_account, name='create_account'),
     path('client/<int:client_id>/send-email/', views.send_email_view, name='send_email'),
@@ -53,4 +53,5 @@ urlpatterns = [
     path('pqr/', views.pqr, name='pqr'),
     path('proyecciones/', views.proyecciones, name='proyecciones'),
     path('send-projection-email/', views.send_projection_email, name='send_projection_email'),
+    path('crear-cliente/', create_client, name='create_client'),
 ]

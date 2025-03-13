@@ -9,11 +9,12 @@
         <div class="col-lg-4">
             <div class="card mb-4">
                 <div class="card-body text-center">
-                    {% if client.image %}
-                        <img src="{{ client.image.url }}" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
-                    {% else %}
-                        <img src="{% static 'images/default-avatar.png' %}" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
-                    {% endif %}
+                    {% if client.imageSave %}
+                    <img src="{{ client.imageSave.url }}" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                {% endif %}
+                
                     <h5 class="my-3">{{ client.name }}</h5>
                     <p class="text-muted mb-1">Cliente ID: {{ client.cardId }}</p>
                     <p class="text-muted mb-4">Estado: {{ client.get_status_display }}</p>
