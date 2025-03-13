@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyección CDT - Banco El Dorado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #1a3b5c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            background-color: #eee;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #1a3b5c;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+        }
+        .highlight {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .disclaimer {
+            font-size: 11px;
+            color: #777;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Banco El Dorado</h1>
+            <h2>Proyección de CDT</h2>
+        </div>
+        
+        <div class="content">
+            <p>Estimado(a) <strong>{{ client_name }}</strong>,</p>
+            
+            <p>Adjunto encontrará la proyección de su potencial inversión en CDT con Banco El Dorado, preparada por su asesor financiero {{ advisor_name }} con fecha {{ date }}.</p>
+            
+            <h3>Resumen de la Proyección</h3>
+            
+            <table>
+                <tr>
+                    <th colspan="2">Parámetros del CDT</th>
+                </tr>
+                <tr>
+                    <td>Monto a Invertir</td>
+                    <td>{{ projection.initialInvestment }}</td>
+                </tr>
+                <tr>
+                    <td>Plazo</td>
+                    <td>{{ projection.term }} días</td>
+                </tr>
+                <tr>
+                    <td>Tasa</td>
+                    <td>{{ projection.rate }}% E.A.</td>
+                </tr>
+                <tr>
+                    <td>Modalidad</td>
+                    <td>{{ projection.paymentType }}</td>
+                </tr>
+            </table>
+            
+            <table>
+                <tr>
+                    <th colspan="2">Resultados</th>
+                </tr>
+                <tr>
+                    <td>Intereses Brutos</td>
+                    <td>{{ projection.grossInterest }}</td>
+                </tr>
+                <tr>
+                    <td>Retención en la Fuente</td>
+                    <td>{{ projection.taxWithholding }}</td>
+                </tr>
+                <tr class="highlight">
+                    <td>Intereses Netos</td>
+                    <td>{{ projection.netInterest }}</td>
+                </tr>
+                <tr class="highlight">
+                    <td>Valor al Vencimiento</td>
+                    <td>{{ projection.finalValue }}</td>
+                </tr>
+                <tr>
+                    <td>Rentabilidad Efectiva</td>
+                    <td>{{ projection.effectiveYield }}</td>
+                </tr>
+            </table>
+            
+            {% if projection.alternativeScenarios %}
+            <h3>Escenarios Alternativos</h3>
+            <table>
+                <tr>
+                    <th>Escenario</th>
+                    <th>Tasa</th>
+                    <th>Interés Neto</th>
+                    <th>Valor Final</th>
+                </tr>
+                {% for scenario in projection.alternativeScenarios %}
+                <tr>
+                    <td>{{ scenario.name }}</td>
+                    <td>{{ scenario.rate }}%</td>
+                    <td>{{ scenario.interest }}</td>
+                    <td>{{ scenario.finalValue }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            
+            <p>Para obtener más información o proceder con esta inversión, por favor contáctenos:</p>
+            <ul>
+                <li>Teléfono: (601) 123-4567</li>
+                <li>Email: inversiones@bancoeldorado.com</li>
+                <li>Visite nuestra sucursal más cercana</li>
+            </ul>
+            
+            <div class="disclaimer">
+                <p>Esta proyección es informativa y no constituye una oferta vinculante. Las tasas están sujetas a cambios según las condiciones del mercado. Los valores pueden variar debido a aproximaciones en los cálculos. Impuestos y retenciones aplicados según la normativa vigente.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© {{ projection.date|slice:":4" }} Banco El Dorado. Todos los derechos reservados.</p>
+            <p>Este correo electrónico y sus anexos pueden contener información confidencial o legalmente privilegiada.</p>
+        </div>
+    </div>
+</body>
+</html> 

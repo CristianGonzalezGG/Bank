@@ -1,0 +1,909 @@
+{% extends 'base.html' %}
+
+{% block title %}Proyecciones CDT - Banco El Dorado{% endblock %}
+
+{% block extra_css %}
+<style>
+    .advisor-header {
+        background: linear-gradient(145deg, #1a3b5c 0%, #3498db 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .advisor-section {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .client-info {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .result-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .result-header {
+        background-color: #1a3b5c;
+        color: white;
+        padding: 1.5rem;
+    }
+    
+    .result-body {
+        padding: 1.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a3b5c;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .comparison-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .comparison-table th {
+        background-color: #1a3b5c;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .comparison-table td {
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .comparison-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .comparison-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    
+    .print-section {
+        display: flex;
+        justify-content: flex-end;
+        margin: 2rem 0;
+    }
+    
+    .cdt-scenario {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 5px solid #1a3b5c;
+        background-color: #f8f9fa;
+    }
+    
+    .actions-section {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .advisor-header {
+            box-shadow: none;
+        }
+        
+        .result-card {
+            box-shadow: none;
+            border: 1px solid #dee2e6;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="advisor-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-5 fw-bold">Proyecciones de CDT</h1>
+                        <p class="lead mb-0">Herramienta para asesores financieros - Genere proyecciones personalizadas para sus clientes</p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <span class="badge bg-light text-dark p-2">Asesor: <span id="advisorName">{{ user.get_full_name|default:user.username }}</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4 no-print">
+            <div class="advisor-section">
+                <h2 class="h4 mb-4">Información del Cliente</h2>
+                
+                <div class="mb-3">
+                    <label for="clientName" class="form-label">Nombre del Cliente</label>
+                    <input type="text" class="form-control" id="clientName" placeholder="Nombre completo">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="clientId" class="form-label">Documento de Identidad</label>
+                    <input type="text" class="form-control" id="clientId" placeholder="Ej. 1.234.567.890">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="clientEmail" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="clientEmail" placeholder="cliente@ejemplo.com">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="clientPhone" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="clientPhone" placeholder="Ej. 300 123 4567">
+                </div>
+            </div>
+            
+            <div class="advisor-section">
+                <h2 class="h4 mb-4">Parámetros del CDT</h2>
+                
+                <div class="mb-3">
+                    <label for="cdtAmount" class="form-label">Monto a Invertir</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="cdtAmount" value="5000000" min="500000" step="100000">
+                    </div>
+                    <div class="form-text">Monto mínimo: $500,000 COP</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="cdtTerm" class="form-label">Plazo (días)</label>
+                    <select class="form-select" id="cdtTerm">
+                        <option value="30">30 días</option>
+                        <option value="60">60 días</option>
+                        <option value="90">90 días</option>
+                        <option value="180">180 días</option>
+                        <option value="270">270 días</option>
+                        <option value="360" selected>360 días</option>
+                        <option value="540">540 días</option>
+                        <option value="720">720 días</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="cdtInterestRate" class="form-label">Tasa de interés E.A. (%)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="cdtInterestRate" value="11.85" step="0.01" min="0" max="20">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text">Tasa actual: 11.85% E.A. para 360 días</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Modalidad de intereses</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="interestPayment" id="paymentAtMaturity" value="maturity" checked>
+                        <label class="form-check-label" for="paymentAtMaturity">
+                            Al vencimiento
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="interestPayment" id="paymentMonthly" value="monthly">
+                        <label class="form-check-label" for="paymentMonthly">
+                            Periódico mensual
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Retención en la fuente</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="withTaxSwitch" checked>
+                        <label class="form-check-label" for="withTaxSwitch">Aplicar retención</label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label d-block">Escenarios de tasa</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="pessimisticScenario" value="pessimistic">
+                        <label class="form-check-label" for="pessimisticScenario">Pesimista</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="optimisticScenario" value="optimistic">
+                        <label class="form-check-label" for="optimisticScenario">Optimista</label>
+                    </div>
+                </div>
+                
+                <button type="button" id="calculateCDT" class="btn btn-primary w-100">
+                    <i class="fas fa-calculator me-2"></i>Generar Proyección
+                </button>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div id="clientInfoDisplay" class="client-info d-none">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 class="h5">Información del Cliente</h3>
+                        <p class="mb-1"><strong>Nombre:</strong> <span id="displayClientName"></span></p>
+                        <p class="mb-1"><strong>Documento:</strong> <span id="displayClientId"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Correo:</strong> <span id="displayClientEmail"></span></p>
+                        <p class="mb-1"><strong>Teléfono:</strong> <span id="displayClientPhone"></span></p>
+                        <p class="mb-1"><strong>Fecha de proyección:</strong> <span id="projectionDate"></span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="baseScenario" class="result-card mb-4 d-none">
+                <div class="result-header">
+                    <h2 class="h4 mb-0">Proyección CDT</h2>
+                    <p class="mb-0 opacity-75" id="scenarioDescription">Plazo: 360 días - Tasa: 11.85% E.A.</p>
+                </div>
+                <div class="result-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="stat-value" id="initialInvestment">$5,000,000</div>
+                                <div class="stat-label">Inversión Inicial</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="stat-value" id="finalValue">$5,592,500</div>
+                                <div class="stat-label">Valor al Vencimiento</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="stat-value" id="effectiveYield">11.38%</div>
+                                <div class="stat-label">Rentabilidad Efectiva</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td>Intereses Brutos</td>
+                                        <td class="text-end" id="grossInterest">$592,500</td>
+                                    </tr>
+                                    <tr id="taxRow">
+                                        <td>Retención en la Fuente (<span id="taxRateDisplay">4%</span>)</td>
+                                        <td class="text-end" id="taxWithholding">$23,700</td>
+                                    </tr>
+                                    <tr class="table-light">
+                                        <td class="fw-bold">Intereses Netos</td>
+                                        <td class="text-end fw-bold" id="netInterest">$568,800</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="amortizationContainer" class="mt-4">
+                        <h5>Tabla de Amortización</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped" id="amortizationTable">
+                                <thead>
+                                    <tr>
+                                        <th>Período</th>
+                                        <th>Fecha</th>
+                                        <th>Saldo Inicial</th>
+                                        <th>Interés</th>
+                                        <th>Retención</th>
+                                        <th>Saldo Final</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="amortizationBody">
+                                    <!-- Will be filled by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="alternativeScenarios" class="d-none">
+                <h3 class="h4 mb-3">Escenarios Alternativos</h3>
+                
+                <div id="pessimisticScenarioCard" class="cdt-scenario d-none">
+                    <h4 class="h5">Escenario Pesimista (-1.5%)</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Tasa:</strong> <span id="pessimisticRate">10.35%</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Interés Neto:</strong> <span id="pessimisticInterest">$492,917</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Valor Final:</strong> <span id="pessimisticFinal">$5,492,917</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="optimisticScenarioCard" class="cdt-scenario d-none">
+                    <h4 class="h5">Escenario Optimista (+1.5%)</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Tasa:</strong> <span id="optimisticRate">13.35%</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Interés Neto:</strong> <span id="optimisticInterest">$642,560</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Valor Final:</strong> <span id="optimisticFinal">$5,642,560</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="comparisonSection" class="mt-4 d-none">
+                <h3 class="h4 mb-3">Comparativa de Plazos</h3>
+                <div class="table-responsive">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Plazo</th>
+                                <th>Tasa E.A.</th>
+                                <th>Interés Neto</th>
+                                <th>Valor Final</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonBody">
+                            <!-- Will be filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="print-section no-print">
+                <button id="printProjection" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-print me-2"></i>Imprimir Proyección
+                </button>
+                <button id="emailProjection" class="btn btn-outline-success">
+                    <i class="fas fa-envelope me-2"></i>Enviar por Email
+                </button>
+            </div>
+            
+            <div class="actions-section no-print d-none" id="actionsSection">
+                <h3 class="h4 mb-3">Acciones Recomendadas</h3>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="action1">
+                    <label class="form-check-label" for="action1">
+                        Programar apertura de CDT
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="action2">
+                    <label class="form-check-label" for="action2">
+                        Enviar simulación al cliente por email
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="action3">
+                    <label class="form-check-label" for="action3">
+                        Revisar otras opciones de inversión
+                    </label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="action4">
+                    <label class="form-check-label" for="action4">
+                        Programar seguimiento en 30 días
+                    </label>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="advisorNotes" class="form-label">Notas del Asesor</label>
+                    <textarea class="form-control" id="advisorNotes" rows="3" placeholder="Agregue notas adicionales sobre esta proyección..."></textarea>
+                </div>
+                
+                <button class="btn btn-success w-100">
+                    <i class="fas fa-save me-2"></i>Guardar en Expediente del Cliente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="container py-5">
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Acceso Denegado</h4>
+        <p>Por favor inicia sesión para acceder a esta herramienta.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set current date for projection
+        const today = new Date();
+        document.getElementById('projectionDate').textContent = today.toLocaleDateString('es-CO', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        // Interest rates by term (days)
+        const interestRatesByTerm = {
+            '30': 9.80,
+            '60': 10.15,
+            '90': 10.45,
+            '180': 11.20,
+            '270': 11.50,
+            '360': 11.85,
+            '540': 12.10,
+            '720': 12.30
+        };
+        
+        // Elements
+        const calculateButton = document.getElementById('calculateCDT');
+        const printButton = document.getElementById('printProjection');
+        const emailButton = document.getElementById('emailProjection');
+        
+        // Client info inputs
+        const clientNameInput = document.getElementById('clientName');
+        const clientIdInput = document.getElementById('clientId');
+        const clientEmailInput = document.getElementById('clientEmail');
+        const clientPhoneInput = document.getElementById('clientPhone');
+        
+        // CDT inputs
+        const amountInput = document.getElementById('cdtAmount');
+        const termSelect = document.getElementById('cdtTerm');
+        const rateInput = document.getElementById('cdtInterestRate');
+        const paymentAtMaturity = document.getElementById('paymentAtMaturity');
+        const paymentMonthly = document.getElementById('paymentMonthly');
+        const withTaxSwitch = document.getElementById('withTaxSwitch');
+        const pessimisticCheck = document.getElementById('pessimisticScenario');
+        const optimisticCheck = document.getElementById('optimisticScenario');
+        
+        // Results displays
+        const clientInfoDisplay = document.getElementById('clientInfoDisplay');
+        const baseScenario = document.getElementById('baseScenario');
+        const alternativeScenarios = document.getElementById('alternativeScenarios');
+        const pessimisticCard = document.getElementById('pessimisticScenarioCard');
+        const optimisticCard = document.getElementById('optimisticScenarioCard');
+        const comparisonSection = document.getElementById('comparisonSection');
+        const actionsSection = document.getElementById('actionsSection');
+        
+        // Client info display elements
+        const displayClientName = document.getElementById('displayClientName');
+        const displayClientId = document.getElementById('displayClientId');
+        const displayClientEmail = document.getElementById('displayClientEmail');
+        const displayClientPhone = document.getElementById('displayClientPhone');
+        
+        // Results elements
+        const scenarioDescription = document.getElementById('scenarioDescription');
+        const initialInvestmentSpan = document.getElementById('initialInvestment');
+        const finalValueSpan = document.getElementById('finalValue');
+        const grossInterestSpan = document.getElementById('grossInterest');
+        const taxWithholdingSpan = document.getElementById('taxWithholding');
+        const netInterestSpan = document.getElementById('netInterest');
+        const effectiveYieldSpan = document.getElementById('effectiveYield');
+        const taxRow = document.getElementById('taxRow');
+        const taxRateDisplay = document.getElementById('taxRateDisplay');
+        const amortizationBody = document.getElementById('amortizationBody');
+        
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+        
+        // Format date
+        function formatDate(date) {
+            return date.toLocaleDateString('es-CO', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        // Calculate CDT
+        function calculateCDT() {
+            // Get values
+            const amount = parseFloat(amountInput.value);
+            const termDays = parseInt(termSelect.value);
+            const annualRate = parseFloat(rateInput.value) / 100;
+            const paymentType = paymentAtMaturity.checked ? 'maturity' : 'monthly';
+            const applyTax = withTaxSwitch.checked;
+            
+            // Update client info
+            if (clientNameInput.value) {
+                displayClientName.textContent = clientNameInput.value;
+                displayClientId.textContent = clientIdInput.value || 'N/A';
+                displayClientEmail.textContent = clientEmailInput.value || 'N/A';
+                displayClientPhone.textContent = clientPhoneInput.value || 'N/A';
+                clientInfoDisplay.classList.remove('d-none');
+            }
+            
+            // Tax rate depends on term
+            const taxRate = termDays > 365 ? 0.04 : 0.07;
+            taxRateDisplay.textContent = (taxRate * 100) + '%';
+            
+            // Show/hide tax row based on withTaxSwitch
+            if (applyTax) {
+                taxRow.style.display = '';
+            } else {
+                taxRow.style.display = 'none';
+            }
+            
+            // Convert annual rate to daily rate
+            const dailyRate = Math.pow(1 + annualRate, 1/365) - 1;
+            
+            // Calculate interest based on payment type
+            let grossInterest, finalValue;
+            
+            if (paymentType === 'maturity') {
+                // Compound interest at maturity
+                finalValue = amount * Math.pow(1 + dailyRate, termDays);
+                grossInterest = finalValue - amount;
+            } else {
+                // Monthly payments (simple interest)
+                const monthlyRate = Math.pow(1 + annualRate, 1/12) - 1;
+                const months = Math.floor(termDays / 30);
+                grossInterest = amount * monthlyRate * months;
+                finalValue = amount + grossInterest;
+            }
+            
+            // Calculate tax withholding and net interest
+            const taxWithholding = applyTax ? grossInterest * taxRate : 0;
+            const netInterest = grossInterest - taxWithholding;
+            const netFinalValue = amount + netInterest;
+            
+            // Calculate effective yield (after tax)
+            const effectiveYield = (netInterest / amount) * (365 / termDays);
+            
+            // Update the scenario description
+            scenarioDescription.textContent = `Plazo: ${termDays} días - Tasa: ${(annualRate * 100).toFixed(2)}% E.A.${paymentType === 'monthly' ? ' - Pago mensual' : ''}`;
+            
+            // Update the results display
+            initialInvestmentSpan.textContent = formatCurrency(amount);
+            finalValueSpan.textContent = formatCurrency(netFinalValue);
+            grossInterestSpan.textContent = formatCurrency(grossInterest);
+            taxWithholdingSpan.textContent = formatCurrency(taxWithholding);
+            netInterestSpan.textContent = formatCurrency(netInterest);
+            effectiveYieldSpan.textContent = (effectiveYield * 100).toFixed(2) + '%';
+            
+            // Generate amortization table
+            generateAmortizationTable(amount, termDays, dailyRate, taxRate, paymentType, applyTax);
+            
+            // Calculate alternative scenarios if checked
+            if (pessimisticCheck.checked) {
+                calculateAlternativeScenario('pessimistic', amount, termDays, annualRate - 0.015, paymentType, applyTax);
+                pessimisticCard.classList.remove('d-none');
+            } else {
+                pessimisticCard.classList.add('d-none');
+            }
+            
+            if (optimisticCheck.checked) {
+                calculateAlternativeScenario('optimistic', amount, termDays, annualRate + 0.015, paymentType, applyTax);
+                optimisticCard.classList.remove('d-none');
+            } else {
+                optimisticCard.classList.add('d-none');
+            }
+            
+            if (pessimisticCheck.checked || optimisticCheck.checked) {
+                alternativeScenarios.classList.remove('d-none');
+            } else {
+                alternativeScenarios.classList.add('d-none');
+            }
+            
+            // Generate term comparison
+            generateTermComparison(amount, annualRate, paymentType, applyTax);
+            
+            // Show results and additional sections
+            baseScenario.classList.remove('d-none');
+            comparisonSection.classList.remove('d-none');
+            actionsSection.classList.remove('d-none');
+        }
+        
+        // Calculate alternative scenario
+        function calculateAlternativeScenario(type, amount, termDays, rate, paymentType, applyTax) {
+            const dailyRate = Math.pow(1 + rate, 1/365) - 1;
+            const taxRate = termDays > 365 ? 0.04 : 0.07;
+            
+            let grossInterest, finalValue;
+            
+            if (paymentType === 'maturity') {
+                finalValue = amount * Math.pow(1 + dailyRate, termDays);
+                grossInterest = finalValue - amount;
+            } else {
+                const monthlyRate = Math.pow(1 + rate, 1/12) - 1;
+                const months = Math.floor(termDays / 30);
+                grossInterest = amount * monthlyRate * months;
+                finalValue = amount + grossInterest;
+            }
+            
+            const taxWithholding = applyTax ? grossInterest * taxRate : 0;
+            const netInterest = grossInterest - taxWithholding;
+            const netFinalValue = amount + netInterest;
+            
+            // Update UI
+            document.getElementById(`${type}Rate`).textContent = (rate * 100).toFixed(2) + '%';
+            document.getElementById(`${type}Interest`).textContent = formatCurrency(netInterest);
+            document.getElementById(`${type}Final`).textContent = formatCurrency(netFinalValue);
+        }
+        
+        // Generate amortization table
+        function generateAmortizationTable(principal, termDays, dailyRate, taxRate, paymentType, applyTax) {
+            // Clear previous table
+            amortizationBody.innerHTML = '';
+            
+            // Get current date
+            const startDate = new Date();
+            
+            if (paymentType === 'maturity') {
+                // For payment at maturity, show just initial and final state
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + termDays);
+                
+                // Initial state
+                const initialRow = document.createElement('tr');
+                initialRow.innerHTML = `
+                    <td>Inicio</td>
+                    <td>${formatDate(startDate)}</td>
+                    <td>${formatCurrency(principal)}</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>${formatCurrency(principal)}</td>
+                `;
+                amortizationBody.appendChild(initialRow);
+                
+                // Final state
+                const finalAmount = principal * Math.pow(1 + dailyRate, termDays);
+                const interest = finalAmount - principal;
+                const tax = applyTax ? interest * taxRate : 0;
+                
+                const finalRow = document.createElement('tr');
+                finalRow.innerHTML = `
+                    <td>Vencimiento</td>
+                    <td>${formatDate(endDate)}</td>
+                    <td>${formatCurrency(principal)}</td>
+                    <td>${formatCurrency(interest)}</td>
+                    <td>${formatCurrency(tax)}</td>
+                    <td>${formatCurrency(finalAmount - tax)}</td>
+                `;
+                amortizationBody.appendChild(finalRow);
+            } else {
+                // For monthly payments, show each month
+                const months = Math.floor(termDays / 30);
+                const monthlyRate = Math.pow(1 + dailyRate, 30) - 1;
+                let balance = principal;
+                
+                for (let i = 1; i <= months; i++) {
+                    const currentDate = new Date(startDate);
+                    currentDate.setMonth(currentDate.getMonth() + i);
+                    
+                    const interest = balance * monthlyRate;
+                    const tax = applyTax ? interest * taxRate : 0;
+                    const netInterest = interest - tax;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>Mes ${i}</td>
+                        <td>${formatDate(currentDate)}</td>
+                        <td>${formatCurrency(balance)}</td>
+                        <td>${formatCurrency(interest)}</td>
+                        <td>${formatCurrency(tax)}</td>
+                        <td>${formatCurrency(balance + netInterest)}</td>
+                    `;
+                    amortizationBody.appendChild(row);
+                    
+                    // If not the last month, interest is paid out
+                    if (i !== months) {
+                        balance = balance; // Balance remains the same as interest is paid out
+                    } else {
+                        balance = balance + netInterest; // Final balance includes interest
+                    }
+                }
+            }
+        }
+        
+        // Generate term comparison
+        function generateTermComparison(amount, baseRate, paymentType, applyTax) {
+            const comparisonBody = document.getElementById('comparisonBody');
+            comparisonBody.innerHTML = '';
+            
+            // Terms to compare
+            const terms = [90, 180, 360, 540, 720];
+            
+            terms.forEach(term => {
+                const row = document.createElement('tr');
+                const rate = interestRatesByTerm[term] / 100;
+                const dailyRate = Math.pow(1 + rate, 1/365) - 1;
+                const taxRate = term > 365 ? 0.04 : 0.07;
+                
+                let grossInterest, finalValue;
+                
+                if (paymentType === 'maturity') {
+                    finalValue = amount * Math.pow(1 + dailyRate, term);
+                    grossInterest = finalValue - amount;
+                } else {
+                    const monthlyRate = Math.pow(1 + rate, 1/12) - 1;
+                    const months = Math.floor(term / 30);
+                    grossInterest = amount * monthlyRate * months;
+                    finalValue = amount + grossInterest;
+                }
+                
+                const taxWithholding = applyTax ? grossInterest * taxRate : 0;
+                const netInterest = grossInterest - taxWithholding;
+                const netFinalValue = amount + netInterest;
+                
+                row.innerHTML = `
+                    <td>${term} días</td>
+                    <td>${(rate * 100).toFixed(2)}%</td>
+                    <td>${formatCurrency(netInterest)}</td>
+                    <td>${formatCurrency(netFinalValue)}</td>
+                `;
+                
+                comparisonBody.appendChild(row);
+            });
+        }
+        
+        // Update interest rate when term changes
+        termSelect.addEventListener('change', function() {
+            const term = this.value;
+            if (interestRatesByTerm[term]) {
+                rateInput.value = interestRatesByTerm[term];
+            }
+        });
+        
+        // Add event listeners
+        calculateButton.addEventListener('click', calculateCDT);
+        
+        printButton.addEventListener('click', function() {
+            window.print();
+        });
+        
+        emailButton.addEventListener('click', function() {
+            const clientName = clientNameInput.value || 'Estimado Cliente';
+            const clientEmail = clientEmailInput.value;
+            
+            if (!clientEmail) {
+                alert('Por favor ingrese el correo electrónico del cliente.');
+                clientEmailInput.focus();
+                return;
+            }
+            
+            // Get the current date in a nice format
+            const today = new Date();
+            const dateString = today.toLocaleDateString('es-CO', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Collect all the projection data
+            const projectionData = {
+                initialInvestment: initialInvestmentSpan.textContent,
+                finalValue: finalValueSpan.textContent,
+                grossInterest: grossInterestSpan.textContent,
+                netInterest: netInterestSpan.textContent,
+                taxWithholding: taxWithholdingSpan.textContent,
+                effectiveYield: effectiveYieldSpan.textContent,
+                term: termSelect.value,
+                rate: rateInput.value,
+                date: dateString,
+                paymentType: paymentAtMaturity.checked ? 'Al vencimiento' : 'Periódico mensual'
+            };
+            
+            // If alternative scenarios are displayed, include them
+            if (!alternativeScenarios.classList.contains('d-none')) {
+                projectionData.alternativeScenarios = [];
+                
+                if (!pessimisticCard.classList.contains('d-none')) {
+                    projectionData.alternativeScenarios.push({
+                        name: 'Pesimista',
+                        rate: document.getElementById('pessimisticRate').textContent,
+                        interest: document.getElementById('pessimisticInterest').textContent,
+                        finalValue: document.getElementById('pessimisticFinal').textContent
+                    });
+                }
+                
+                if (!optimisticCard.classList.contains('d-none')) {
+                    projectionData.alternativeScenarios.push({
+                        name: 'Optimista',
+                        rate: document.getElementById('optimisticRate').textContent,
+                        interest: document.getElementById('optimisticInterest').textContent,
+                        finalValue: document.getElementById('optimisticFinal').textContent
+                    });
+                }
+            }
+            
+            // Show loading state
+            emailButton.disabled = true;
+            emailButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+            
+            // Send data to server with hardcoded URL
+            fetch('{% url "blog:send_projection_email" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    clientName: clientName,
+                    clientEmail: clientEmail,
+                    projectionData: projectionData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                emailButton.disabled = false;
+                emailButton.innerHTML = '<i class="fas fa-envelope me-2"></i>Enviar por Email';
+                
+                if (data.success) {
+                    alert('¡Proyección enviada con éxito!\n' + data.message);
+                } else {
+                    alert('Error al enviar la proyección: ' + data.message);
+                }
+            })
+            .catch(error => {
+                emailButton.disabled = false;
+                emailButton.innerHTML = '<i class="fas fa-envelope me-2"></i>Enviar por Email';
+                alert('Error de conexión: ' + error);
+            });
+        });
+    });
+
+    // Add this function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %} 

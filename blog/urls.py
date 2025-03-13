@@ -51,4 +51,6 @@ urlpatterns = [
     path('inversiones/', views.inversiones_view, name='inversiones'),
     path('seguridad/', views.seguridad_view, name='seguridad'),
     path('pqr/', views.pqr, name='pqr'),
+    path('proyecciones/', views.proyecciones, name='proyecciones'),
+    path('send-projection-email/', views.send_projection_email, name='send_projection_email'),
 ]

@@ -9,7 +9,7 @@ import pdfkit
 import random
 from django.conf import settings
 from django.utils import timezone
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 class Client(models.Model):
     class Status(models.TextChoices):
@@ -124,13 +124,30 @@ class Loan(models.Model):
         return f"Loan for {self.client.name} - ${self.amount}"
 
     def calculate_monthly_payment(self):
-        # Convertir todos los valores a Decimal para asegurar consistencia
-        P = Decimal(str(self.amount))  # Principal (monto del préstamo)
-        r = Decimal(str(self.interest_rate)) / Decimal('100') / Decimal('12')  # Tasa mensual
-        n = Decimal(str(self.repayment_term))  # Número de pagos
+        # Handle zero interest rate case separately
+        if self.interest_rate == 0:
+            # For zero interest, simple division of principal by term
+            if self.repayment_term == 0:
+                return Decimal('0')  # Handle zero term case
+            return self.amount / Decimal(self.repayment_term)
         
-        monthly_payment = P * (r * (Decimal('1') + r)**n) / ((Decimal('1') + r)**n - Decimal('1'))
-        return monthly_payment
+        # Convert annual rate to monthly rate
+        monthly_rate = self.interest_rate / Decimal('100') / Decimal('12')
+        
+        # Ensure term is not zero to avoid division by zero
+        if self.repayment_term == 0:
+            return Decimal('0')  # Return zero payment for zero term
+        
+        # Standard loan payment formula: P × r(1 + r)^n/((1 + r)^n - 1)
+        # Where P = principal, r = monthly rate, n = number of payments
+        n = Decimal(self.repayment_term)
+        if monthly_rate == 0:
+            return self.amount / n
+        
+        term_factor = (Decimal('1') + monthly_rate) ** n
+        monthly_payment = self.amount * (monthly_rate * term_factor) / (term_factor - Decimal('1'))
+        
+        return monthly_payment.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     def save(self, *args, **kwargs):
         if not self.pk:  # Only on creation

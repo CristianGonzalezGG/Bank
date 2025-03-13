@@ -53,6 +53,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from .models import UserTwoFactorSettings, TwoFactorCode
 from django.contrib.auth.models import User
 from .forms import PQRForm
+from django.utils.html import strip_tags
 
 
 @login_required
@@ -724,4 +725,55 @@ def generate_radicado():
     timestamp = datetime.now().strftime('%Y%m%d')
     random_chars = ''.join(random.choices(string.digits, k=6))
     return f"{prefix}{timestamp}{random_chars}"
+
+def proyecciones(request):
+    # Only check if user is authenticated
+    if request.user.is_authenticated:
+        return render(request, 'proyecciones.html')
+    else:
+        # Redirect non-authenticated users to login
+        messages.warning(request, "Por favor inicia sesión para acceder a esta página.")
+        return redirect('login')  # Make sure 'login' is the correct name for your login URL
+
+def send_projection_email(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            # Get data from the POST request
+            data = json.loads(request.body)
+            client_name = data.get('clientName', '')
+            client_email = data.get('clientEmail', '')
+            projection_data = data.get('projectionData', {})
+            
+            if not client_email:
+                return JsonResponse({'success': False, 'message': 'Se requiere correo electrónico del cliente'})
+            
+            # Create the email context
+            context = {
+                'client_name': client_name,
+                'advisor_name': request.user.get_full_name() or request.user.username,
+                'projection': projection_data,
+                'date': projection_data.get('date', ''),
+            }
+            
+            # Render the email template
+            html_message = render_to_string('email_projection.html', context)
+            plain_message = strip_tags(html_message)
+            
+            # Send the email
+            email = EmailMessage(
+                subject=f'Proyección CDT - Banco El Dorado',
+                body=html_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[client_email],
+                reply_to=[request.user.email or settings.DEFAULT_FROM_EMAIL]
+            )
+            email.content_subtype = "html"  # Set the content type to HTML
+            email.send()
+            
+            return JsonResponse({'success': True, 'message': f'Proyección enviada a {client_email}'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'Error al enviar email: {str(e)}'})
+            
+    return JsonResponse({'success': False, 'message': 'Método no permitido o usuario no autenticado'})
 

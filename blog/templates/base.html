@@ -534,7 +534,14 @@
                     </li>
                     
                     {% if user.is_authenticated %}
-                        {% if user_role == 'ADVISOR' %}
+                       
+                            <!-- VISIBLE PROYECCIONES LINK -->
+                            <li class="nav-item">
+                                <a class="nav-link   href="{% url 'blog:proyecciones' %}">
+                                    <i class="fas fa-chart-line me-1"></i> Proyecciones CDT
+                                </a>
+                            </li>
+                            
                             <!-- MENÚ DE ASESOR -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="clientesDropdown" role="button" data-bs-toggle="dropdown">
@@ -583,6 +590,14 @@
                                     <i class="fas fa-bell"></i>
                                     <span class="badge bg-danger">{{ pending_requests_count|default:"0" }}</span>
                                 </a>
+                            </li>
+
+                            <!-- Añadir menú de Inversiones -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="inversionesDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-chart-line"></i> Inversiones
+                                </a>
+
                             </li>
                         {% else %}
                             <!-- MENÚ DE CLIENTE AUTENTICADO -->
@@ -650,6 +665,43 @@
                                 </a></li>
                             </ul>
                         </li>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                    <!-- Show for any authenticated user -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'proyecciones' %}">
+                            <i class="fas fa-chart-line me-1"></i>Proyecciones CDT
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if user.is_authenticated%}
+                    <!-- Only show for staff/advisors -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarAdvisorTools" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-tie me-1"></i>Herramientas de Asesor
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarAdvisorTools">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'proyecciones' %}">
+                                    <i class="fas fa-chart-line me-2"></i>Proyecciones CDT
+                                </a>
+                            </li>
+                            <!-- Add more advisor tools here as needed -->
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-users me-2"></i>Gestión de Clientes
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-tasks me-2"></i>Seguimiento de Leads
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
@@ -785,5 +837,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
     {% block extra_js %}{% endblock %}
+
+    {% if user.is_authenticated %}
+    <div class="container mt-3 p-3 bg-light">
+        <p><strong>Debug - Available URLs:</strong></p>
+        <p>Proyecciones URL: {% url 'proyecciones' %}</p>
+        <!-- Add other URLs to check they're working -->
+    </div>
+    {% endif %}
 </body>
 </html>

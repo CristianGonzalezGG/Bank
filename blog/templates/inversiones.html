@@ -413,7 +413,7 @@
             <a href="#investment-options" class="btn btn-light btn-lg">
                 <i class="fas fa-chart-line me-2"></i>Opciones de Inversión
             </a>
-            <a href="#investment-calculator" class="btn btn-outline-light btn-lg">
+            <a href="{% url 'blog:proyecciones' %}" class="btn btn-outline-light btn-lg">
                 <i class="fas fa-calculator me-2"></i>Calculadora de Rendimientos
             </a>
         </div>
@@ -906,187 +906,257 @@
             </a>
         </div>
     </div>
+
+    <div class="row mb-5" id="cdt-simulator">
+        <div class="col-12 text-center mb-4" data-aos="fade-up">
+            <h2 class="display-5 fw-bold">Simulador de CDT Real</h2>
+            <p class="lead text-muted">Calcula el rendimiento exacto de tu inversión en CDT con valores reales del mercado.</p>
+        </div>
+        
+        <div class="col-lg-6" data-aos="fade-right">
+            <div class="calculator-form">
+                <h3 class="h4 mb-4">Parámetros de tu CDT</h3>
+                
+                <div class="mb-3">
+                    <label for="cdtAmount" class="form-label">Monto a invertir</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="cdtAmount" value="5000000" min="500000" step="100000">
+                    </div>
+                    <div class="form-text">Monto mínimo: $500,000 COP</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="cdtTerm" class="form-label">Plazo (días)</label>
+                    <select class="form-select" id="cdtTerm">
+                        <option value="30">30 días</option>
+                        <option value="60">60 días</option>
+                        <option value="90">90 días</option>
+                        <option value="180">180 días</option>
+                        <option value="270">270 días</option>
+                        <option value="360" selected>360 días</option>
+                        <option value="540">540 días</option>
+                        <option value="720">720 días</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="cdtInterestRate" class="form-label">Tasa de interés E.A. (%)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="cdtInterestRate" value="11.85" step="0.01" min="0" max="20">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text">Tasa actual: 11.85% E.A. para 360 días</div>
+                </div>
+                
+                <button type="button" id="calculateCDT" class="btn btn-primary w-100">
+                    <i class="fas fa-calculator me-2"></i>Calcular Rendimiento
+                </button>
+            </div>
+        </div>
+        
+        <div class="col-lg-6" data-aos="fade-left">
+            <div class="card h-100 shadow border-0 rounded-3">
+                <div class="card-header bg-primary text-white py-3">
+                    <h3 class="h4 mb-0">Resultados de tu CDT</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div id="cdt-results">
+                        <div class="text-center p-4">
+                            <i class="fas fa-calculator fa-3x text-muted mb-3"></i>
+                            <p class="lead">Complete los datos y presione "Calcular Rendimiento" para ver los resultados.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="cdt-summary" style="display: none;">
+                        <div class="row mb-4">
+                            <div class="col-6 border-end">
+                                <div class="text-center">
+                                    <h4 class="h6 text-muted">Inversión Inicial</h4>
+                                    <p class="h3 mb-0" id="initialInvestment">$5,000,000</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <h4 class="h6 text-muted">Valor al Vencimiento</h4>
+                                    <p class="h3 mb-0" id="finalValue">$5,592,500</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td>Intereses Brutos</td>
+                                    <td class="text-end" id="grossInterest">$592,500</td>
+                                </tr>
+                                <tr>
+                                    <td>Retención en la Fuente (4%)</td>
+                                    <td class="text-end" id="taxWithholding">$23,700</td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td class="fw-bold">Intereses Netos</td>
+                                    <td class="text-end fw-bold" id="netInterest">$568,800</td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td class="fw-bold">Rentabilidad Efectiva</td>
+                                    <td class="text-end fw-bold" id="effectiveYield">11.38%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
+
+<!-- Debugging script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - checking CDT elements');
+    
+    // Check if elements exist
+    const button = document.getElementById('calculateCDT');
+    console.log('Calculate button found:', !!button);
+    
+    if (button) {
+        // Add a very simple click handler
+        button.addEventListener('click', function() {
+            console.log('Button clicked!');
+            document.getElementById('cdt-results').style.display = 'none';
+            document.getElementById('cdt-summary').style.display = 'block';
+            document.getElementById('initialInvestment').textContent = 'TEST SUCCESS';
+        });
+    }
+});
+</script>
 
 {% block extra_js %}
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.28.0/dist/apexcharts.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar AOS
+        // Initialize AOS animation library
         AOS.init({
             duration: 800,
             once: true,
             offset: 100
         });
         
-        // Gráfico de comportamiento del mercado
-        const marketOptions = {
-            series: [{
-                name: "CDT",
-                data: [9.2, 9.5, 10.1, 10.8, 11.2, 11.5, 11.7, 11.85]
-            }, {
-                name: "Fondo Conservador",
-                data: [8.2, 8.6, 8.9, 9.1, 9.3, 9.4, 9.42, 9.5]
-            }, {
-                name: "Fondo Balanceado",
-                data: [10.2, 10.5, 11.0, 11.5, 11.9, 12.2, 12.4, 12.6]
-            }],
-            chart: {
-                type: 'line',
-                height: 300,
-                toolbar: {
-                    show: false
-                }
-            },
-            colors: ['#1a3b5c', '#3498db', '#f39c12'],
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 3
-            },
-            grid: {
-                borderColor: '#e0e0e0',
-                row: {
-                    colors: ['#f3f3f3', 'transparent'],
-                    opacity: 0.5
-                },
-            },
-            markers: {
-                size: 4
-            },
-            xaxis: {
-                categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'],
-                title: {
-                    text: 'Meses (2023)'
-                }
-            },
-            yaxis: {
-                title: {
-                    text: 'Rendimiento (%)'
-                },
-                min: 8,
-                max: 14
-            },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'right',
-                floating: true,
-                offsetY: -25,
-                offsetX: -5
-            },
-            tooltip: {
-                shared: true,
-                intersect: false,
-                y: {
-                    formatter: function (y) {
-                        if (typeof y !== "undefined") {
-                            return y.toFixed(2) + "%";
-                        }
-                        return y;
-                    }
-                }
-            }
-        };
-
-        const marketChart = new ApexCharts(document.querySelector("#marketChart"), marketOptions);
-        marketChart.render();
+        // Keep your existing chart code here
         
-        // Gráfico de rendimiento por tipo
-        const performanceOptions = {
-            series: [11.85, 9.42, 12.6, 15.2],
-            chart: {
-                type: 'donut',
-                height: 300
-            },
-            labels: ['CDT', 'Fondo Conservador', 'Fondo Balanceado', 'Fondo Agresivo'],
-            colors: ['#1a3b5c', '#3498db', '#f39c12', '#e74c3c'],
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }],
-            tooltip: {
-                y: {
-                    formatter: function(value) {
-                        return value + "% E.A.";
-                    }
-                }
-            }
-        };
-
-        const performanceChart = new ApexCharts(document.querySelector("#performanceChart"), performanceOptions);
-        performanceChart.render();
+        // SIMPLE CDT CALCULATOR - START
+        console.log('Setting up CDT calculator');
         
-        // Calculadora de inversión
-        const amountSlider = document.getElementById('investmentAmount');
-        const termSlider = document.getElementById('investmentTerm');
-        const typeSelect = document.getElementById('investmentType');
-        const amountValue = document.getElementById('amountValue');
-        const termValue = document.getElementById('termValue');
-        const calculatedResult = document.getElementById('calculatedResult');
-        const profitResult = document.getElementById('profitResult');
+        // Get elements
+        const calculateButton = document.getElementById('calculateCDT');
+        const amountInput = document.getElementById('cdtAmount');
+        const termSelect = document.getElementById('cdtTerm');
+        const rateInput = document.getElementById('cdtInterestRate');
         
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value);
+        // Display elements
+        const resultsDiv = document.getElementById('cdt-results');
+        const summaryDiv = document.getElementById('cdt-summary');
+        const initialInvestmentSpan = document.getElementById('initialInvestment');
+        const finalValueSpan = document.getElementById('finalValue');
+        const grossInterestSpan = document.getElementById('grossInterest');
+        const taxWithholdingSpan = document.getElementById('taxWithholding');
+        const netInterestSpan = document.getElementById('netInterest');
+        const effectiveYieldSpan = document.getElementById('effectiveYield');
+        
+        // Log if elements were found
+        console.log('Calculate button found:', !!calculateButton);
+        console.log('Amount input found:', !!amountInput);
+        console.log('Results div found:', !!resultsDiv);
+        console.log('Summary div found:', !!summaryDiv);
+        
+        // Format currency function
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0
+            }).format(amount);
         }
         
-        function calculateInvestment() {
-            const amount = parseFloat(amountSlider.value);
-            const term = parseFloat(termSlider.value);
-            const type = typeSelect.value;
+        // Calculate CDT function
+        function calculateCDT() {
+            console.log('Calculate button clicked!');
             
-            let rate;
-            switch(type) {
-                case 'cdt':
-                    rate = 0.1185;
-                    break;
-                case 'fund':
-                    rate = 0.0942;
-                    break;
-                case 'balanced':
-                    rate = 0.126;
-                    break;
-                case 'aggressive':
-                    rate = 0.152;
-                    break;
-                default:
-                    rate = 0.1185;
+            try {
+                // Get values
+                const amount = parseFloat(amountInput.value);
+                const termDays = parseInt(termSelect.value);
+                const annualRate = parseFloat(rateInput.value) / 100;
+                
+                console.log('Amount:', amount);
+                console.log('Term:', termDays);
+                console.log('Rate:', annualRate);
+                
+                // Tax rate (4% for long term, 7% for short term)
+                const taxRate = termDays > 365 ? 0.04 : 0.07;
+                
+                // Calculate based on compound interest
+                const dailyRate = Math.pow(1 + annualRate, 1/365) - 1;
+                const finalAmount = amount * Math.pow(1 + dailyRate, termDays);
+                const interest = finalAmount - amount;
+                const tax = interest * taxRate;
+                const netInterest = interest - tax;
+                const netFinal = amount + netInterest;
+                
+                // Calculate effective yield
+                const effectiveYield = (netInterest / amount) * (365 / termDays);
+                
+                // Update display
+                console.log('Updating display');
+                initialInvestmentSpan.textContent = formatCurrency(amount);
+                finalValueSpan.textContent = formatCurrency(netFinal);
+                grossInterestSpan.textContent = formatCurrency(interest);
+                taxWithholdingSpan.textContent = formatCurrency(tax);
+                netInterestSpan.textContent = formatCurrency(netInterest);
+                effectiveYieldSpan.textContent = (effectiveYield * 100).toFixed(2) + '%';
+                
+                // Show results
+                resultsDiv.style.display = 'none';
+                summaryDiv.style.display = 'block';
+                
+                console.log('Display updated');
+            } catch (error) {
+                console.error('Error in CDT calculation:', error);
+                alert('Ocurrió un error al calcular. Por favor verifica tus datos.');
             }
-            
-            // Convertir tasa efectiva anual a mensual
-            const monthlyRate = Math.pow(1 + rate, 1/12) - 1;
-            const finalAmount = amount * Math.pow(1 + monthlyRate, term);
-            const profit = finalAmount - amount;
-            
-            calculatedResult.textContent = formatCurrency(finalAmount);
-            profitResult.textContent = `Ganancia: ${formatCurrency(profit)}`;
         }
         
-        amountSlider.addEventListener('input', function() {
-            amountValue.textContent = formatCurrency(this.value);
-            calculateInvestment();
-        });
+        // Connect calculate button to function
+        if (calculateButton) {
+            calculateButton.addEventListener('click', calculateCDT);
+            console.log('Added click event listener to calculate button');
+        }
         
-        termSlider.addEventListener('input', function() {
-            termValue.textContent = this.value === '1' ? '1 mes' : `${this.value} meses`;
-            calculateInvestment();
-        });
+        // Predefined interest rates
+        const interestRates = {
+            '30': 9.80,
+            '60': 10.15,
+            '90': 10.45,
+            '180': 11.20,
+            '270': 11.50,
+            '360': 11.85,
+            '540': 12.10,
+            '720': 12.30
+        };
         
-        typeSelect.addEventListener('change', calculateInvestment);
-        
-        // Inicializar calculadora
-        amountValue.textContent = formatCurrency(amountSlider.value);
-        calculateInvestment();
+        // Update interest rate when term changes
+        if (termSelect && rateInput) {
+            termSelect.addEventListener('change', function() {
+                const selectedTerm = this.value;
+                if (interestRates[selectedTerm]) {
+                    rateInput.value = interestRates[selectedTerm];
+                }
+            });
+        }
+        // SIMPLE CDT CALCULATOR - END
     });
 </script>
 {% endblock %}
