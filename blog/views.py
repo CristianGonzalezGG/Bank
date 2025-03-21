@@ -35,7 +35,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
 import pdfkit
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from django.http import StreamingHttpResponse
 from django.db.models import F
 import json
@@ -70,6 +70,8 @@ from django.http import JsonResponse
 from .forms import IDVerificationForm  # Asegúrate de importar el formulario
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
+from client_portal.models import ProjectionRequest, ProjectionResponse, SimpleProjection
+from client_portal.forms import ProjectionForm
 
 def id_verification(request):
     if request.method == 'POST':
@@ -176,17 +178,30 @@ def apertura_cuenta(request):
 def search_client(request):
     query = request.GET.get('cardId', '')  
     client = None
-    account = None
+    accounts = []  # Inicializamos la lista de cuentas vacía
 
     if query:
         try:
             client = Client.objects.get(cardId=query)
-            if hasattr(client, 'account'):
-                account = client.account
+            # Obtenemos todas las cuentas asociadas al cliente usando el related_name
+            accounts = Account.objects.filter(client=client).select_related('client')
+            
+            # Para debugging
+            print(f"Cliente encontrado: {client.name}")
+            print(f"Número de cuentas encontradas: {accounts.count()}")
+            
         except Client.DoesNotExist:
             client = None
+        except Exception as e:
+            print(f"Error al buscar cuentas: {str(e)}")
 
-    return render(request, 'card_info.html', {'client': client, 'account': account, 'query': query})
+    context = {
+        'client': client,
+        'accounts': accounts,  # Pasamos las cuentas al contexto
+        'query': query
+    }
+
+    return render(request, 'card_info.html', context)
 
 
 
@@ -499,9 +514,13 @@ def client_detail(request, id):
     # Obtener todas las cuentas asociadas al cliente usando el related_name
     accounts = Account.objects.filter(client=client)
     
+    # Obtener todas las citas asociadas al cliente
+    appointments = Appointment.objects.filter(client=client).order_by('-date', '-time')
+    
     context = {
         'client': client,
-        'accounts': accounts,  # Pasar las cuentas al contexto
+        'accounts': accounts,
+        'appointments': appointments,  # Agregar las citas al contexto
     }
     
     return render(request, 'client/client_detail.html', context)
@@ -522,26 +541,20 @@ def register_view(request):
 
 # Vista de login
 def login_view(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            
             if user is not None:
-                if user.email:  # Si el usuario tiene email, forzar 2FA
-                    # Guardar el usuario en la sesión temporalmente
-                    request.session['temp_user_id'] = user.id
-                    # Generar y enviar código 2FA
-                    send_2fa_code(request, user)
-                    messages.info(request, "Por favor ingrese el código de verificación enviado a su correo.")
-                    return redirect('blog:verify_2fa')
-                else:
-                    # Si no tiene email, login normal
-                    auth_login(request, user)
-                    messages.success(request, f"Bienvenido, {username}")
-                    return redirect("blog:home")
+                login(request, user)
+                messages.success(request, f"Bienvenido, {username}!")
+                # Redirigir a la página que el usuario intentaba acceder
+                next_page = request.GET.get('next')
+                if next_page:
+                    return redirect(next_page)
+                return redirect('blog:home')
             else:
                 messages.error(request, "Usuario o contraseña incorrectos.")
         else:
@@ -843,29 +856,20 @@ def disable_2fa(request):
         return redirect('blog:home')
 
 def inversiones_view(request):
+    """Vista pública para la página de inversiones"""
     return render(request, 'inversiones.html')
 
-def seguridad_view(request):
-    return render(request, 'seguridad.html')
+def proyecciones_view(request):
+    """Vista pública para la página de proyecciones"""
+    return render(request, 'proyecciones.html')
 
 def tramites_digitales(request):
+    """Vista pública para la página de trámites digitales"""
     return render(request, 'tramites_digitales.html')
 
-def generate_radicado():
-    """Genera un número de radicado único para la solicitud PQR."""
-    prefix = "PQR"
-    timestamp = datetime.now().strftime('%Y%m%d')
-    random_chars = ''.join(random.choices(string.digits, k=6))
-    return f"{prefix}{timestamp}{random_chars}"
-
-def proyecciones(request):
-    # Only check if user is authenticated
-    if request.user.is_authenticated:
-        return render(request, 'proyecciones.html')
-    else:
-        # Redirect non-authenticated users to login
-        messages.warning(request, "Por favor inicia sesión para acceder a esta página.")
-        return redirect('login')  # Make sure 'login' is the correct name for your login URL
+def seguridad(request):
+    """Vista pública para la página de seguridad"""
+    return render(request, 'seguridad.html')
 
 def send_projection_email(request):
     if request.method == 'POST' and request.user.is_authenticated:
@@ -1043,4 +1047,129 @@ def manage_account(request, account_id):
     }
     
     return render(request, 'account/manage_account.html', context)
+
+@csrf_exempt
+def save_projection(request):
+    if request.method == 'POST':
+        try:
+            # Obtener y limpiar los datos
+            def clean_number(value):
+                if isinstance(value, str):
+                    return value.replace('$', '').replace(',', '').replace(' ', '')
+                return value
+
+            # Crear la proyección
+            projection = SimpleProjection.objects.create(
+                name=request.POST.get('name'),
+                email=request.POST.get('email'),
+                initial_amount=Decimal(clean_number(request.POST.get('initial_amount', '0'))),
+                term_days=int(request.POST.get('term_days', '0')),
+                interest_rate=Decimal(clean_number(request.POST.get('interest_rate', '0'))),
+                payment_type=request.POST.get('payment_type', 'maturity'),
+                final_amount=Decimal(clean_number(request.POST.get('final_amount', '0'))),
+                net_interest=Decimal(clean_number(request.POST.get('net_interest', '0'))),
+                status='PENDING'
+            )
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Proyección guardada exitosamente',
+                'projection_id': projection.id
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error al guardar la proyección: {str(e)}'
+            }, status=400)
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Método no permitido'
+    }, status=405)
+
+@login_required
+def advisor_projections(request):
+    projections = SimpleProjection.objects.all().order_by('-created_at')
+    return render(request, 'blog/advisor/projections.html', {
+        'projections': projections
+    })
+
+def mark_projection_as_reviewed(request, projection_id):
+    if request.method == 'POST':
+        try:
+            projection = get_object_or_404(SimpleProjection, id=projection_id)
+            projection.status = 'REVIEWED'
+            projection.save()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+def contact_client(request, projection_id):
+    projection = get_object_or_404(SimpleProjection, id=projection_id)
+    
+    if request.method == 'POST':
+        try:
+            # Preparar el contexto para el template
+            context = {
+                'subject': request.POST.get('subject', 'Seguimiento de su Proyección CDT'),
+                'message': request.POST.get('message', ''),
+                'client_name': projection.name,
+                'projection': {
+                    'amount': f"${projection.initial_amount:,.2f}",
+                    'term': projection.term_days,
+                    'rate': projection.interest_rate
+                }
+            }
+
+            try:
+                # Intentar renderizar el template
+                html_message = render_to_string('emails/send_email_template.html', context)
+            except Exception as template_error:
+                return JsonResponse({
+                    'success': False,
+                    'error': f"Error al renderizar el template: {str(template_error)}"
+                })
+
+            try:
+                # Intentar enviar el correo
+                send_mail(
+                    subject=context['subject'],
+                    message='',  # Versión texto plano
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[projection.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+            except Exception as email_error:
+                return JsonResponse({
+                    'success': False,
+                    'error': f"Error al enviar el correo: {str(email_error)}"
+                })
+
+            # Actualizar estado
+            projection.status = 'CONTACTED'
+            projection.save()
+
+            return render(request, 'blog/email_sent_success.html', {
+                'client_email': projection.email,
+                'client_id': projection_id
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+
+    # Para GET request, mostrar el formulario
+    return render(request, 'blog/send_email_form.html', {
+        'projection': projection,
+        'form': {
+            'to_email': projection.email,
+            'subject': 'Seguimiento de su Proyección CDT - Banco El Dorado',
+            'message': f'Hemos revisado su solicitud de proyección CDT por un monto de ${projection.initial_amount:,.2f} a {projection.term_days} días.'
+        }
+    })
 

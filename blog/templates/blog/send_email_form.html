@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Enviar Email - Banco El Dorado{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">Enviar Email al Cliente</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Detalles de la Proyección</h5>
+                        <p><strong>Cliente:</strong> {{ projection.name }}</p>
+                        <p><strong>Email:</strong> {{ projection.email }}</p>
+                        <p><strong>Monto:</strong> ${{ projection.initial_amount|floatformat:2 }}</p>
+                        <p><strong>Plazo:</strong> {{ projection.term_days }} días</p>
+                    </div>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Para:</label>
+                            <input type="email" class="form-control" value="{{ projection.email }}" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Asunto:</label>
+                            <input type="text" name="subject" class="form-control" 
+                                   value="{{ form.subject }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mensaje:</label>
+                            <textarea name="message" class="form-control" rows="6" required>{{ form.message }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="sendEmailBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Enviar Email
+                            </button>
+                            <a href="{% url 'blog:advisor_projections' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('sendEmailBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+
+    fetch(window.location.href, {
+        method: 'POST',
+        body: new FormData(this),
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        if (html.startsWith('{')) {
+            // Es una respuesta JSON (error)
+            const data = JSON.parse(html);
+            throw new Error(data.error);
+        } else {
+            // Es HTML (éxito)
+            document.documentElement.innerHTML = html;
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al enviar el correo',
+            text: error.message
+        });
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+});
+</script>
+
+<style>
+    .form-control:readonly {
+        background-color: #e9ecef;
+    }
+</style>
+{% endblock %} 

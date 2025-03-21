@@ -24,3 +24,11 @@ class TwoFactorMiddleware:
         
         response = self.get_response(request)
         return response 
+
+# Si tienes un middleware personalizado
+PUBLIC_URLS = [
+    r'^inversiones/$',
+    r'^proyecciones/$',
+    r'^tramites/$',
+    # ... otras URLs públicas ...
+] 

@@ -1,34 +1,273 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
-{% block title %}Información tarjeta{% endblock %}
+{% block title %}Consulta de Cliente - Banco El Dorado{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <form class="d-flex" method="GET" action="{% url 'blog:search_client' %}">
-        <input class="form-control me-2" type="text" name="cardId" placeholder="Ingrese cédula (cardId)" value="{{ query }}">
-        <button class="btn btn-primary" type="submit">Buscar</button>
-    </form>
+<div class="container py-4">
+    <!-- Sección de búsqueda -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-3">
+                <i class="fas fa-search text-primary me-2"></i>Consulta de Cliente
+            </h4>
+            <form class="row g-3" method="GET" action="{% url 'blog:search_client' %}">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">
+                            <i class="fas fa-id-card"></i>
+                        </span>
+                        <input 
+                            class="form-control form-control-lg" 
+                            type="text" 
+                            name="cardId" 
+                            placeholder="Ingrese número de identificación" 
+                            value="{{ query }}"
+                            required
+                            pattern="[0-9]+"
+                            title="Por favor ingrese solo números">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-primary btn-lg w-100" type="submit">
+                        <i class="fas fa-search me-2"></i>Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     {% if client %}
-        <div class="mt-4">
-            <h2 class="text-success">Cliente encontrado</h2>
-            <p><strong>Nombre:</strong> {{ client.name }}</p>
-            <p><strong>Email:</strong> {{ client.email }}</p>
-            <p><strong>Teléfono:</strong> {{ client.phone_number }}</p>
-
-            {% if account %}
-                <h3 class="text-primary">Cuenta Asociada</h3>
-                <p><strong>Número de Cuenta:</strong> {{ account.numberAccount }}</p>
-                <p><strong>Tipo de Cuenta:</strong> {{ account.get_account_type_display }}</p>
-                <p><strong>Tarjeta Débito:</strong> {{ account.debit_card_number }} (Vence: {{ account.debit_expiration_date }})</p>
-                <p><strong>Tarjeta Crédito:</strong> {{ account.credit_card_number }} (Vence: {{ account.credit_expiration_date }})</p>
-            {% else %}
-                <p class="text-danger">Este cliente no tiene cuentas asociadas.</p>
-                <a href="{% url 'blog:create_account' client.id %}" class="btn btn-success">Crear Cuenta</a>
-            {% endif %}
+    <div class="row">
+        <!-- Información del cliente -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2"></i>Información del Cliente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% if client.imageSave %}
+                            <img src="{{ client.imageSave.url }}" alt="Foto del cliente" 
+                                 class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/default-avatar.png' %}" alt="Avatar por defecto" 
+                                 class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-id-badge text-primary me-2"></i>
+                            <strong>ID:</strong> {{ client.cardId }}
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-user-circle text-primary me-2"></i>
+                            <strong>Nombre:</strong> {{ client.name }}
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-envelope text-primary me-2"></i>
+                            <strong>Email:</strong> {{ client.email }}
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-phone text-primary me-2"></i>
+                            <strong>Teléfono:</strong> {{ client.phone_number }}
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                            <strong>Dirección:</strong> {{ client.address }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'blog:client_detail' client.id %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-info-circle me-2"></i>Ver Perfil Completo
+                    </a>
+                </div>
+            </div>
         </div>
+
+        <!-- Información de cuentas -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-university me-2"></i>Cuentas Asociadas
+                    </h5>
+                    {% if not accounts %}
+                    <a href="{% url 'blog:create_account' client.id %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus me-2"></i>Nueva Cuenta
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <!-- Agregamos debugging info -->
+                    {% if debug %}
+                    <div class="alert alert-info">
+                        <p>Cliente ID: {{ client.id }}</p>
+                        <p>Número de cuentas: {{ accounts|length }}</p>
+                        <p>Cuentas disponibles: {{ accounts|join:", " }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if accounts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tipo de Cuenta</th>
+                                        <th>Número</th>
+                                        <th>Saldo</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for account in accounts %}
+                                    <tr>
+                                        <td>
+                                            <i class="fas {% if account.account_type == 'CHECKING' %}fa-credit-card
+                                                      {% else %}fa-piggy-bank{% endif %} text-primary me-2"></i>
+                                            {{ account.get_account_type_display }}
+                                        </td>
+                                        <td>{{ account.numberAccount }}</td>
+                                        <td>${{ account.balance|floatformat:2|intcomma }}</td>
+                                        <td>
+                                            <span class="badge {% if account.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ account.is_active|yesno:"Activa,Inactiva" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" 
+                                                        onclick="showAccountDetails('{{ account.id }}')"
+                                                        title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <a href="{% url 'blog:manage_account' account.id %}" 
+                                                   class="btn btn-sm btn-outline-success"
+                                                   title="Gestionar cuenta">
+                                                    <i class="fas fa-cog"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
+                            <h5>No hay cuentas asociadas</h5>
+                            <p class="text-muted">Este cliente no tiene cuentas registradas en el sistema.</p>
+                            <a href="{% url 'blog:create_account' client.id %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Crear Nueva Cuenta
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
     {% elif query %}
-        <p class="text-danger">No se encontró ningún cliente con la cédula ingresada.</p>
+    <div class="alert alert-warning" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>No encontrado:</strong> No se encontró ningún cliente con el número de identificación "{{ query }}".
+    </div>
     {% endif %}
 </div>
+
+<!-- Modal para detalles de cuenta -->
+<div class="modal fade" id="accountDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Detalles de la Cuenta
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="accountDetailsContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function showAccountDetails(accountId) {
+    const modal = new bootstrap.Modal(document.getElementById('accountDetailsModal'));
+    const contentDiv = document.getElementById('accountDetailsContent');
+    
+    modal.show();
+    contentDiv.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`/account/${accountId}/details/`);
+        const data = await response.json();
+        
+        if (data.success) {
+            contentDiv.innerHTML = `
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <small class="text-muted d-block">Número de Cuenta</small>
+                        <strong>${data.account.numberAccount}</strong>
+                    </div>
+                    <div class="list-group-item">
+                        <small class="text-muted d-block">Tipo de Cuenta</small>
+                        <strong>${data.account.type}</strong>
+                    </div>
+                    <div class="list-group-item">
+                        <small class="text-muted d-block">Saldo Actual</small>
+                        <strong>$${parseFloat(data.account.balance).toLocaleString()}</strong>
+                    </div>
+                    ${data.account.credit_limit ? `
+                    <div class="list-group-item">
+                        <small class="text-muted d-block">Límite de Crédito</small>
+                        <strong>$${parseFloat(data.account.credit_limit).toLocaleString()}</strong>
+                    </div>
+                    ` : ''}
+                    <div class="list-group-item">
+                        <small class="text-muted d-block">Estado</small>
+                        <span class="badge ${data.account.is_active ? 'bg-success' : 'bg-danger'}">
+                            ${data.account.is_active ? 'Activa' : 'Inactiva'}
+                        </span>
+                    </div>
+                    <div class="list-group-item">
+                        <small class="text-muted d-block">Fecha de Apertura</small>
+                        <strong>${new Date(data.account.created_at).toLocaleDateString()}</strong>
+                    </div>
+                </div>
+            `;
+        } else {
+            contentDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Error al cargar los detalles de la cuenta
+                </div>
+            `;
+        }
+    } catch (error) {
+        contentDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Error de conexión
+            </div>
+        `;
+    }
+}
+</script>
 {% endblock %}

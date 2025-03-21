@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Detalle de Proyección #{{ projection.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Información del Cliente</h5>
+                            <p><strong>Nombre:</strong> {{ projection.client.get_full_name }}</p>
+                            <p><strong>Email:</strong> {{ projection.client.email }}</p>
+                            <p><strong>Fecha de solicitud:</strong> {{ projection.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Detalles de la Proyección</h5>
+                            <p><strong>Monto inicial:</strong> ${{ projection.initial_amount|floatformat:2 }}</p>
+                            <p><strong>Plazo:</strong> {{ projection.term_days }} días</p>
+                            <p><strong>Tasa:</strong> {{ projection.interest_rate }}%</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5>Resultados</h5>
+                            <p><strong>Monto final:</strong> ${{ projection.final_amount|floatformat:2 }}</p>
+                            <p><strong>Interés neto:</strong> ${{ projection.net_interest|floatformat:2 }}</p>
+                            <p><strong>Tipo de pago:</strong> {{ projection.payment_type }}</p>
+                        </div>
+                    </div>
+
+                    {% if projection.client_notes %}
+                    <div class="alert alert-info">
+                        <h5>Notas del Cliente:</h5>
+                        {{ projection.client_notes|linebreaks }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Responder al Cliente</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" accept-charset="utf-8">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Asunto</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="subject" 
+                                   name="subject" 
+                                   required
+                                   accept-charset="utf-8">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Mensaje</label>
+                            <textarea class="form-control" 
+                                      id="message" 
+                                      name="message" 
+                                      rows="6" 
+                                      required
+                                      accept-charset="utf-8"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Enviar Respuesta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Historial de Respuestas</h4>
+                </div>
+                <div class="card-body">
+                    {% for response in projection.responses.all %}
+                    <div class="border-bottom mb-3 pb-3">
+                        <h6>{{ response.subject }}</h6>
+                        <small class="text-muted">
+                            Por: {{ response.advisor.get_full_name }} - 
+                            {{ response.created_at|date:"d/m/Y H:i" }}
+                        </small>
+                        <p class="mt-2">{{ response.message }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay respuestas previas</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

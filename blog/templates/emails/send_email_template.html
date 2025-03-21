@@ -5,118 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
             margin: 0;
             padding: 0;
-            background-color: #f8f9fa;
-            color: #212529;
-            line-height: 1.6;
         }
-        .email-container {
-            width: 100%;
+        .container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            padding: 20px;
         }
-        .email-header {
-            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-            color: #ffffff;
-            padding: 2rem;
+        .header {
+            background-color: #1a3b5c;
+            color: white;
+            padding: 20px;
             text-align: center;
         }
-        .email-header img {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 1rem;
-            border-radius: 50%;
-            border: 3px solid #ffffff;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        .content {
+            padding: 20px;
+            background-color: #fff;
         }
-        .email-header h1 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 600;
-        }
-        .email-body {
-            padding: 2rem;
-            color: #212529;
-        }
-        .email-body h2 {
-            font-size: 1.5rem;
-            color: #0d6efd;
-            margin-bottom: 1rem;
-        }
-        .email-body p {
-            font-size: 1rem;
-            margin: 1rem 0;
-            color: #495057;
-        }
-        .email-footer {
+        .footer {
             background-color: #f8f9fa;
-            padding: 1.5rem;
+            padding: 20px;
             text-align: center;
-            font-size: 0.875rem;
-            color: #6c757d;
-            border-top: 1px solid #dee2e6;
-        }
-        .email-footer a {
-            color: #0d6efd;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .email-footer a:hover {
-            text-decoration: underline;
-        }
-        .email-footer p {
-            margin: 0.5rem 0;
-        }
-        .btn {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            text-align: center;
-            text-decoration: none;
-            background-color: #0d6efd;
-            color: #ffffff;
-            border-radius: 0.375rem;
-            margin: 1rem 0;
+            font-size: 12px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="email-header">
-            <img src="https://i.postimg.cc/ZnQjmqR9/logo.png" alt="Logo de Banco El Dorado">
+    <div class="container">
+        <div class="header">
             <h1>Banco El Dorado</h1>
         </div>
-
-        <div class="email-body">
-            <h2>{{ subject }}</h2>
+        <div class="content">
+            <p>Estimado/a {{ client_name }},</p>
+            
             <p>{{ message }}</p>
             
-            <p>Estimado cliente:</p>
-            <p>
-                Esperamos que este mensaje le encuentre bien. En Banco El Dorado, nos comprometemos a brindarle un servicio excepcional y a mantenerlo informado sobre nuestros productos y servicios.
-            </p>
-            <p>
-                Le recordamos que puede acceder a su cuenta en línea a través de nuestro portal seguro, donde podrá realizar transacciones, revisar su saldo y consultar sus estados de cuenta de manera fácil y rápida.
-            </p>
-            <p>
-                Si necesita asistencia, no dude en comunicarse con nuestro servicio de atención al cliente al (123) 456-7890 o a través de nuestro correo electrónico soporte@bancoeldorado.com
-            </p>
+            <p>Detalles de su proyección:</p>
+            <ul>
+                <li>Monto: {{ projection.amount }}</li>
+                <li>Plazo: {{ projection.term }} días</li>
+                <li>Tasa: {{ projection.rate }}%</li>
+            </ul>
+            
+            <p>Si tiene alguna pregunta, no dude en contactarnos.</p>
+            
+            <p>Atentamente,<br>
+            Equipo de Banco El Dorado</p>
         </div>
-
-        <div class="email-footer">
-            <p>© 2024 Banco El Dorado - Todos los derechos reservados.</p>
-            <p>
-                <a href="https://www.bancoeldorado.com/terminos">Términos y Condiciones</a> |
-                <a href="https://www.bancoeldorado.com/privacidad">Política de Privacidad</a>
-            </p>
-            <p>¿Necesitas ayuda? Contacta a nuestro <a href="https://www.bancoeldorado.com/soporte">centro de soporte</a></p>
+        <div class="footer">
+            <p>Este es un correo automático, por favor no responda a este mensaje.</p>
+            <p>© 2024 Banco El Dorado. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>

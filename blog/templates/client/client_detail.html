@@ -132,43 +132,69 @@
 
             <!-- Sección de Citas -->
             <div class="card mt-4">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Citas del Cliente</h5>
+                    <a href="{% url 'blog:create_appointment' client.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-calendar-plus"></i> Nueva Cita
+                    </a>
                 </div>
                 <div class="card-body">
                     {% if appointments %}
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Tipo de Cita</th>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
-                                    <th>Sede</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for appointment in appointments %}
-                                <tr>
-                                    <td>{{ appointment.get_appointment_type_display }}</td>
-                                    <td>{{ appointment.date|date:"d/m/Y" }}</td>
-                                    <td>{{ appointment.time|time:"H:i" }}</td>
-                                    <td>{{ appointment.branch }}</td>
-                                    <td>
-                                        <span class="badge badge-{{ appointment.status|lower }}">
-                                            {{ appointment.get_status_display }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center">No hay citas programadas para este cliente.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de Cita</th>
+                                        <th>Fecha</th>
+                                        <th>Hora</th>
+                                        <th>Sede</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointments %}
+                                    <tr>
+                                        <td>{{ appointment.get_appointment_type_display }}</td>
+                                        <td>{{ appointment.date|date:"d/m/Y" }}</td>
+                                        <td>{{ appointment.time|time:"H:i" }}</td>
+                                        <td>{{ appointment.branch }}</td>
+                                        <td>
+                                            <span class="badge {% if appointment.status == 'PENDING' %}bg-warning
+                                                {% elif appointment.status == 'CONFIRMED' %}bg-info
+                                                {% elif appointment.status == 'COMPLETED' %}bg-success
+                                                {% elif appointment.status == 'CANCELLED' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ appointment.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{% url 'blog:appointment_detail' appointment.id %}" 
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if appointment.status == 'PENDING' %}
+                                                <a href="{% url 'blog:appointment_cancel' appointment.id %}"
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   title="Cancelar cita"
+                                                   onclick="return confirm('¿Está seguro de cancelar esta cita?');">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% else %}
-                        <p class="text-muted">No hay citas programadas para este cliente.</p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No hay citas programadas para este cliente.
+                        </div>
                     {% endif %}
                 </div>
             </div>

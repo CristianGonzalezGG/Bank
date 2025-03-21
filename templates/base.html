@@ -1055,6 +1055,15 @@
                             <li><a class="dropdown-item" href="{% url 'blog:seguridad' %}"><i class="fas fa-shield-alt"></i> Centro de Seguridad</a></li>
                         </ul>
                     </li>
+
+                    <!-- En el menú del asesor -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'blog:advisor_projections' %}">
+                                <i class="fas fa-calculator me-1"></i> Proyecciones CDT
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

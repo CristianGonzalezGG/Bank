@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Proyecciones CDT - Panel Asesor{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Solicitudes de Proyecciones CDT</h2>
+            <p class="text-muted">Gestiona las solicitudes de proyecciones de CDT de los clientes</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Correo</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for projection in projections %}
+                        <tr data-projection-id="{{ projection.id }}">
+                            <td>{{ projection.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>{{ projection.name }}</td>
+                            <td>{{ projection.email }}</td>
+                            <td>${{ projection.initial_amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="badge bg-{{ projection.status|lower }}">
+                                    {{ projection.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            data-email="{{ projection.email|escapejs }}" 
+                                            onclick="contactClient(this.dataset.email)">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" 
+                                            onclick="markAsReviewed({{ projection.id }})">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay proyecciones pendientes</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function contactClient(email) {
+    if (!email) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Email no válido',
+            confirmButtonText: 'Aceptar'
+        });
+        return;
+    }
+
+    // Obtener el botón que fue clickeado
+    const button = event.target.closest('button');
+    
+    // Obtener el ID de la proyección del botón o del elemento más cercano
+    const projectionId = button.closest('tr').querySelector('[data-projection-id]').dataset.projectionId;
+
+    // Redireccionar directamente a la URL de contacto
+    window.location.href = `/projection/${projectionId}/contact/`;
+}
+
+// Función para obtener el token CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
+
+{% endblock %} 

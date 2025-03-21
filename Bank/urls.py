@@ -5,5 +5,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Make sure your blog app URLs are included
     path('', include('blog.urls')),  # Adjust the path as needed
+    path('portal/', include('client_portal.urls')),  # Añade esta línea
     # Other URL patterns
 ] 

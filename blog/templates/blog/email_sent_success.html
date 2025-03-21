@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Email Enviado - Banco El Dorado{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                    <h3 class="card-title">¡Correo Enviado Exitosamente!</h3>
+                    <p class="card-text text-muted">
+                        El correo ha sido enviado correctamente a {{ client_email }}.
+                    </p>
+                    <div class="mt-4">
+                        <a href="{% url 'blog:advisor_projections' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver a Proyecciones
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

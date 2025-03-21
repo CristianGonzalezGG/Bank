@@ -51,7 +51,11 @@ class Account(models.Model):
         ('CHECKING', 'Cuenta Corriente'),
     ]
 
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='accounts')
+    client = models.ForeignKey(
+        Client, 
+        on_delete=models.CASCADE, 
+        related_name='accounts'  # Asegúrate de que esto esté definido
+    )
     account_type = models.CharField(max_length=50, choices=ACCOUNT_TYPES)
     numberAccount = models.CharField(max_length=20, unique=True, editable=False)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
