@@ -1,0 +1,88 @@
+/* Estilos del botón de ayuda */
+.help-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.help-button img {
+    width: 30px;
+    height: 30px;
+}
+
+/* Estilos del chatbot */
+.chatbot-container {
+    display: none;
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 300px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.chatbot-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-header h3 {
+    margin: 0;
+}
+
+.close-chatbot {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.chatbot-body {
+    padding: 15px;
+}
+
+.chatbot-body ul {
+    padding-left: 0;
+}
+
+.chatbot-body ul li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+.chatbot-body ul li button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px;
+    width: 100%;
+    text-align: left;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.chatbot-body ul li button:hover {
+    background-color: #0056b3;
+}
+
+.chatbot-response {
+    margin-top: 15px;
+    font-style: italic;
+}

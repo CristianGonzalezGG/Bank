@@ -1,0 +1,475 @@
+/* General Styles */
+form label {
+    font-size: 16px; /* Asegurar un tamaño de fuente legible */
+    font-weight: bold; /* Negrita para mayor visibilidad */
+    color: #333; /* Color del texto del label */
+    display: block; /* Asegurar que los labels ocupen todo el ancho */
+    margin-bottom: 5px; /* Espacio entre el label y el campo de entrada */
+}
+
+/* Estilos para los campos del formulario */
+form input[type="text"], form select, form textarea {
+    width: 100%; /* Asegurar que los campos ocupen todo el ancho disponible */
+    padding: 10px; /* Espaciado interno */
+    border: 1px solid #ccc; /* Borde ligero */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 14px; /* Tamaño de fuente */
+    box-sizing: border-box; /* Para incluir el padding en el ancho total */
+}
+
+
+
+body {
+    font-family: 'Roboto', sans-serif; /* Asegúrate de que Roboto esté importado */
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    animation: fadeIn 1s ease-in-out;
+}
+.el-dorado-container {
+    text-align: center; /* Centrar el contenido */
+    margin: 50px 0; /* Espaciado vertical alrededor del contenedor */
+}
+.main-title {
+    font-size: 38px; /* Tamaño de fuente para el título principal */
+    color: #d6a700; /* Color dorado */
+    margin: 0; /* Eliminar margen */
+}
+
+.golden-line {
+    width: 50%; /* Ajustar el ancho de la línea */
+    border: 1px solid #d6a700; /* Color dorado para la línea */
+    margin: 20px auto; /* Centrar la línea con márgenes */
+}
+
+.subtitle {
+    font-size: 24px; /* Tamaño de fuente para el subtítulo */
+    color: #d6a700; /* Color dorado */
+    margin: 0; /* Eliminar margen */
+}
+.logo {
+    width: 10%; /* Resizes according to screen width */
+    height: auto; /* Keeps aspect ratio */
+}
+/* Estilos generales para el header */
+header {
+    background-color: #333; /* Fondo oscuro */
+    color: #fff;
+    padding: 10px 0;
+    position: relative;
+    z-index: 1000;
+}
+
+/* Contenedor del logo y el menú */
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Estilo para el logo */
+.logo img {
+    max-width: 50px;
+}
+
+/* Estilo para el menú principal */
+nav {
+    display: flex;
+    align-items: center;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: #ffc107; /* Color amarillo de hover */
+}
+
+/* Submenú desplegable */
+nav ul li:hover .submenu {
+    display: block;
+}
+
+.submenu {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.submenu li {
+    margin: 5px 0;
+}
+
+.submenu li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Estilo del botón destacado */
+.cta-button {
+    background-color: #ffc107; /* Botón con color amarillo */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #e0a800;
+}
+
+/* Estilo para el menú superior (ejemplo de "Personas", "Negocios", etc.) */
+.top-menu {
+    background-color: #444;
+    padding: 5px 0;
+    text-align: center;
+}
+
+.top-menu ul {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.top-menu ul li {
+    margin: 0 20px;
+}
+
+.top-menu ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.top-menu ul li a:hover {
+    color: #ffc107;
+}
+
+
+nav {
+    margin: 20px 0;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #ffdd57;
+    text-decoration: underline;
+}
+
+#content {
+    max-width: 900px;
+    margin: 20px auto; /* Añadido margen para más separación */
+    padding: 30px; /* Mayor padding para más espacio */
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+.client-detail-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.client-info {
+    width: 60%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.6s ease-in-out;
+}
+
+.client-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.client-info li {
+    margin: 15px 0; /* Aumentar espacio entre elementos */
+    font-size: 1.1rem;
+}
+
+.client-info li strong {
+    color: #333;
+}
+
+.client-image {
+    width: 35%;
+    text-align: center;
+    animation: zoomIn 0.7s ease-in-out;
+}
+
+.client-image img {
+    width: 100%;  /* La imagen ocupa el 100% del contenedor */
+    height: auto; /* Mantiene la proporción de la imagen */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra de la imagen */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.client-image img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer */
+footer {
+    background: #4CAF50; /* Color verde para el pie de página */
+    color: white;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+    animation: slideUp 1s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    #content {
+        flex-direction: column;
+        padding: 15px; /* Menos padding en móvil */
+    }
+
+    .client-info, .client-image {
+        width: 100%;
+    }
+
+    .client-image img {
+        max-width: 100%;
+    }
+}
+
+
+
+
+/* Contenedor para los filtros y la lista */
+.filters-and-list {
+    display: flex; /* Usar flexbox para los elementos hijos */
+    width: 1400px; /* Ancho completo */
+    margin-left: -200px;
+    
+}
+
+/* Formulario de Filtros */
+#filterForm {
+    max-width: 100%; /* Ancho máximo del formulario */
+    padding: 20px; /* Espaciado interno */
+    background-color: #ffffff; /* Fondo blanco para el formulario */
+    border: 1px solid #d6d6d6; /* Borde gris claro */
+    border-radius: 5px; /* Bordes redondeados */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    margin-right: 100px; /* Espacio entre el formulario y la lista */
+}
+
+/* Alineación de etiquetas y campos de entrada */
+#filterForm div {
+    margin-bottom: 15px; 
+    /* Espaciado entre los elementos del formulario */
+}
+
+#filterForm label {
+    font-weight: bold; /* Texto en negrita para las etiquetas */
+    margin-bottom: 5px; /* Espaciado entre la etiqueta y el campo */
+    display: block; /* Asegura que las etiquetas ocupen todo el ancho */
+}
+
+/* Los campos de entrada y selecciones */
+#filterForm input[type="text"],
+#filterForm input[type="date"],
+#filterForm select {
+    width: 100%; /* Ancho completo de los campos */
+    padding: 10px; /* Espaciado interno */
+    border: 1px solid #d6d6d6; /* Borde gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 14px; /* Tamaño de fuente para los campos */
+    box-sizing: border-box; /* Incluye padding y border en el ancho total */
+}
+
+/* Botón de filtro */
+#filterButton {
+    background-color: #d6a700; /* Color de fondo dorado */
+    color: white; /* Color del texto */
+    padding: 10px; /* Espaciado interno */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados */
+    cursor: pointer; /* Cambiar cursor al pasar por encima */
+    font-size: 16px; /* Tamaño de fuente del botón */
+}
+
+#filterButton:hover {
+    background-color: #c69b00; /* Color más oscuro al pasar el mouse */
+}
+
+/* Lista de Clientes */
+#clientList {
+    flex-grow: 1; /* Ocupa el resto del espacio disponible */
+    padding: 20px; /* Espaciado interno */
+    width: 100%;
+}
+
+/* Tarjetas de clientes */
+.client-card {
+    margin-bottom: 15px; /* Espaciado entre tarjetas */
+    padding: 15px; /* Espaciado interno */
+    border: 1px solid #d6d6d6; /* Borde gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+    background-color: #f9f9f9; /* Fondo gris claro */
+}
+.footer {
+    background-color: #222;
+    color: #fff;
+    padding: 40px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px; /* Ajusta el ancho máximo */
+    margin: 0 auto; /* Centra el footer */
+    padding: 0 20px;
+}
+
+.footer-section {
+    width: 30%;
+}
+
+.footer-section h4 {
+    margin-bottom: 20px;
+    font-weight: bold;
+    border-bottom: 2px solid #f39c12; /* Línea debajo del título */
+    padding-bottom: 5px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin: 10px 0;
+}
+
+.footer-section ul li a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease; /* Transición de color */
+}
+
+.footer-section ul li a:hover {
+    color: #f39c12; /* Color al pasar el mouse */
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    border-top: 1px solid #444; /* Línea superior */
+    padding-top: 20px;
+}
+
+.footer-bottom p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.social-media {
+    margin-top: 20px;
+}
+
+.social-media a {
+    margin: 0 10px;
+    transition: transform 0.3s ease; /* Transición de transformación */
+}
+
+.social-media a:hover {
+    transform: scale(1.2); /* Escala al pasar el mouse */
+}
+
+.social-media img {
+    width: 30px;
+    height: 30px;
+}
+
+/* Animaciones de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.footer {
+    animation: fadeIn 0.8s ease-in; /* Animación de entrada */
+}

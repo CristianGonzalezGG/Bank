@@ -7,8 +7,53 @@ from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django import forms
 from django.utils import timezone
+from django import forms
+from decimal import Decimal
 
+from django import forms
 
+class IDVerificationForm(forms.Form):
+    # Campo para subir la imagen del ID
+    id_image = forms.ImageField(
+        label="Subir imagen de ID",
+        required=True,
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
+
+    # Campo para seleccionar el tipo de documento
+    DOCUMENT_TYPES = [
+        ('ID', 'Documento de Identidad'),
+        ('PASSPORT', 'Pasaporte'),
+        ('DRIVER_LICENSE', 'Licencia de Conducir'),
+    ]
+    document_type = forms.ChoiceField(
+        label="Tipo de Documento",
+        choices=DOCUMENT_TYPES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    # Campo para seleccionar el país
+    COUNTRIES = [
+        ('CO', 'Colombia'),
+        ('US', 'Estados Unidos'),
+        ('MX', 'México'),
+        # Agrega más países según sea necesario
+    ]
+    country = forms.ChoiceField(
+        label="País",
+        choices=COUNTRIES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    # Campo para ingresar el número de documento
+    document_number = forms.CharField(
+        label="Número de Documento",
+        max_length=50,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
 
 class EmailForm(forms.Form):
     subject = forms.CharField(
@@ -133,29 +178,74 @@ class ClientForm(forms.ModelForm):
 
 from django import forms
 from .models import Account
+from django import forms
+from .models import Account
+from django.core.validators import MinValueValidator
+
+from django import forms
+from .models import Account
+from django.core.validators import MinValueValidator
 
 class AccountForm(forms.ModelForm):
     initial_deposit = forms.DecimalField(
-        max_digits=10,
+        required=False,
+        min_value=Decimal('0'),
         decimal_places=2,
-        min_value=0,
-        label="Depósito Inicial",
-        help_text="Monto mínimo para apertura: $0"
+        label='Depósito Inicial',
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+
+    company_nit = forms.CharField(
+        required=False,
+        max_length=20,
+        label='NIT de la Empresa',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    company_name = forms.CharField(
+        required=False,
+        max_length=100,
+        label='Nombre de la Empresa',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    credit_limit = forms.DecimalField(
+        required=False,
+        min_value=Decimal('0'),
+        decimal_places=2,
+        label='Cupo de Crédito',
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
 
     class Meta:
         model = Account
         fields = ['account_type']
         widgets = {
-            'account_type': forms.Select(attrs={'class': 'form-select'}),
+            'account_type': forms.Select(attrs={'class': 'form-control'})
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['account_type'].widget.attrs.update({
-            'class': 'form-control',
-            'required': 'required'
-        })
+    def clean(self):
+        cleaned_data = super().clean()
+        account_type = cleaned_data.get('account_type')
+
+        if account_type:
+            if account_type.startswith('SAVINGS_'):
+                initial_deposit = cleaned_data.get('initial_deposit')
+                if initial_deposit is None or initial_deposit < Decimal('50000'):
+                    raise forms.ValidationError('Las cuentas de ahorro requieren un depósito inicial mínimo de $50,000')
+
+                if account_type == 'SAVINGS_NOMINA':
+                    if not cleaned_data.get('company_nit'):
+                        raise forms.ValidationError('El NIT de la empresa es requerido para cuentas nómina')
+                    if not cleaned_data.get('company_name'):
+                        raise forms.ValidationError('El nombre de la empresa es requerido para cuentas nómina')
+
+            elif account_type == 'CHECKING':
+                credit_limit = cleaned_data.get('credit_limit')
+                if credit_limit is None or credit_limit <= 0:
+                    raise forms.ValidationError('Debe especificar un cupo de crédito válido para cuenta corriente')
+
+        return cleaned_data
 
 class AppointmentForm(forms.ModelForm):
     class Meta:

@@ -10,11 +10,20 @@ import random
 from django.conf import settings
 from django.utils import timezone
 from decimal import Decimal, ROUND_HALF_UP
+from django.core.exceptions import ValidationError
+from django.db.models import Q
+from django.core.validators import MinValueValidator, RegexValidator
 
 
+
+from django.db import models
+from django.core.validators import MinValueValidator
+from django.utils import timezone
+import random
+from decimal import Decimal
 
 class Client(models.Model):
-    cardId = models.CharField(max_length=20, unique=True, null=True)  # Asegúrate de que exista este campo
+    cardId = models.CharField(max_length=20, unique=True, null=True)
     name = models.CharField(max_length=100)
     email = models.EmailField()
     phone_number = models.CharField(max_length=15)
@@ -22,66 +31,144 @@ class Client(models.Model):
     imageSave = models.ImageField(upload_to='client_photos/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
-
-
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse('blog:client_detail', args=[self.id])
 
-    
     class Meta:
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['-created_at']),
         ]
-    
-
-    
-    def get_account_number(self):
-        try:
-            return self.account.numberAccount
-        except Account.DoesNotExist:
-            return 'No Account'
-
-    def get_type(self):
-        try:
-            return self.account.account_type
-        except Account.DoesNotExist:
-            return 'NOT TYPE'
 
 class Account(models.Model):
     ACCOUNT_TYPES = [
-        ('SAVINGS', 'Cuenta de Ahorros'),
+        ('SAVINGS_NORMAL', 'Cuenta de Ahorros Normal'),
+        ('SAVINGS_NOMINA', 'Cuenta Nómina'),
+        ('SAVINGS_AMIGA', 'Cuenta Amiga'),
         ('CHECKING', 'Cuenta Corriente'),
-        ('FIXED', 'Depósito a Plazo Fijo'),
-        ('SALARY', 'Cuenta Sueldo')
     ]
 
-    client = models.OneToOneField(Client, on_delete=models.CASCADE)
-    numberAccount = models.CharField(max_length=20, unique=True)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='accounts')
     account_type = models.CharField(max_length=50, choices=ACCOUNT_TYPES)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    numberAccount = models.CharField(max_length=20, unique=True, editable=False)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"Account {self.numberAccount} - {self.client.name}"
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    # Campos específicos para cuenta corriente
+    cvv = models.CharField(max_length=3, null=True, blank=True)
+    expiration_date = models.DateField(null=True, blank=True)
+    credit_limit = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        verbose_name='Límite de Crédito'
+    )
+    
+    # Campos específicos para cuenta nómina
+    company_nit = models.CharField(
+        max_length=20, 
+        null=True, 
+        blank=True,
+        verbose_name='NIT de la Empresa'
+    )
+    company_name = models.CharField(
+        max_length=100, 
+        null=True, 
+        blank=True,
+        verbose_name='Nombre de la Empresa'
+    )
+    
+    # Campo para clave virtual (solo cuentas de ahorro)
+    virtual_key = models.CharField(
+        max_length=6, 
+        null=True, 
+        blank=True,
+        verbose_name='Clave Virtual'
+    )
 
     def generate_account_number(self):
+        prefix = {
+            'SAVINGS_NORMAL': '10',
+            'SAVINGS_NOMINA': '11',
+            'SAVINGS_AMIGA': '12',
+            'CHECKING': '20',
+        }.get(self.account_type, '00')
+        
         while True:
-            number = ''.join([str(random.randint(0, 9)) for _ in range(10)])
+            number = f"{prefix}{''.join([str(random.randint(0, 9)) for _ in range(8)])}"
             if not Account.objects.filter(numberAccount=number).exists():
                 return number
 
+    def generate_cvv(self):
+        return ''.join([str(random.randint(0, 9)) for _ in range(3)])
+
+    def generate_expiration_date(self):
+        return datetime.now().date() + timedelta(days=1825)  # 5 años
+
+    def generate_virtual_key(self):
+        return ''.join([str(random.randint(0, 9)) for _ in range(6)])
+
+    def validate_account_limit(self, client):
+        """Validar límites de cuenta por tipo"""
+        if self.account_type.startswith('SAVINGS_'):
+            savings_count = Account.objects.filter(
+                client=client,
+                account_type__in=['SAVINGS_NORMAL', 'SAVINGS_NOMINA', 'SAVINGS_AMIGA']
+            ).count()
+            if savings_count > 0:
+                raise ValidationError('El cliente ya tiene una cuenta de ahorros activa.')
+        
+        elif self.account_type == 'CHECKING':
+            checking_count = Account.objects.filter(
+                client=client,
+                account_type='CHECKING'
+            ).count()
+            if checking_count > 0:
+                raise ValidationError('El cliente ya tiene una cuenta corriente activa.')
+
+    def clean(self):
+        super().clean()
+        # La validación de límites se moverá a la vista
+
     def save(self, *args, **kwargs):
-        if not self.numberAccount:
+        if not self.pk:  # Solo para cuentas nuevas
             self.numberAccount = self.generate_account_number()
+            
+            if self.account_type.startswith('SAVINGS_'):
+                self.virtual_key = self.generate_virtual_key()
+            
+            elif self.account_type == 'CHECKING':
+                self.cvv = self.generate_cvv()
+                self.expiration_date = self.generate_expiration_date()
+        
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.get_account_type_display()} - {self.numberAccount}"
+
+    def get_account_type_display(self):
+        """
+        Método personalizado para manejar casos donde el tipo de cuenta pudiera no coincidir
+        """
+        try:
+            return dict(self.ACCOUNT_TYPES)[self.account_type]
+        except KeyError:
+            # Si el tipo no existe en las opciones actuales, devolver un valor por defecto
+            return "Tipo de cuenta no especificado"
+
+    def is_savings_account(self):
+        """
+        Verifica si la cuenta es de cualquier tipo de ahorro
+        """
+        return self.account_type in ['SAVINGS_NORMAL', 'SAVINGS_NOMINA', 'SAVINGS_AMIGA']
+
+    class Meta:
+        ordering = ['-created_at']
 
 class Loan(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
@@ -149,7 +236,22 @@ class Loan(models.Model):
         
         return monthly_payment.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
+    def clean(self):
+        # Verificar préstamos activos
+        if not self.pk:  # Solo para préstamos nuevos
+            active_loans = Loan.objects.filter(
+                client=self.client,
+                status__in=['PENDING', 'ACTIVE']
+            ).exists()
+            
+            if active_loans:
+                raise ValidationError(
+                    'El cliente tiene un préstamo activo pendiente de pago. '
+                    'Debe cancelar el préstamo actual antes de solicitar uno nuevo.'
+                )
+
     def save(self, *args, **kwargs):
+        self.clean()
         if not self.pk:  # Only on creation
             self.remaining_balance = self.amount
             self.monthly_payment = self.calculate_monthly_payment()

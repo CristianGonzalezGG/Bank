@@ -66,46 +66,50 @@
             <!-- Información de la cuenta -->
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Información de Cuenta</h5>
-                    {% if not model.account %}
-                        <a href="{% url 'blog:create_account' client.id %}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Crear Cuenta
-                        </a>
-                    {% endif %}
+                    <h5 class="mb-0">Cuentas</h5>
+                    <a href="{% url 'blog:create_account' client.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Nueva Cuenta
+                    </a>
                 </div>
                 <div class="card-body">
-                    {% if model.account %}
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0">Número de Cuenta</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{ model.account.numberAccount }}</p>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0">Tipo de Cuenta</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{ model.account.account_type }}</p>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0">Saldo Actual</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">${{ model.account.balance|floatformat:2 }}</p>
-                            </div>
+                    {% if accounts %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de Cuenta</th>
+                                        <th>Número de Cuenta</th>
+                                        <th>Saldo</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for account in accounts %}
+                                    <tr>
+                                        <td>{{ account.get_account_type_display }}</td>
+                                        <td>{{ account.numberAccount }}</td>
+                                        <td>${{ account.balance|floatformat:2 }}</td>
+                                        <td>
+                                            {% if account.is_active %}
+                                                <span class="badge bg-success">Activa</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Inactiva</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'blog:manage_account' account.id %}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-cog me-1"></i> Gestionar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-piggy-bank fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">Este cliente aún no tiene una cuenta bancaria.</p>
-                            <p class="text-muted">Puede crear una nueva cuenta haciendo clic en el botón superior.</p>
+                        <div class="alert alert-info">
+                            Este cliente no tiene cuentas registradas.
                         </div>
                     {% endif %}
                 </div>
@@ -171,4 +175,267 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para detalles de cuenta -->
+<div class="modal fade" id="accountDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Detalles de la Cuenta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="accountDetails" class="p-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para clave virtual -->
+<div class="modal fade" id="virtualKeyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Modificar Clave Virtual</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="virtualKeyForm">
+                    <div class="mb-3">
+                        <label for="newVirtualKey" class="form-label">Nueva Clave Virtual</label>
+                        <input type="password" class="form-control" id="newVirtualKey" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmVirtualKey" class="form-label">Confirmar Clave Virtual</label>
+                        <input type="password" class="form-control" id="confirmVirtualKey" required>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">Actualizar Clave</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos CSS personalizados -->
+<style>
+.action-btn:hover .fa-spin-hover {
+    animation: fa-spin 1s infinite linear;
+}
+
+.animate {
+    animation-duration: 0.2s;
+    animation-fill-mode: both;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(0.5rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.slideIn {
+    animation-name: slideIn;
+}
+
+.dropdown-item {
+    transition: all 0.2s ease;
+    padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(3px);
+}
+
+.dropdown-item i {
+    margin-right: 8px;
+    width: 20px;
+}
+
+.modal.fade .modal-dialog {
+    transition: transform 0.2s ease-out;
+    transform: scale(0.98);
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+</style>
+
+<!-- Scripts JavaScript -->
+<script>
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+async function showAccountDetails(accountId) {
+    const modal = new bootstrap.Modal(document.getElementById('accountDetailsModal'));
+    const detailsContainer = document.getElementById('accountDetails');
+    
+    detailsContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+    modal.show();
+    
+    try {
+        const response = await fetch(`/blog/account/${accountId}/details/`);
+        const data = await response.json();
+        
+        if (data.success) {
+            detailsContainer.innerHTML = `
+                <div class="account-details">
+                    <div class="mb-3">
+                        <strong>Número de Cuenta:</strong>
+                        <span class="text-muted">${data.data.number}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tipo de Cuenta:</strong>
+                        <span class="text-muted">${data.data.type}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Saldo:</strong>
+                        <span class="text-muted">$${data.data.balance.toFixed(2)}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tasa de Interés:</strong>
+                        <span class="text-muted">${data.data.interest_rate}%</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Estado:</strong>
+                        <span class="badge ${data.data.is_active ? 'bg-success' : 'bg-danger'}">
+                            ${data.data.is_active ? 'Activa' : 'Inactiva'}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Fecha de Creación:</strong>
+                        <span class="text-muted">${data.data.created_at}</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            detailsContainer.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+        }
+    } catch (error) {
+        detailsContainer.innerHTML = `<div class="alert alert-danger">Error al cargar los detalles</div>`;
+    }
+}
+
+async function updateVirtualKey(accountId) {
+    const modal = new bootstrap.Modal(document.getElementById('virtualKeyModal'));
+    const form = document.getElementById('virtualKeyForm');
+    
+    modal.show();
+    
+    form.onsubmit = async function(e) {
+        e.preventDefault();
+        const newKey = document.getElementById('newVirtualKey').value;
+        const confirmKey = document.getElementById('confirmVirtualKey').value;
+        
+        if (newKey !== confirmKey) {
+            showToast('error', 'Las claves no coinciden');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/blog/account/${accountId}/virtual-key/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ new_key: newKey })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                showToast('success', data.message);
+                modal.hide();
+            } else {
+                showToast('error', data.message);
+            }
+        } catch (error) {
+            showToast('error', 'Error al actualizar la clave virtual');
+        }
+    };
+}
+
+async function toggleAccountStatus(accountId, currentStatus) {
+    if (!confirm('¿Está seguro de cambiar el estado de la cuenta?')) return;
+    
+    try {
+        const response = await fetch(`/blog/account/${accountId}/status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ is_active: !currentStatus })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showToast('success', data.message);
+            location.reload();
+        } else {
+            showToast('error', data.message);
+        }
+    } catch (error) {
+        showToast('error', 'Error al cambiar el estado de la cuenta');
+    }
+}
+
+async function deleteAccount(accountId) {
+    if (!confirm('¿Está seguro de eliminar esta cuenta? Esta acción no se puede deshacer.')) return;
+    
+    try {
+        const response = await fetch(`/blog/account/${accountId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showToast('success', data.message);
+            location.reload();
+        } else {
+            showToast('error', data.message);
+        }
+    } catch (error) {
+        showToast('error', 'Error al eliminar la cuenta');
+    }
+}
+
+// Función auxiliar para mostrar notificaciones
+function showToast(type, message) {
+    const toastContainer = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+</script>
+
+<!-- Agregar el contenedor para los toasts -->
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>
 {% endblock %}

@@ -13,9 +13,15 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Clientes</h2>
-                <a href="{% url 'blog:create_client' %}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Nuevo Cliente
-                </a>
+                <div>
+                    <small class="text-muted me-3">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        Última actualización: <span id="lastUpdate">{% now "H:i:s" %}</span>
+                    </small>
+                    <a href="{% url 'blog:create_client' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Nuevo Cliente
+                    </a>
+                </div>
             </div>
             
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -43,14 +49,32 @@
                                     Creado: {{ client.created_at|date:"d/m/Y" }}
                                 </p>
                                 <div class="mt-2">
-                                    {% if client.account %}
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle me-1"></i>
-                                            Cuenta Activa
-                                        </span>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ client.account.get_account_type_display }}
-                                        </small>
+                                    {% if client.accounts.exists %}
+                                        {% with account=client.accounts.first %}
+                                            {% if account.is_active %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    Cuenta Activa
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times-circle me-1"></i>
+                                                    Cuenta Inactiva
+                                                </span>
+                                            {% endif %}
+                                            <small class="text-muted d-block mt-1">
+                                                {% with account_type=account.get_account_type_display %}
+                                                    {% if account_type %}
+                                                        {{ account_type }}
+                                                    {% else %}
+                                                        Tipo no especificado
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </small>
+                                            <small class="text-muted d-block">
+                                                Saldo: ${{ account.balance|floatformat:2 }}
+                                            </small>
+                                        {% endwith %}
                                     {% else %}
                                         <span class="badge bg-warning">
                                             <i class="fas fa-exclamation-circle me-1"></i>
@@ -68,10 +92,12 @@
                                 <a href="{{ client.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-eye me-1"></i>Ver Detalles
                                 </a>
-                                {% if client.account %}
-                                    <a href="#" class="btn btn-outline-success btn-sm">
-                                        <i class="fas fa-money-bill-wave me-1"></i>Ver Cuenta
-                                    </a>
+                                {% if client.accounts.exists %}
+                                    {% with account=client.accounts.first %}
+                                        <a href="{% url 'blog:manage_account' account.id %}" class="btn btn-outline-success btn-sm">
+                                            <i class="fas fa-cog me-1"></i>Gestionar Cuenta
+                                        </a>
+                                    {% endwith %}
                                 {% endif %}
                             </div>
                         </div>
@@ -132,5 +158,19 @@
         border-radius: 50%; /* Hace que la imagen sea circular */
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar la página cada 30 segundos
+    setInterval(function() {
+        location.reload();
+    }, 30000);
+
+    // Actualizar el contador de tiempo
+    setInterval(function() {
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+    }, 1000);
+});
+</script>
 
 {% endblock %}

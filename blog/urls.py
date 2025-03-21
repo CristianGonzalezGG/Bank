@@ -13,6 +13,7 @@ app_name = 'blog'
 
 urlpatterns = [
     path('', views.home, name='home'),  
+    path('id-verification/', views.id_verification, name='id_verification'),
     path('email-sent-success/', views.sent_email_success, name="email_sent_success"),
     path('send-email/', views.send_email_view, name='send_email'),
     path('register/', views.register_view, name='register'), 
@@ -54,4 +55,11 @@ urlpatterns = [
     path('proyecciones/', views.proyecciones, name='proyecciones'),
     path('send-projection-email/', views.send_projection_email, name='send_projection_email'),
     path('crear-cliente/', create_client, name='create_client'),
+    path('client/<int:id>/', views.client_detail, name='client_detail'),
+    path('create-account/<int:client_id>/', views.create_account, name='create_account'),
+    path('account/<int:account_id>/status/', views.update_account_status, name='update_account_status'),
+    path('account/<int:account_id>/virtual-key/', views.update_virtual_key, name='update_virtual_key'),
+    path('account/<int:account_id>/details/', views.get_account_details, name='get_account_details'),
+    path('account/<int:account_id>/delete/', views.delete_account, name='delete_account'),
+    path('account/<int:account_id>/manage/', views.manage_account, name='manage_account'),
 ]

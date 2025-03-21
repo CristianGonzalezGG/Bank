@@ -3,98 +3,61 @@
 
 {% block extra_css %}
 <style>
-    .account-creation-container {
-        min-height: 80vh;
-        padding: 2rem;
+    body {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Arial', sans-serif;
     }
 
-    .account-card {
-        background: white;
+    .card {
         border-radius: 1rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
     }
 
-    .account-card:hover {
+    .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     }
 
-    .progress-steps {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 2rem;
-        position: relative;
-    }
-
-    .step {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #e9ecef;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        position: relative;
-        z-index: 1;
+    .form-control {
+        border-radius: 0.5rem;
+        border: 2px solid #e9ecef;
         transition: all 0.3s ease;
     }
 
-    .step.active {
+    .form-control:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 5px rgba(78, 115, 223, 0.5);
+    }
+
+    .btn-primary {
         background: #4e73df;
-        color: white;
+        border: none;
+        border-radius: 2rem;
+        transition: all 0.3s ease;
     }
 
-    .step.completed {
-        background: #1cc88a;
-        color: white;
+    .btn-primary:hover {
+        background: #2e59d9;
+        transform: translateY(-2px);
     }
 
-    .step-connector {
-        position: absolute;
-        top: 20px;
-        left: 40px;
-        right: 40px;
-        height: 2px;
+    .btn-outline-secondary {
+        border-radius: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
         background: #e9ecef;
+        transform: translateY(-2px);
     }
 
-    .step-connector-progress {
-        height: 100%;
-        background: #4e73df;
-        width: 0;
-        transition: width 0.5s ease;
-    }
-
-    .form-step {
-        display: none;
-        animation: slideIn 0.5s ease forwards;
-    }
-
-    .form-step.active {
-        display: block;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .floating-input {
+    .floating-label {
         position: relative;
         margin-bottom: 1.5rem;
     }
 
-    .floating-input input {
+    .floating-label input {
         width: 100%;
         padding: 0.8rem;
         border: 2px solid #e9ecef;
@@ -103,7 +66,7 @@
         transition: all 0.3s ease;
     }
 
-    .floating-input label {
+    .floating-label label {
         position: absolute;
         left: 1rem;
         top: 50%;
@@ -115,43 +78,62 @@
         pointer-events: none;
     }
 
-    .floating-input input:focus,
-    .floating-input input:not(:placeholder-shown) {
+    .floating-label input:focus,
+    .floating-label input:not(:placeholder-shown) {
         border-color: #4e73df;
     }
 
-    .floating-input input:focus + label,
-    .floating-input input:not(:placeholder-shown) + label {
+    .floating-label input:focus + label,
+    .floating-label input:not(:placeholder-shown) + label {
         top: 0;
         font-size: 0.8rem;
         color: #4e73df;
     }
 
-    .btn-next,
-    .btn-prev {
-        padding: 0.8rem 2rem;
-        border-radius: 2rem;
+    .account-type-card {
+        cursor: pointer;
         transition: all 0.3s ease;
+        border: 2px solid transparent;
+        padding: 1.5rem;
+        border-radius: 1rem;
     }
 
-    .btn-next {
-        background: #4e73df;
-        color: white;
+    .account-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
 
-    .btn-prev {
-        background: #e9ecef;
-        color: #6c757d;
+    .account-type-card.selected {
+        border-color: #4e73df;
+        background-color: #f8f9fc;
     }
 
-    .btn-next:hover {
-        background: #2e59d9;
-        transform: translateX(5px);
+    .account-features {
+        list-style: none;
+        padding-left: 0;
     }
 
-    .btn-prev:hover {
-        background: #dde2e6;
-        transform: translateX(-5px);
+    .account-features li {
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .account-features li i {
+        margin-right: 0.5rem;
+        color: #1cc88a;
+    }
+
+    .interest-rate {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4e73df;
+    }
+
+    .account-icon {
+        font-size: 2.5rem;
+        color: #4e73df;
+        margin-bottom: 1rem;
     }
 
     .success-animation {
@@ -187,98 +169,81 @@
             transform: scale3d(1.1, 1.1, 1);
         }
     }
-
-    .account-type-card {
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-
-    .account-type-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-
-    .account-type-card.selected {
-        border-color: #4e73df;
-        background-color: #f8f9fc;
-    }
-
-    .account-features {
-        list-style: none;
-        padding-left: 0;
-    }
-
-    .account-features li {
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .account-features li i {
-        margin-right: 0.5rem;
-        color: #1cc88a;
-    }
-
-    .interest-rate {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #4e73df;
-    }
-
-    .account-icon {
-        font-size: 2.5rem;
-        color: #4e73df;
-        margin-bottom: 1rem;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container py-4">
-    <div class="row justify-content-center">
+    <div class="row">
         <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Crear Nueva Cuenta para {{ client.name }}</h4>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Crear Nueva Cuenta para {{ client.name }}</h4>
                 </div>
                 <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if existing_accounts %}
+                        <div class="alert alert-info">
+                            <h5>Cuentas Existentes:</h5>
+                            <ul>
+                            {% for account in existing_accounts %}
+                                <li>{{ account.get_account_type_display }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="alert alert-warning">
+                        <h5>Restricciones:</h5>
+                        <ul>
+                            <li>Solo se permite una cuenta de ahorros (Normal, Nómina o Amiga) por cliente</li>
+                            <li>Solo se permite una cuenta corriente por cliente</li>
+                            <li>Depósito mínimo para cuentas de ahorro: $50,000</li>
+                            <li>Depósito mínimo para cuenta corriente: $100,000</li>
+                        </ul>
+                    </div>
+
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="id_account_type">Tipo de Cuenta</label>
-                                    {{ form.account_type }}
-                                    {% if form.account_type.errors %}
-                                        <div class="invalid-feedback">
-                                            {{ form.account_type.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="id_initial_deposit">Depósito Inicial</label>
-                                    {{ form.initial_deposit }}
-                                    {% if form.initial_deposit.errors %}
-                                        <div class="invalid-feedback">
-                                            {{ form.initial_deposit.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
+                        <div class="mb-3">
+                            <label for="{{ form.account_type.id_for_label }}" class="form-label">Tipo de Cuenta</label>
+                            {{ form.account_type }}
+                        </div>
+
+                        <div id="savings_fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="{{ form.initial_deposit.id_for_label }}" class="form-label">Depósito Inicial</label>
+                                {{ form.initial_deposit }}
                             </div>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus-circle me-2"></i>Crear Cuenta
-                            </button>
-                            <a href="{% url 'blog:client_detail' client.id %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Volver
-                            </a>
+                        <div id="nomina_fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="{{ form.company_nit.id_for_label }}" class="form-label">NIT de la Empresa</label>
+                                {{ form.company_nit }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.company_name.id_for_label }}" class="form-label">Nombre de la Empresa</label>
+                                {{ form.company_name }}
+                            </div>
                         </div>
+
+                        <div id="checking_fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="{{ form.credit_limit.id_for_label }}" class="form-label">Cupo de Crédito</label>
+                                {{ form.credit_limit }}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Crear Cuenta</button>
                     </form>
                 </div>
             </div>
@@ -303,4 +268,24 @@
         })
 })()
 </script>
-{% endblock %} 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const accountTypeSelect = document.getElementById('{{ form.account_type.id_for_label }}');
+    const savingsFields = document.getElementById('savings_fields');
+    const nominaFields = document.getElementById('nomina_fields');
+    const checkingFields = document.getElementById('checking_fields');
+
+    function updateFields() {
+        const selectedType = accountTypeSelect.value;
+        
+        savingsFields.style.display = selectedType.startsWith('SAVINGS_') ? 'block' : 'none';
+        nominaFields.style.display = selectedType === 'SAVINGS_NOMINA' ? 'block' : 'none';
+        checkingFields.style.display = selectedType === 'CHECKING' ? 'block' : 'none';
+    }
+
+    accountTypeSelect.addEventListener('change', updateFields);
+    updateFields();
+});
+</script>
+{% endblock %}

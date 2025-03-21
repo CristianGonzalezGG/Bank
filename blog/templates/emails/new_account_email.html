@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #4e73df;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f8f9fc;
+            border: 1px solid #e3e6f0;
+        }
+        .account-details {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border: 1px solid #e3e6f0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #858796;
+        }
+        .button {
+            background-color: #4e73df;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .important {
+            color: #4e73df;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>¡Bienvenido a {{ bank_name }}!</h1>
+    </div>
+    
+    <div class="content">
+        <p>Estimado(a) {{ client.name }},</p>
+        
+        <p>Nos complace informarle que su cuenta ha sido creada exitosamente.</p>
+        
+        <div class="account-details">
+            <h2>Detalles de su cuenta:</h2>
+            <p><strong>Tipo de Cuenta:</strong> {{ account.get_account_type_display }}</p>
+            <p><strong>Número de Cuenta:</strong> {{ account.numberAccount }}</p>
+            <p><strong>Depósito Inicial:</strong> ${{ initial_deposit|floatformat:2 }}</p>
+            <p><strong>Tasa de Interés:</strong> {{ account.interest_rate }}%</p>
+            {% if account.credit_limit %}
+            <p><strong>Límite de Crédito:</strong> ${{ account.credit_limit|floatformat:2 }}</p>
+            {% endif %}
+            <p class="important">Contraseña Virtual: {{ account.virtual_password }}</p>
+        </div>
+
+        <p><strong>Importante:</strong> Por seguridad, le recomendamos cambiar su contraseña virtual en su primera visita a nuestra sucursal.</p>
+        
+        <p>Si tiene alguna pregunta o necesita asistencia, no dude en contactarnos:</p>
+        <ul>
+            <li>Teléfono: (123) 456-7890</li>
+            <li>Email: soporte@bancoeldorado.com</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>{{ bank_name }} - Todos los derechos reservados © {{ current_year }}</p>
+        <p>Este es un correo automático, por favor no responda a este mensaje.</p>
+    </div>
+</body>
+</html>

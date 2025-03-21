@@ -1,0 +1,92 @@
+.custom-button {
+    background-color: #ffffff00;
+    color: #fff;
+    width: 8.5em;
+    height: 2.9em;
+    border: #3654ff 0.2em solid;
+    border-radius: 11px;
+    text-align: right;
+    transition: all 0.6s ease;
+}
+
+.custom-button:hover {
+    background-color: #3654ff;
+    cursor: pointer;
+}
+  
+.custom-button svg {
+    width: 1.6em;
+    margin: -0.2em 0.8em 1em;
+    position: absolute;
+    display: flex;
+    transition: all 0.6s ease;
+}
+  
+.custom-button:hover svg {
+    transform: translateX(5px);
+}
+  
+.custom-text {
+    margin: 0 1.5em;
+}
+
+/* admin.css */
+.gradient-custom-2 {
+    /* fallback for old browsers */
+    background: #fccb90;
+    
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right, #9c9e8e, #fcd34d); /* Para navegadores Webkit */
+    background: linear-gradient(to right, #9c9e8e, #fcd34d); /* Estándar */
+    
+    
+    
+    }
+    
+    @media (min-width: 768px) {
+    .gradient-form {
+    height: 100vh !important;
+    }
+    }
+    @media (min-width: 769px) {
+    .gradient-custom-2 {
+    border-top-right-radius: .3rem;
+    border-bottom-right-radius: .3rem;
+    }
+    }
+/* Estilo para el footer utilizando Flexbox */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#content {
+    flex: 1; /* Permite que el contenido ocupe el espacio restante */
+}
+
+footer {
+    background: #333; /* Color verde para el pie de página */
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Si decides usar position: fixed, puedes añadir lo siguiente en lugar de lo anterior */
+/* footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: #4CAF50; 
+    color: white;
+    text-align: center;
+    padding: 20px */
+
+
+
+

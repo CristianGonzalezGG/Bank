@@ -38,8 +38,11 @@ SECRET_KEY = 'django-insecure-b2w*qp1xgh()g@c9*gc*z8a_4#o)12efabp9+7^a=qo+gnhkg+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+ALLOWED_HOSTS = ['.ngrok-free.app', '127.0.0.1', 'localhost']
 
-ALLOWED_HOSTS = []
+
+
+
 
 
 # Application definition
@@ -141,7 +144,16 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'blog', 'static'),
 ]
+# Configuración de archivos estáticos
+STATIC_URL = '/static/'
 
+# Ruta donde se recopilarán los archivos estáticos
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Directorios adicionales donde Django buscará archivos estáticos
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -150,6 +162,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/'  # Cambia '/login' a la ruta que usas para la página de login
+import os
+
+ID_ANALYZER_API_KEY = os.getenv("J7RhZdWyHk2xrrWDLFW5YyswzvKfu7R4", "0H99fAONyS6mpUlY5iK51YGLTVeX8pKG")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

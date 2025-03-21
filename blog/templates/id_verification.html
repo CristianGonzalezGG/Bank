@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Verificación de ID</h2>
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <!-- Campo para subir la imagen del ID -->
+        <div class="mb-3">
+            <label for="id_image" class="form-label">Subir imagen de ID</label>
+            {{ form.id_image }}
+            <div class="invalid-feedback">
+                Por favor, sube una imagen válida.
+            </div>
+        </div>
+
+        <!-- Campo para seleccionar el tipo de documento -->
+        <div class="mb-3">
+            <label for="document_type" class="form-label">Tipo de Documento</label>
+            {{ form.document_type }}
+            <div class="invalid-feedback">
+                Por favor, selecciona un tipo de documento.
+            </div>
+        </div>
+
+        <!-- Campo para seleccionar el país -->
+        <div class="mb-3">
+            <label for="country" class="form-label">País</label>
+            {{ form.country }}
+            <div class="invalid-feedback">
+                Por favor, selecciona un país.
+            </div>
+        </div>
+
+        <!-- Campo para ingresar el número de documento -->
+        <div class="mb-3">
+            <label for="document_number" class="form-label">Número de Documento</label>
+            {{ form.document_number }}
+            <div class="invalid-feedback">
+                Por favor, ingresa un número de documento válido.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Verificar ID</button>
+    </form>
+
+    {% if result %}
+    <div class="mt-4">
+        <h3>Resultados de la Verificación</h3>
+        <pre>{{ result|pprint }}</pre>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="alert alert-danger mt-4">
+        <strong>Error:</strong> {{ error }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

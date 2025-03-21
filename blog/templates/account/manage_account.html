@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gestionar Cuenta - {{ account.numberAccount }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Tarjeta Principal de la Cuenta -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-university me-2"></i>
+                Información de la Cuenta
+            </h5>
+            <span class="badge {% if account.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                {{ account.is_active|yesno:"Activa,Inactiva" }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="text-muted">Número de Cuenta</label>
+                        <h5>{{ account.numberAccount }}</h5>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted">Tipo de Cuenta</label>
+                        <h5>{{ account.get_account_type_display }}</h5>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="text-muted">Saldo Actual</label>
+                        <h5>${{ account.balance|floatformat:2 }}</h5>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted">Tasa de Interés</label>
+                        <h5>{{ account.interest_rate }}%</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones de la Cuenta -->
+    <div class="row">
+        <!-- Cambiar Estado -->
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-toggle-on me-2"></i>Estado de la Cuenta</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_status">
+                        <input type="hidden" name="status" value="{{ account.is_active|yesno:'false,true' }}">
+                        <button type="submit" class="btn btn-{{ account.is_active|yesno:'danger,success' }} w-100">
+                            {% if account.is_active %}
+                                <i class="fas fa-ban me-2"></i>Desactivar Cuenta
+                            {% else %}
+                                <i class="fas fa-check-circle me-2"></i>Activar Cuenta
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cambiar Clave Virtual -->
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-warning">
+                    <h6 class="mb-0"><i class="fas fa-key me-2"></i>Clave Virtual</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="virtualKeyForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_virtual_key">
+                        <div class="mb-3">
+                            <input type="password" 
+                                   name="new_virtual_key" 
+                                   class="form-control" 
+                                   placeholder="Nueva clave virtual"
+                                   required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" 
+                                   name="confirm_virtual_key" 
+                                   class="form-control" 
+                                   placeholder="Confirmar clave virtual"
+                                   required>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="fas fa-save me-2"></i>Actualizar Clave
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eliminar Cuenta -->
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="fas fa-trash-alt me-2"></i>Eliminar Cuenta</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" onsubmit="return confirm('¿Está seguro de eliminar esta cuenta? Esta acción no se puede deshacer.')">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="fas fa-trash-alt me-2"></i>Eliminar Cuenta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Transacciones -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h6 class="mb-0"><i class="fas fa-history me-2"></i>Historial de Transacciones</h6>
+        </div>
+        <div class="card-body">
+            {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.date }}</td>
+                                <td>{{ transaction.type }}</td>
+                                <td>${{ transaction.amount }}</td>
+                                <td>{{ transaction.status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No hay transacciones registradas para esta cuenta.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Mensajes Toast -->
+{% if messages %}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    {% for message in messages %}
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header {% if message.tags == 'success' %}bg-success{% else %}bg-danger{% endif %} text-white">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+            <strong class="me-auto">{{ message.tags|title }}</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar todos los toasts
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    var toastList = toastElList.map(function(toastEl) {
+        return new bootstrap.Toast(toastEl, {
+            autohide: true,
+            delay: 3000
+        })
+    });
+
+    // Validación del formulario de clave virtual
+    document.getElementById('virtualKeyForm').addEventListener('submit', function(e) {
+        var newKey = this.querySelector('[name="new_virtual_key"]').value;
+        var confirmKey = this.querySelector('[name="confirm_virtual_key"]').value;
+
+        if (newKey !== confirmKey) {
+            e.preventDefault();
+            alert('Las claves no coinciden');
+            return false;
+        }
+
+        if (newKey.length < 6) {
+            e.preventDefault();
+            alert('La clave debe tener al menos 6 caracteres');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %} 

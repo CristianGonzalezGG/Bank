@@ -59,6 +59,65 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 import os
 import uuid
+import requests
+from django.conf import settings
+from django.shortcuts import render
+from django.http import JsonResponse
+import requests
+from django.conf import settings
+from django.shortcuts import render
+from django.http import JsonResponse
+from .forms import IDVerificationForm  # Asegúrate de importar el formulario
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ValidationError
+
+def id_verification(request):
+    if request.method == 'POST':
+        form = IDVerificationForm(request.POST, request.FILES)  # Asegúrate de incluir request.FILES
+        if form.is_valid():
+            # Obtener los datos del formulario
+            id_image = form.cleaned_data['id_image']
+            document_type = form.cleaned_data['document_type']
+            country = form.cleaned_data['country']
+            document_number = form.cleaned_data['document_number']
+
+            # URL de la API de ID Analyzer
+            url = "https://api.idanalyzer.com/v1/verify"
+
+            # Parámetros de la solicitud
+            files = {'file': id_image}
+            data = {
+                'apikey': settings.ID_ANALYZER_API_KEY,
+                'authenticate': 'true',  # Verificar autenticidad del documento
+                'outputface': 'true',   # Extraer la cara del documento
+                'document_type': document_type,  # Tipo de documento
+                'country': country,  # País
+                'document_number': document_number,  # Número de documento
+            }
+
+            # Hacer la solicitud a la API
+            try:
+                response = requests.post(url, files=files, data=data)
+                response.raise_for_status()  # Lanzar excepción si hay un error HTTP
+                result = response.json()
+
+                # Verificar si la respuesta es válida
+                if result.get('error'):
+                    return JsonResponse({'error': result['error']['message']}, status=400)
+
+                # Devolver los resultados de la verificación
+                return render(request, 'id_verification.html', {'result': result})
+
+            except requests.exceptions.RequestException as e:
+                return JsonResponse({'error': str(e)}, status=500)
+        else:
+            # Si el formulario no es válido, devuelve un error con más detalles
+            return JsonResponse({'error': 'Formulario inválido', 'errors': form.errors}, status=400)
+
+    else:
+        # Si es una solicitud GET, muestra el formulario vacío
+        form = IDVerificationForm()
+        return render(request, 'id_verification.html', {'form': form})
 def apertura_cuenta(request):
     if request.method == "POST":
         nombre = request.POST.get('nombre')
@@ -129,48 +188,92 @@ def search_client(request):
 
     return render(request, 'card_info.html', {'client': client, 'account': account, 'query': query})
 
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Client, Account
+from .forms import AccountForm
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.conf import settings
+from decimal import Decimal
+from .models import Client, Account
+from .forms import AccountForm
+
 @login_required
 def create_account(request, client_id):
     client = get_object_or_404(Client, id=client_id)
     
-    # Verificar si el cliente ya tiene una cuenta
-    if hasattr(client, 'account'):
-        messages.error(request, "Este cliente ya tiene una cuenta.")
-        return redirect('blog:client_detail', id=client_id)
-
     if request.method == 'POST':
         form = AccountForm(request.POST)
         if form.is_valid():
-            account = form.save(commit=False)
-            account.client = client
-            
-            # Establecer la tasa de interés según el tipo de cuenta
-            if account.account_type == 'SAVINGS':
-                account.interest_rate = 2.5
-            elif account.account_type == 'FIXED':
-                account.interest_rate = 4.0
-            else:
-                account.interest_rate = 0.5
-                
-            account.balance = form.cleaned_data['initial_deposit']
-            account.save()
+            try:
+                account = form.save(commit=False)
+                account.client = client
 
-            messages.success(
-                request, 
-                f'Cuenta creada exitosamente. Número de cuenta: {account.numberAccount}'
-            )
-            
-            return redirect('blog:client_detail', id=client_id)
-        else:
-            messages.error(request, "Error al crear la cuenta. Por favor, verifique los datos.")
+                # Validar límites de cuenta antes de guardar
+                account.validate_account_limit(client)
+
+                # Configurar campos específicos según el tipo de cuenta
+                if account.account_type.startswith('SAVINGS_'):
+                    account.balance = form.cleaned_data.get('initial_deposit', 0)
+                    account.virtual_key = account.generate_virtual_key()
+                    
+                    if account.account_type == 'SAVINGS_NOMINA':
+                        account.company_nit = form.cleaned_data.get('company_nit')
+                        account.company_name = form.cleaned_data.get('company_name')
+                
+                elif account.account_type == 'CHECKING':
+                    account.credit_limit = form.cleaned_data.get('credit_limit')
+                    account.cvv = account.generate_cvv()
+                    account.expiration_date = account.generate_expiration_date()
+                
+                account.save()
+                
+                success_message = [
+                    f'Cuenta creada exitosamente.',
+                    f'Número de cuenta: {account.numberAccount}'
+                ]
+
+                if account.virtual_key:
+                    success_message.append(f'Clave virtual: {account.virtual_key}')
+                if account.cvv:
+                    success_message.append(f'CVV: {account.cvv}')
+                if account.expiration_date:
+                    success_message.append(f'Fecha de vencimiento: {account.expiration_date.strftime("%m/%Y")}')
+
+                messages.success(request, '\n'.join(success_message))
+                return redirect('blog:client_detail', id=client_id)
+                
+            except ValidationError as e:
+                messages.error(request, str(e))
     else:
         form = AccountForm()
-
-    return render(request, 'account/create_account.html', {
+    
+    context = {
         'form': form,
-        'client': client
-    })
-
+        'client': client,
+        'existing_accounts': Account.objects.filter(client=client),
+        'can_create_savings': not Account.objects.filter(
+            client=client,
+            account_type__in=['SAVINGS_NORMAL', 'SAVINGS_NOMINA', 'SAVINGS_AMIGA']
+        ).exists(),
+        'can_create_checking': not Account.objects.filter(
+            client=client,
+            account_type='CHECKING'
+        ).exists(),
+    }
+    
+    return render(request, 'account/create_account.html', context)
 from django.shortcuts import render
 
 import base64
@@ -370,46 +473,38 @@ def bin_lookup(request):
     return render(request, 'card_info.html', {'card_data': card_data, 'error': error})
 
 
-
 @login_required
 def client_list(request):
-    clients = Client.objects.all().prefetch_related('account')
-    return render(request, 'client/client_list.html', {'clients': clients})
+    # Usar select_related y prefetch_related para optimizar las consultas
+    clients = Client.objects.prefetch_related(
+        'accounts'
+    ).order_by('-created_at')
+    
+    return render(request, 'client/client_list.html', {
+        'clients': clients
+    })
 
 
 
 
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Client, Account, Appointment
 
 @login_required
 def client_detail(request, id):
     client = get_object_or_404(Client, id=id)
-    account_number = client.get_account_number()
-    appointments = client.appointments.all()  # Obtener todas las citas del cliente
     
-    # Obtener el modelo de la tarjeta si existe
-    try:
-        account = Account.objects.get(client=client)
-        model = {
-            'client': client,
-            'account': account,
-            'account_number': account_number,
-        }
-    except Account.DoesNotExist:
-        model = {
-            'client': client,
-            'account_number': 'No Account',
-        }
-
+    # Obtener todas las cuentas asociadas al cliente usando el related_name
+    accounts = Account.objects.filter(client=client)
+    
     context = {
         'client': client,
-        'account_number': account_number,
-        'model': model,
-        'appointments': appointments,  # Pasar las citas al contexto
+        'accounts': accounts,  # Pasar las cuentas al contexto
     }
     
     return render(request, 'client/client_detail.html', context)
-
-
 # Vista de registro de usuario
 def register_view(request):
     if request.method == "POST":
@@ -481,9 +576,14 @@ def loan_create(request):
     if request.method == 'POST':
         form = LoanForm(request.POST)
         if form.is_valid():
-            loan = form.save()
-            messages.success(request, 'Préstamo creado exitosamente.')
-            return redirect('blog:loan_detail', id=loan.id)
+            try:
+                loan = form.save(commit=False)
+                loan.full_clean()
+                loan.save()
+                messages.success(request, 'Préstamo creado exitosamente.')
+                return redirect('blog:loan_detail', id=loan.id)
+            except ValidationError as e:
+                messages.error(request, str(e))
     else:
         form = LoanForm()
     return render(request, 'loan/loan_form.html', {'form': form})
@@ -808,4 +908,139 @@ def send_projection_email(request):
             return JsonResponse({'success': False, 'message': f'Error al enviar email: {str(e)}'})
             
     return JsonResponse({'success': False, 'message': 'Método no permitido o usuario no autenticado'})
+
+@require_http_methods(["POST"])
+@login_required
+def update_account_status(request, account_id):
+    try:
+        account = get_object_or_404(Account, id=account_id)
+        data = json.loads(request.body)
+        account.is_active = data.get('is_active', account.is_active)
+        account.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Estado de cuenta actualizado',
+            'is_active': account.is_active
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=400)
+
+@require_http_methods(["POST"])
+@login_required
+def update_virtual_key(request, account_id):
+    try:
+        account = get_object_or_404(Account, id=account_id)
+        data = json.loads(request.body)
+        new_key = data.get('new_key')
+        
+        if not new_key or len(new_key) < 6:
+            raise ValidationError('La clave virtual debe tener al menos 6 caracteres')
+            
+        account.virtual_password = new_key
+        account.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Clave virtual actualizada exitosamente'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=400)
+
+@require_http_methods(["GET"])
+@login_required
+def get_account_details(request, account_id):
+    try:
+        account = get_object_or_404(Account, id=account_id)
+        return JsonResponse({
+            'success': True,
+            'data': {
+                'id': account.id,
+                'number': account.numberAccount,
+                'type': account.get_account_type_display(),
+                'balance': float(account.balance),
+                'interest_rate': float(account.interest_rate),
+                'is_active': account.is_active,
+                'created_at': account.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'management_fee': float(account.management_fee) if account.management_fee else 0,
+                'credit_limit': float(account.credit_limit) if account.credit_limit else 0
+            }
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=400)
+
+@require_http_methods(["DELETE"])
+@login_required
+def delete_account(request, account_id):
+    try:
+        account = get_object_or_404(Account, id=account_id)
+        account.delete()
+        return JsonResponse({
+            'success': True,
+            'message': 'Cuenta eliminada exitosamente'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=400)
+
+@login_required
+def manage_account(request, account_id):
+    account = get_object_or_404(Account, id=account_id)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        try:
+            if action == 'update_status':
+                new_status = request.POST.get('status') == 'true'
+                account.is_active = new_status
+                account.save()
+                messages.success(request, 'Estado de cuenta actualizado exitosamente')
+                
+            elif action == 'update_virtual_key':
+                new_key = request.POST.get('new_virtual_key')
+                confirm_key = request.POST.get('confirm_virtual_key')
+                
+                if new_key != confirm_key:
+                    raise ValidationError('Las claves no coinciden')
+                if len(new_key) < 6:
+                    raise ValidationError('La clave debe tener al menos 6 caracteres')
+                    
+                account.virtual_password = new_key
+                account.save()
+                messages.success(request, 'Clave virtual actualizada exitosamente')
+                
+            elif action == 'delete':
+                client_id = account.client.id
+                account.delete()
+                messages.success(request, 'Cuenta eliminada exitosamente')
+                return redirect('blog:client_detail', id=client_id)
+                
+        except ValidationError as e:
+            messages.error(request, str(e))
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+        
+        return redirect('blog:manage_account', account_id=account_id)
+    
+    # Obtener historial de transacciones (si existe)
+    transactions = []  # Aquí puedes agregar la lógica para obtener transacciones si las tienes
+    
+    context = {
+        'account': account,
+        'transactions': transactions,
+    }
+    
+    return render(request, 'account/manage_account.html', context)
 
