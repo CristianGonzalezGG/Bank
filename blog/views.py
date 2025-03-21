@@ -385,6 +385,22 @@ from django.conf import settings
 from django.utils.html import format_html
 from datetime import datetime
 
+def generate_radicado():
+    """
+    Genera un número de radicado único para las PQR
+    Formato: PQR-YYYYMMDD-XXXXX (donde X es un número aleatorio)
+    """
+    # Obtener la fecha actual en formato YYYYMMDD
+    fecha = datetime.now().strftime('%Y%m%d')
+    
+    # Generar 5 dígitos aleatorios
+    digitos = ''.join(random.choices(string.digits, k=5))
+    
+    # Crear el número de radicado
+    radicado = f"PQR-{fecha}-{digitos}"
+    
+    return radicado
+
 def pqr(request):
     """Vista para mostrar y procesar el formulario de PQR con un correo más estilizado."""
     if request.method == 'POST':
