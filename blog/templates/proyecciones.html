@@ -4,25 +4,26 @@
 
 {% block extra_css %}
 <style>
-    .advisor-header {
+    /* Estilos comunes */
+    .header-section {
         background: linear-gradient(145deg, #1a3b5c 0%, #3498db 100%);
         color: white;
-        border-radius: 12px;
-        padding: 2.5rem;
+        border-radius: 8px;
+        padding: 2rem;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
     
-    .advisor-section {
+    .card-section {
         background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         padding: 2rem;
         margin-bottom: 2rem;
     }
     
     .form-label {
-        font-weight: 600;
+        font-weight: 500;
         color: #333;
     }
     
@@ -35,9 +36,9 @@
     
     .result-card {
         border: none;
-        border-radius: 12px;
+        border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
     
     .result-header {
@@ -51,7 +52,7 @@
     }
     
     .stat-value {
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: 700;
         color: #1a3b5c;
         margin-bottom: 0.5rem;
@@ -72,28 +73,42 @@
     .comparison-table th {
         background-color: #1a3b5c;
         color: white;
-        padding: 1rem;
+        padding: 0.75rem;
         text-align: center;
     }
     
     .comparison-table td {
-        padding: 1rem;
+        padding: 0.75rem;
         text-align: center;
         border-bottom: 1px solid #e9ecef;
     }
     
-    .comparison-table tr:last-child td {
-        border-bottom: none;
+    .btn-primary {
+        background-color: #1a3b5c;
+        border-color: #1a3b5c;
     }
     
-    .comparison-table tr:nth-child(even) {
+    .btn-primary:hover {
+        background-color: #162f4c;
+        border-color: #162f4c;
+    }
+    
+    /* Estilos para clientes */
+    .contact-card {
+        border-left: 4px solid #1a3b5c;
         background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 0 8px 8px 0;
+        margin-top: 2rem;
     }
     
-    .print-section {
-        display: flex;
-        justify-content: flex-end;
-        margin: 2rem 0;
+    /* Estilos para asesores */
+    .advisor-section {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+        margin-bottom: 2rem;
     }
     
     .cdt-scenario {
@@ -111,6 +126,50 @@
         margin-top: 2rem;
     }
     
+    .projection-list {
+        margin-top: 2rem;
+    }
+    
+    .projection-card {
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .projection-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-pending {
+        background-color: #ffeeba;
+        color: #856404;
+    }
+    
+    .status-reviewed {
+        background-color: #b8daff;
+        color: #004085;
+    }
+    
+    .status-contacted {
+        background-color: #c3e6cb;
+        color: #155724;
+    }
+    
+    .response-form {
+        display: none;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
     @media print {
         .no-print {
             display: none !important;
@@ -120,15 +179,6 @@
             width: 100%;
             max-width: 100%;
         }
-        
-        .advisor-header {
-            box-shadow: none;
-        }
-        
-        .result-card {
-            box-shadow: none;
-            border: 1px solid #dee2e6;
-        }
     }
 </style>
 {% endblock %}
@@ -137,35 +187,71 @@
 <div class="container py-5">
     <div class="row">
         <div class="col-12">
-            <div class="advisor-header">
+            <div class="header-section">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h1 class="display-5 fw-bold">Proyecciones de CDT</h1>
-                        <p class="lead mb-0">Calcula el rendimiento de tu inversión en CDT</p>
+                        <h1 class="h2 fw-bold">{% if user.is_authenticated %}Proyecciones de CDT{% else %}Simulador de CDT{% endif %}</h1>
+                        <p class="lead mb-0">{% if user.is_authenticated %}Calcula y gestiona proyecciones para tus clientes{% else %}Calcula cuánto podría rendir tu inversión{% endif %}</p>
                     </div>
+                    {% if user.is_authenticated %}
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-light" id="toggleProjectionsList">
+                            <i class="fas fa-list me-2"></i>Ver Proyecciones Pendientes
+                        </button>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
     
+    {% if user.is_authenticated %}
+    <!-- Lista de proyecciones pendientes (solo para asesores) -->
+    <div class="row projection-list" id="pendingProjectionsList" style="display: none;">
+        <div class="col-12">
+            <div class="card-section">
+                <h2 class="h4 mb-4">Proyecciones Pendientes</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Email</th>
+                                <th>Monto</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingProjectionsTable">
+                            <!-- Se llenará con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
     <div class="row">
         <div class="col-lg-4">
-            <div class="advisor-section">
-                <h2 class="h4 mb-4">Información Personal</h2>
+            <div class="card-section">
+                <h2 class="h5 mb-4">{% if user.is_authenticated %}Información del Cliente{% else %}Datos Personales{% endif %}</h2>
                 
                 <div class="mb-3">
                     <label for="clientName" class="form-label">Nombre Completo</label>
-                    <input type="text" class="form-control" id="clientName" placeholder="Nombre completo">
+                    <input type="text" class="form-control" id="clientName" placeholder="{% if user.is_authenticated %}Nombre del cliente{% else %}Ingresa tu nombre{% endif %}">
                 </div>
                 
                 <div class="mb-3">
                     <label for="clientEmail" class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-control" id="clientEmail" placeholder="cliente@ejemplo.com">
+                    <input type="email" class="form-control" id="clientEmail" placeholder="{% if user.is_authenticated %}correo@cliente.com{% else %}tucorreo@ejemplo.com{% endif %}">
                 </div>
             </div>
             
-            <div class="advisor-section">
-                <h2 class="h4 mb-4">Parámetros del CDT</h2>
+            <div class="card-section">
+                <h2 class="h5 mb-4">Parámetros del CDT</h2>
                 
                 <div class="mb-3">
                     <label for="cdtAmount" class="form-label">Monto a Invertir</label>
@@ -191,15 +277,6 @@
                 </div>
                 
                 <div class="mb-3">
-                    <label for="cdtInterestRate" class="form-label">Tasa de interés E.A. (%)</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control" id="cdtInterestRate" value="11.85" step="0.01" min="0" max="20">
-                        <span class="input-group-text">%</span>
-                    </div>
-                    <div class="form-text">Tasa actual: 11.85% E.A. para 360 días</div>
-                </div>
-                
-                <div class="mb-3">
                     <label class="form-label">Modalidad de intereses</label>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="interestPayment" id="paymentAtMaturity" value="maturity" checked>
@@ -213,6 +290,17 @@
                             Periódico mensual
                         </label>
                     </div>
+                </div>
+                
+                {% if user.is_authenticated %}
+                <!-- Campo editable para asesores -->
+                <div class="mb-3">
+                    <label for="cdtInterestRate" class="form-label">Tasa de interés E.A. (%)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="cdtInterestRate" value="11.85" step="0.01" min="0" max="20">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text">Tasa actual: 11.85% E.A. para 360 días</div>
                 </div>
                 
                 <div class="mb-3">
@@ -234,6 +322,10 @@
                         <label class="form-check-label" for="optimisticScenario">Optimista</label>
                     </div>
                 </div>
+                {% else %}
+                <!-- Campo oculto para clientes -->
+                <input type="hidden" id="cdtInterestRate" value="11.85">
+                {% endif %}
                 
                 <button type="button" id="calculateCDT" class="btn btn-primary w-100">
                     <i class="fas fa-calculator me-2"></i>Calcular Proyección
@@ -245,19 +337,19 @@
             <div id="clientInfoDisplay" class="client-info d-none">
                 <div class="row">
                     <div class="col-md-6">
-                        <h3 class="h5">Información del Cliente</h3>
+                        <h3 class="h5">Información del {% if user.is_authenticated %}Cliente{% else %}Simulador{% endif %}</h3>
                         <p class="mb-1"><strong>Nombre:</strong> <span id="displayClientName"></span></p>
                         <p class="mb-1"><strong>Correo:</strong> <span id="displayClientEmail"></span></p>
                     </div>
                     <div class="col-md-6">
-                        <p class="mb-1"><strong>Fecha de proyección:</strong> <span id="projectionDate"></span></p>
+                        <p class="mb-1"><strong>Fecha de {% if user.is_authenticated %}proyección{% else %}simulación{% endif %}:</strong> <span id="projectionDate"></span></p>
                     </div>
                 </div>
             </div>
             
             <div id="baseScenario" class="result-card mb-4 d-none">
                 <div class="result-header">
-                    <h2 class="h4 mb-0">Proyección CDT</h2>
+                    <h2 class="h5 mb-0">{% if user.is_authenticated %}Proyección CDT{% else %}Resultado de tu Simulación{% endif %}</h2>
                     <p class="mb-0 opacity-75" id="scenarioDescription">Plazo: 360 días - Tasa: 11.85% E.A.</p>
                 </div>
                 <div class="result-body">
@@ -303,6 +395,8 @@
                         </div>
                     </div>
                     
+                    {% if user.is_authenticated %}
+                    <!-- Tabla de amortización visible solo para asesores -->
                     <div id="amortizationContainer" class="mt-4">
                         <h5>Tabla de Amortización</h5>
                         <div class="table-responsive">
@@ -323,9 +417,12 @@
                             </table>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             
+            {% if user.is_authenticated %}
+            <!-- Escenarios alternativos visibles solo para asesores -->
             <div id="alternativeScenarios" class="d-none">
                 <h3 class="h4 mb-3">Escenarios Alternativos</h3>
                 
@@ -359,9 +456,10 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             
             <div id="comparisonSection" class="mt-4 d-none">
-                <h3 class="h4 mb-3">Comparativa de Plazos</h3>
+                <h3 class="h5 mb-3">Comparativa de Plazos</h3>
                 <div class="table-responsive">
                     <table class="comparison-table">
                         <thead>
@@ -379,7 +477,9 @@
                 </div>
             </div>
             
-            <div class="print-section">
+            {% if user.is_authenticated %}
+            <!-- Sección de acciones visible solo para asesores -->
+            <div class="print-section no-print d-none" id="printSection">
                 <button id="printProjection" class="btn btn-outline-primary me-2">
                     <i class="fas fa-print me-2"></i>Imprimir Proyección
                 </button>
@@ -420,8 +520,71 @@
                     <textarea class="form-control" id="advisorNotes" rows="3" placeholder="Agregue notas adicionales sobre esta proyección..."></textarea>
                 </div>
                 
-                <button class="btn btn-success w-100">
+                <button id="saveToClientBtn" class="btn btn-success w-100">
                     <i class="fas fa-save me-2"></i>Guardar en Expediente del Cliente
+                </button>
+            </div>
+            
+            <!-- Formulario de respuesta a solicitud (visible al responder) -->
+            <div id="responseForm" class="response-form">
+                <h3 class="h5 mb-3">Responder al Cliente</h3>
+                <form id="projectionResponseForm">
+                    <div class="mb-3">
+                        <label for="responseSubject" class="form-label">Asunto</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="responseSubject" 
+                               required
+                               value="Respuesta a su solicitud de CDT - Banco El Dorado">
+                    </div>
+                    <div class="mb-3">
+                        <label for="responseMessage" class="form-label">Mensaje</label>
+                        <textarea class="form-control" 
+                                  id="responseMessage" 
+                                  rows="6" 
+                                  required
+                                  placeholder="Estimado cliente, en respuesta a su solicitud de proyección de CDT..."></textarea>
+                    </div>
+                    <input type="hidden" id="projectionId" value="">
+                    <div class="d-flex justify-content-between">
+                        <button type="button" id="cancelResponse" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Enviar Respuesta
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <!-- Para clientes, mostrar tarjeta de contacto -->
+            <div id="contactAdvisor" class="contact-card d-none">
+                <h3 class="h5 mb-3">¿Deseas hacer realidad esta inversión?</h3>
+                <p>Nuestros asesores financieros pueden ayudarte a abrir tu CDT y resolver todas tus dudas sobre este producto.</p>
+                <button id="saveAndContact" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Enviar Solicitud
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para confirmar eliminación -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar esta solicitud de proyección? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash-alt me-2"></i>Eliminar
                 </button>
             </div>
         </div>
@@ -452,10 +615,11 @@
             '720': 12.30
         };
         
+        // Variable para verificar si es asesor
+        const isAdvisor = {% if user.is_authenticated %}true{% else %}false{% endif %};
+        
         // Elements
         const calculateButton = document.getElementById('calculateCDT');
-        const printButton = document.getElementById('printProjection');
-        const emailButton = document.getElementById('emailProjection');
         
         // Client info inputs
         const clientNameInput = document.getElementById('clientName');
@@ -467,18 +631,369 @@
         const rateInput = document.getElementById('cdtInterestRate');
         const paymentAtMaturity = document.getElementById('paymentAtMaturity');
         const paymentMonthly = document.getElementById('paymentMonthly');
-        const withTaxSwitch = document.getElementById('withTaxSwitch');
-        const pessimisticCheck = document.getElementById('pessimisticScenario');
-        const optimisticCheck = document.getElementById('optimisticScenario');
         
         // Results displays
         const clientInfoDisplay = document.getElementById('clientInfoDisplay');
         const baseScenario = document.getElementById('baseScenario');
+        const comparisonSection = document.getElementById('comparisonSection');
+        
+        // Cliente o asesor específicos elementos
+        {% if user.is_authenticated %}
+        const withTaxSwitch = document.getElementById('withTaxSwitch');
+        const pessimisticCheck = document.getElementById('pessimisticScenario');
+        const optimisticCheck = document.getElementById('optimisticScenario');
         const alternativeScenarios = document.getElementById('alternativeScenarios');
         const pessimisticCard = document.getElementById('pessimisticScenarioCard');
         const optimisticCard = document.getElementById('optimisticScenarioCard');
-        const comparisonSection = document.getElementById('comparisonSection');
         const actionsSection = document.getElementById('actionsSection');
+        const printSection = document.getElementById('printSection');
+        const saveToClientBtn = document.getElementById('saveToClientBtn');
+        const printButton = document.getElementById('printProjection');
+        const emailButton = document.getElementById('emailProjection');
+        const toggleProjectionsListBtn = document.getElementById('toggleProjectionsList');
+        const pendingProjectionsList = document.getElementById('pendingProjectionsList');
+        const responseForm = document.getElementById('responseForm');
+        const projectionResponseForm = document.getElementById('projectionResponseForm');
+        const cancelResponseBtn = document.getElementById('cancelResponse');
+        
+        // Modal de confirmación de eliminación
+        const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        let projectionToDelete = null;
+        
+        // Toggle para mostrar/ocultar la lista de proyecciones pendientes
+        toggleProjectionsListBtn.addEventListener('click', function() {
+            if (pendingProjectionsList.style.display === 'none') {
+                pendingProjectionsList.style.display = 'block';
+                loadPendingProjections();
+                this.innerHTML = '<i class="fas fa-calculator me-2"></i>Volver al Simulador';
+            } else {
+                pendingProjectionsList.style.display = 'none';
+                this.innerHTML = '<i class="fas fa-list me-2"></i>Ver Proyecciones Pendientes';
+            }
+        });
+        
+        // Cargar proyecciones pendientes
+        function loadPendingProjections() {
+            fetch('{% url "blog:get_pending_projections" %}')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('pendingProjectionsTable');
+                    tableBody.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <i class="fas fa-inbox fa-2x mb-3 text-muted d-block"></i>
+                                    No hay proyecciones pendientes
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+                    
+                    data.forEach(projection => {
+                        const statusClass = 
+                            projection.status === 'PENDING' ? 'status-pending' :
+                            projection.status === 'REVIEWED' ? 'status-reviewed' :
+                            'status-contacted';
+                        
+                        const statusText = 
+                            projection.status === 'PENDING' ? 'Pendiente' :
+                            projection.status === 'REVIEWED' ? 'Revisado' :
+                            'Contactado';
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>#${projection.id}</td>
+                            <td>${projection.client_name}</td>
+                            <td>${projection.client_email}</td>
+                            <td>$${parseFloat(projection.initial_amount).toLocaleString('es-CO')}</td>
+                            <td>${new Date(projection.created_at).toLocaleDateString('es-CO')}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-info view-projection" data-id="${projection.id}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success mark-as-reviewed" data-id="${projection.id}" ${projection.status !== 'PENDING' ? 'disabled' : ''}>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary contact-client" data-id="${projection.id}" data-name="${projection.client_name}" data-email="${projection.client_email}">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger delete-projection" data-id="${projection.id}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    
+                    // Agregar event listeners a los botones de cada fila
+                    document.querySelectorAll('.view-projection').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const projectionId = this.getAttribute('data-id');
+                            viewProjection(projectionId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.mark-as-reviewed').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const projectionId = this.getAttribute('data-id');
+                            markAsReviewed(projectionId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.contact-client').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const projectionId = this.getAttribute('data-id');
+                            const clientName = this.getAttribute('data-name');
+                            const clientEmail = this.getAttribute('data-email');
+                            showResponseForm(projectionId, clientName, clientEmail);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-projection').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            projectionToDelete = this.getAttribute('data-id');
+                            deleteConfirmModal.show();
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading projections:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron cargar las proyecciones pendientes'
+                    });
+                });
+        }
+        
+        // Ver detalles de una proyección
+        function viewProjection(projectionId) {
+            fetch(`{% url "blog:get_projection_detail" %}?id=${projectionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Llenar el formulario con los datos de la proyección
+                        clientNameInput.value = data.projection.client_name;
+                        clientEmailInput.value = data.projection.client_email;
+                        amountInput.value = data.projection.initial_amount;
+                        termSelect.value = data.projection.term_days;
+                        rateInput.value = data.projection.interest_rate;
+                        
+                        if (data.projection.payment_type === 'maturity') {
+                            paymentAtMaturity.checked = true;
+                        } else {
+                            paymentMonthly.checked = true;
+                        }
+                        
+                        // Calcular la proyección
+                        calculateCDT();
+                        
+                        // Ocultar la lista de proyecciones
+                        pendingProjectionsList.style.display = 'none';
+                        toggleProjectionsListBtn.innerHTML = '<i class="fas fa-list me-2"></i>Ver Proyecciones Pendientes';
+                        
+                        // Scroll al inicio
+                        window.scrollTo(0, 0);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'No se pudo cargar la proyección'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error viewing projection:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo cargar la proyección'
+                    });
+                });
+        }
+        
+        // Marcar proyección como revisada
+        function markAsReviewed(projectionId) {
+            fetch('{% url "blog:mark_projection_reviewed" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ id: projectionId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Proyección marcada como revisada',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    
+                    // Recargar la lista de proyecciones
+                    loadPendingProjections();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'No se pudo actualizar el estado'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error marking projection as reviewed:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo actualizar el estado'
+                });
+            });
+        }
+        
+        // Mostrar formulario de respuesta
+        function showResponseForm(projectionId, clientName, clientEmail) {
+            document.getElementById('projectionId').value = projectionId;
+            document.getElementById('responseMessage').value = 
+                `Estimado(a) ${clientName},\n\nHemos revisado su solicitud de proyección de CDT y nos complace ofrecerle las siguientes opciones personalizadas.\n\nPara continuar con el proceso de apertura o resolver cualquier duda, puede responder a este correo o contactarnos directamente a nuestras líneas de atención.\n\nAtentamente,\n${document.querySelector('meta[name="username"]')?.content || 'Asesor Financiero'}\nBanco El Dorado`;
+            
+            responseForm.style.display = 'block';
+            responseForm.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Cancelar respuesta
+        cancelResponseBtn.addEventListener('click', function() {
+            responseForm.style.display = 'none';
+        });
+        
+        // Enviar respuesta al cliente
+        projectionResponseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const projectionId = document.getElementById('projectionId').value;
+            const subject = document.getElementById('responseSubject').value;
+            const message = document.getElementById('responseMessage').value;
+            
+            if (!projectionId || !subject || !message) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campos incompletos',
+                    text: 'Por favor complete todos los campos'
+                });
+                return;
+            }
+            
+            // Mostrar indicador de carga
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+            
+            fetch('{% url "blog:contact_projection_client" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    id: projectionId,
+                    subject: subject,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                
+                if (data.success) {
+                    responseForm.style.display = 'none';
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Respuesta enviada',
+                        text: 'La respuesta ha sido enviada exitosamente al cliente'
+                    });
+                    
+                    // Recargar la lista de proyecciones
+                    loadPendingProjections();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'No se pudo enviar la respuesta'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error sending response:', error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al enviar la respuesta'
+                });
+            });
+        });
+        
+        // Confirmar eliminación de proyección
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (!projectionToDelete) return;
+            
+            fetch('{% url "blog:delete_projection" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ id: projectionToDelete })
+            })
+            .then(response => response.json())
+            .then(data => {
+                deleteConfirmModal.hide();
+                
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Proyección eliminada',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    
+                    // Recargar la lista de proyecciones
+                    loadPendingProjections();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'No se pudo eliminar la proyección'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting projection:', error);
+                deleteConfirmModal.hide();
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo eliminar la proyección'
+                });
+            });
+        });
+        {% else %}
+        const contactAdvisor = document.getElementById('contactAdvisor');
+        const saveAndContact = document.getElementById('saveAndContact');
+        {% endif %}
         
         // Client info display elements
         const displayClientName = document.getElementById('displayClientName');
@@ -494,7 +1009,6 @@
         const effectiveYieldSpan = document.getElementById('effectiveYield');
         const taxRow = document.getElementById('taxRow');
         const taxRateDisplay = document.getElementById('taxRateDisplay');
-        const amortizationBody = document.getElementById('amortizationBody');
         
         // Format currency
         function formatCurrency(amount) {
@@ -519,9 +1033,21 @@
             // Get values
             const amount = parseFloat(amountInput.value);
             const termDays = parseInt(termSelect.value);
-            const annualRate = parseFloat(rateInput.value) / 100;
+            
+            // En modo cliente (no autenticado) usar tasas fijas
+            // En modo asesor (autenticado) permitir editar tasas
+            let annualRate;
+            if (isAdvisor) {
+                annualRate = parseFloat(rateInput.value) / 100;
+            } else {
+                annualRate = interestRatesByTerm[termDays] / 100;
+                rateInput.value = interestRatesByTerm[termDays];
+            }
+            
             const paymentType = paymentAtMaturity.checked ? 'maturity' : 'monthly';
-            const applyTax = withTaxSwitch.checked;
+            
+            // Aplicar retención por defecto para clientes, configurable para asesores
+            const applyTax = isAdvisor ? withTaxSwitch.checked : true;
             
             // Update client info
             if (clientNameInput.value) {
@@ -534,11 +1060,13 @@
             const taxRate = termDays > 365 ? 0.04 : 0.07;
             taxRateDisplay.textContent = (taxRate * 100) + '%';
             
-            // Show/hide tax row based on withTaxSwitch
-            if (applyTax) {
-                taxRow.style.display = '';
-            } else {
-                taxRow.style.display = 'none';
+            // Show/hide tax row based on applyTax (solo relevante para asesores)
+            if (isAdvisor) {
+                if (applyTax) {
+                    taxRow.style.display = '';
+                } else {
+                    taxRow.style.display = 'none';
+                }
             }
             
             // Convert annual rate to daily rate
@@ -578,40 +1106,49 @@
             netInterestSpan.textContent = formatCurrency(netInterest);
             effectiveYieldSpan.textContent = (effectiveYield * 100).toFixed(2) + '%';
             
-            // Generate amortization table
-            generateAmortizationTable(amount, termDays, dailyRate, taxRate, paymentType, applyTax);
-            
-            // Calculate alternative scenarios if checked
-            if (pessimisticCheck.checked) {
-                calculateAlternativeScenario('pessimistic', amount, termDays, annualRate - 0.015, paymentType, applyTax);
-                pessimisticCard.classList.remove('d-none');
+            // Funcionalidades específicas del asesor
+            if (isAdvisor) {
+                // Generate amortization table
+                generateAmortizationTable(amount, termDays, dailyRate, taxRate, paymentType, applyTax);
+                
+                // Calculate alternative scenarios if checked
+                if (pessimisticCheck.checked) {
+                    calculateAlternativeScenario('pessimistic', amount, termDays, annualRate - 0.015, paymentType, applyTax);
+                    pessimisticCard.classList.remove('d-none');
+                } else {
+                    pessimisticCard.classList.add('d-none');
+                }
+                
+                if (optimisticCheck.checked) {
+                    calculateAlternativeScenario('optimistic', amount, termDays, annualRate + 0.015, paymentType, applyTax);
+                    optimisticCard.classList.remove('d-none');
+                } else {
+                    optimisticCard.classList.add('d-none');
+                }
+                
+                if (pessimisticCheck.checked || optimisticCheck.checked) {
+                    alternativeScenarios.classList.remove('d-none');
+                } else {
+                    alternativeScenarios.classList.add('d-none');
+                }
+                
+                // Mostrar secciones de asesor
+                actionsSection.classList.remove('d-none');
+                printSection.classList.remove('d-none');
             } else {
-                pessimisticCard.classList.add('d-none');
-            }
-            
-            if (optimisticCheck.checked) {
-                calculateAlternativeScenario('optimistic', amount, termDays, annualRate + 0.015, paymentType, applyTax);
-                optimisticCard.classList.remove('d-none');
-            } else {
-                optimisticCard.classList.add('d-none');
-            }
-            
-            if (pessimisticCheck.checked || optimisticCheck.checked) {
-                alternativeScenarios.classList.remove('d-none');
-            } else {
-                alternativeScenarios.classList.add('d-none');
+                // Para clientes, mostrar sección de contacto
+                contactAdvisor.classList.remove('d-none');
             }
             
             // Generate term comparison
-            generateTermComparison(amount, annualRate, paymentType, applyTax);
+            generateTermComparison(amount, paymentType, applyTax);
             
-            // Show results and additional sections
+            // Show results
             baseScenario.classList.remove('d-none');
             comparisonSection.classList.remove('d-none');
-            actionsSection.classList.remove('d-none');
         }
         
-        // Calculate alternative scenario
+        // Calculate alternative scenario (solo para asesores)
         function calculateAlternativeScenario(type, amount, termDays, rate, paymentType, applyTax) {
             const dailyRate = Math.pow(1 + rate, 1/365) - 1;
             const taxRate = termDays > 365 ? 0.04 : 0.07;
@@ -638,9 +1175,13 @@
             document.getElementById(`${type}Final`).textContent = formatCurrency(netFinalValue);
         }
         
-        // Generate amortization table
+        // Generate amortization table (solo para asesores)
         function generateAmortizationTable(principal, termDays, dailyRate, taxRate, paymentType, applyTax) {
+            // Solo si es asesor y existe el elemento
+            if (!isAdvisor || !document.getElementById('amortizationBody')) return;
+            
             // Clear previous table
+            const amortizationBody = document.getElementById('amortizationBody');
             amortizationBody.innerHTML = '';
             
             // Get current date
@@ -714,7 +1255,7 @@
         }
         
         // Generate term comparison
-        function generateTermComparison(amount, baseRate, paymentType, applyTax) {
+        function generateTermComparison(amount, paymentType, applyTax) {
             const comparisonBody = document.getElementById('comparisonBody');
             comparisonBody.innerHTML = '';
             
@@ -757,7 +1298,8 @@
         // Update interest rate when term changes
         termSelect.addEventListener('change', function() {
             const term = this.value;
-            if (interestRatesByTerm[term]) {
+            // Solo actualizar automáticamente para clientes, o si es asesor y no ha editado manualmente
+            if (!isAdvisor && interestRatesByTerm[term]) {
                 rateInput.value = interestRatesByTerm[term];
             }
         });
@@ -765,97 +1307,116 @@
         // Add event listeners
         calculateButton.addEventListener('click', calculateCDT);
         
-        printButton.addEventListener('click', function() {
-            window.print();
-        });
-        
-        emailButton.addEventListener('click', function() {
-            const clientName = clientNameInput.value || 'Estimado Cliente';
-            const clientEmail = clientEmailInput.value;
-            
-            if (!clientEmail) {
-                alert('Por favor ingrese el correo electrónico del cliente.');
-                clientEmailInput.focus();
-                return;
-            }
-            
-            // Get the current date in a nice format
-            const today = new Date();
-            const dateString = today.toLocaleDateString('es-CO', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+        // Listeners específicos para asesores
+        if (isAdvisor) {
+            // Print button
+            document.getElementById('printProjection').addEventListener('click', function() {
+                window.print();
             });
             
-            // Collect all the projection data
-            const projectionData = {
-                clientName: encodeURIComponent(clientName),
-                clientEmail: clientEmail,
-                initialInvestment: initialInvestmentSpan.textContent,
-                finalValue: finalValueSpan.textContent,
-                grossInterest: grossInterestSpan.textContent,
-                netInterest: netInterestSpan.textContent,
-                taxWithholding: taxWithholdingSpan.textContent,
-                effectiveYield: effectiveYieldSpan.textContent,
-                term: termSelect.value,
-                rate: rateInput.value,
-                date: encodeURIComponent(dateString),
-                paymentType: encodeURIComponent(paymentAtMaturity.checked ? 'Al vencimiento' : 'Periódico mensual')
-            };
+            // Email button
+            document.getElementById('emailProjection').addEventListener('click', function() {
+                sendProjectionEmail();
+            });
             
-            // Show loading state
-            emailButton.disabled = true;
-            emailButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
-            
-            // Send data to server
-            fetch('{% url "blog:save_projection" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(projectionData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                emailButton.disabled = false;
-                emailButton.innerHTML = '<i class="fas fa-envelope me-2"></i>Enviar por Email';
+            // Función para enviar email
+            function sendProjectionEmail() {
+                const clientName = clientNameInput.value || 'Estimado Cliente';
+                const clientEmail = clientEmailInput.value;
                 
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Correo enviado!',
-                        text: data.message,
-                        confirmButtonText: 'Aceptar'
-                    });
-                } else {
+                if (!clientEmail) {
+                    alert('Por favor ingrese el correo electrónico del cliente.');
+                    clientEmailInput.focus();
+                    return;
+                }
+                
+                // Get the current date in a nice format
+                const today = new Date();
+                const dateString = today.toLocaleDateString('es-CO', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // Collect all the projection data
+                const projectionData = {
+                    clientName: clientName,
+                    clientEmail: clientEmail,
+                    initialInvestment: initialInvestmentSpan.textContent,
+                    finalValue: finalValueSpan.textContent,
+                    grossInterest: grossInterestSpan.textContent,
+                    netInterest: netInterestSpan.textContent,
+                    taxWithholding: taxWithholdingSpan.textContent,
+                    effectiveYield: effectiveYieldSpan.textContent,
+                    term: termSelect.value,
+                    rate: rateInput.value,
+                    date: dateString,
+                    paymentType: paymentAtMaturity.checked ? 'Al vencimiento' : 'Periódico mensual'
+                };
+                
+                // Show loading state
+                emailButton.disabled = true;
+                emailButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+                
+                // Send data to server
+                fetch('{% url "blog:send_projection_email" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(projectionData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    emailButton.disabled = false;
+                    emailButton.innerHTML = '<i class="fas fa-envelope me-2"></i>Enviar por Email';
+                    
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Correo enviado!',
+                            text: data.message,
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Error al enviar el correo',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    emailButton.disabled = false;
+                    emailButton.innerHTML = '<i class="fas fa-envelope me-2"></i>Enviar por Email';
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error',
-                        text: data.message || 'Error al enviar el correo',
+                        title: 'Error de conexión',
+                        text: error.message,
                         confirmButtonText: 'Aceptar'
                     });
-                }
-            })
-            .catch(error => {
-                emailButton.disabled = false;
-                emailButton.innerHTML = '<i class="fas fa-envelope me-2"></i>Enviar por Email';
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de conexión',
-                    text: error.message,
-                    confirmButtonText: 'Aceptar'
                 });
+            }
+            
+            // Guardar proyección (asesor)
+            document.getElementById('saveToClientBtn').addEventListener('click', async function() {
+                saveProjection(this);
             });
-        });
-
-        // Actualizar el evento click del botón de guardar
-        const saveToClientButton = document.querySelector('.btn-success');
-        saveToClientButton.addEventListener('click', async function() {
+        } else {
+            // Guardar proyección (cliente)
+            document.getElementById('saveAndContact').addEventListener('click', async function() {
+                saveProjection(this);
+            });
+        }
+        
+        // Función común para guardar proyección
+        async function saveProjection(buttonElement) {
             try {
                 // Validar que se haya calculado la proyección
                 if (document.getElementById('baseScenario').classList.contains('d-none')) {
-                    throw new Error('Por favor, calcule la proyección antes de guardar');
+                    throw new Error('Por favor, calcula la proyección antes de continuar');
                 }
 
                 // Validar campos obligatorios
@@ -863,14 +1424,14 @@
                 const clientEmail = document.getElementById('clientEmail').value;
                 
                 if (!clientName || !clientEmail) {
-                    throw new Error('Por favor, complete el nombre y correo del cliente');
+                    throw new Error('Por favor, completa nombre y correo electrónico');
                 }
 
                 // Mostrar indicador de carga
                 const loadingIndicator = document.createElement('span');
                 loadingIndicator.className = 'spinner-border spinner-border-sm ms-2';
-                this.appendChild(loadingIndicator);
-                this.disabled = true;
+                buttonElement.appendChild(loadingIndicator);
+                buttonElement.disabled = true;
 
                 // Obtener todos los valores necesarios
                 const formData = new FormData();
@@ -883,6 +1444,11 @@
                 formData.append('final_amount', document.getElementById('finalValue').textContent.replace(/[^0-9.]/g, ''));
                 formData.append('net_interest', document.getElementById('netInterest').textContent.replace(/[^0-9.]/g, ''));
 
+                // Para asesores, añadir notas si existen
+                if (isAdvisor && document.getElementById('advisorNotes')) {
+                    formData.append('advisor_notes', document.getElementById('advisorNotes').value);
+                }
+
                 const response = await fetch('{% url "blog:save_projection" %}', {
                     method: 'POST',
                     body: formData,
@@ -894,16 +1460,21 @@
                 const data = await response.json();
 
                 if (!data.success) {
-                    throw new Error(data.message);
+                    throw new Error(data.message || 'Error al guardar la proyección');
                 }
 
                 // Mostrar mensaje de éxito
                 Swal.fire({
                     icon: 'success',
-                    title: '¡Proyección guardada!',
-                    text: 'Un asesor se pondrá en contacto contigo pronto.',
+                    title: isAdvisor ? '¡Proyección guardada!' : '¡Solicitud enviada!',
+                    text: isAdvisor ? 'La proyección ha sido guardada correctamente.' : 'Un asesor se pondrá en contacto contigo pronto para ayudarte con tu inversión.',
                     showConfirmButton: true
                 });
+                
+                // Si es asesor, refrescar la lista de proyecciones
+                if (isAdvisor && pendingProjectionsList) {
+                    loadPendingProjections();
+                }
                 
             } catch (error) {
                 Swal.fire({
@@ -913,14 +1484,14 @@
                 });
             } finally {
                 // Limpiar el indicador de carga y rehabilitar el botón
-                this.disabled = false;
-                const spinner = this.querySelector('.spinner-border');
+                buttonElement.disabled = false;
+                const spinner = buttonElement.querySelector('.spinner-border');
                 if (spinner) spinner.remove();
             }
-        });
+        }
     });
 
-    // Asegúrate de que esta función getCookie esté presente
+    // Función getCookie
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -936,4 +1507,5 @@
         return cookieValue;
     }
 </script>
-{% endblock %} 
+{% endblock %}
+           

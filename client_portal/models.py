@@ -75,3 +75,17 @@ class SimpleProjection(models.Model):
 
     def __str__(self):
         return f"Proyección de {self.name} - ${self.initial_amount:,.2f}"
+
+class Projection(models.Model):
+    client_name = models.CharField(max_length=100)
+    client_email = models.EmailField()
+    initial_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    final_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    net_interest = models.DecimalField(max_digits=12, decimal_places=2)
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    term_days = models.IntegerField()
+    payment_type = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Projection for {self.client_name} - {self.initial_amount}"

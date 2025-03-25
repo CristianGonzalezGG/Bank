@@ -8,6 +8,15 @@
             font-family: Arial, sans-serif;
             line-height: 1.6;
             color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .header {
             background-color: #1a3b5c;
@@ -15,50 +24,125 @@
             padding: 20px;
             text-align: center;
         }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
         .content {
-            padding: 20px;
-            background-color: #f8f9fa;
+            padding: 30px;
+            background-color: #ffffff;
         }
         .footer {
             background-color: #1a3b5c;
             color: white;
             padding: 20px;
             text-align: center;
+            font-size: 12px;
         }
         .contact-info {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #e9ecef;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
             border-radius: 5px;
+            border-left: 4px solid #1a3b5c;
+        }
+        .investment-details {
+            background-color: #e9f5fb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .investment-details h3 {
+            color: #1a3b5c;
+            margin-top: 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #28a745;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        h1, h2, h3, h4 {
+            color: #1a3b5c;
+        }
+        .social-links {
+            margin-top: 15px;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 5px;
+            color: white;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>{{ bank_info.name }}</h1>
-        <p>Respuesta a su Solicitud de Proyección CDT</p>
-    </div>
-
-    <div class="content">
-        <p>Estimado(a) {{ client_name }},</p>
-
-        <p>En respuesta a su solicitud de proyección de CDT, nuestro asesor {{ advisor_name }} le ha enviado la siguiente información:</p>
-
-        <h3>{{ response.subject }}</h3>
-        
-        {{ response.message|linebreaks }}
-
-        <div class="contact-info">
-            <h4>Información de Contacto</h4>
-            <p>Teléfono: {{ bank_info.phone }}</p>
-            <p>Email: {{ bank_info.email }}</p>
-            <p>Sitio web: {{ bank_info.website }}</p>
+    <div class="container">
+        <div class="header">
+            {% if bank_info.logo_url %}
+            <img src="{{ bank_info.logo_url }}" alt="{{ bank_info.name }}" class="logo">
+            {% endif %}
+            <h1>{{ bank_info.name }}</h1>
+            <p>Tu Solicitud de CDT - Información Importante</p>
         </div>
-    </div>
 
-    <div class="footer">
-        <p>Gracias por confiar en {{ bank_info.name }}</p>
-        <small>Este es un correo automático, por favor no responda a este mensaje.</small>
+        <div class="content">
+            <p>Estimado(a) {{ client_name }},</p>
+
+            <p>Gracias por tu interés en nuestros Certificados de Depósito a Término (CDT). Nos complace que hayas considerado a {{ bank_info.name }} para tus necesidades de inversión.</p>
+
+            {% if projection_details %}
+            <div class="investment-details">
+                <h3>Detalles de tu Inversión</h3>
+                <p><strong>Monto inicial:</strong> ${{ projection_details.initial_amount }}</p>
+                <p><strong>Plazo:</strong> {{ projection_details.term_days }} días</p>
+                <p><strong>Tasa de interés:</strong> {{ projection_details.interest_rate }}%</p>
+                <p><strong>Rendimiento estimado:</strong> ${{ projection_details.net_interest }}</p>
+                <p><strong>Monto final:</strong> ${{ projection_details.final_amount }}</p>
+            </div>
+            {% endif %}
+
+            <h3>{{ response.subject }}</h3>
+            
+            {{ response.message|linebreaks }}
+
+            {% if bank_info.website %}
+            <p>Para más información sobre nuestros productos, por favor visita nuestra página web:</p>
+            <p>
+                <a href="{{ bank_info.website }}" class="button">Visitar Sitio Web</a>
+            </p>
+            {% endif %}
+
+            <div class="contact-info">
+                <h4>Información de Contacto</h4>
+                <p><strong>Asesor:</strong> {{ advisor_name }}</p>
+                {% if bank_info.phone %}
+                <p><strong>Teléfono:</strong> {{ bank_info.phone }}</p>
+                {% endif %}
+                {% if bank_info.email %}
+                <p><strong>Email:</strong> {{ bank_info.email }}</p>
+                {% endif %}
+                {% if bank_info.address %}
+                <p><strong>Dirección:</strong> {{ bank_info.address }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© {% now "Y" %} {{ bank_info.name }}. Todos los derechos reservados.</p>
+            
+            <div class="social-links">
+                {% if bank_info.facebook %}<a href="{{ bank_info.facebook }}">Facebook</a>{% endif %}
+                {% if bank_info.twitter %}<a href="{{ bank_info.twitter }}">Twitter</a>{% endif %}
+                {% if bank_info.instagram %}<a href="{{ bank_info.instagram }}">Instagram</a>{% endif %}
+                {% if bank_info.linkedin %}<a href="{{ bank_info.linkedin }}">LinkedIn</a>{% endif %}
+            </div>
+            
+            <p><small>Este es un correo automático, por favor no responda a este mensaje. Si necesitas asistencia, contacta directamente a tu asesor.</small></p>
+        </div>
     </div>
 </body>
 </html> 

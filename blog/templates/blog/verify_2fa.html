@@ -1,52 +1,334 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-    <h2 class="text-3xl font-bold text-center mb-6">Verificación de Dos Factores</h2>
-    <p class="text-center text-gray-600">Se ha enviado un código de verificación a: <strong>{{ email }}</strong></p>
-    
-    <div class="flex justify-center mb-4">
-        <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
-            <i class="fas fa-shield-alt text-white text-3xl"></i>
+<div class="container mt-5">
+    <div class="row justify-content-center align-items-center min-vh-80">
+        <div class="col-md-6">
+            <div class="verification-card">
+                <!-- Logo y Título -->
+                <div class="text-center mb-4">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo" class="verification-logo animate-float">
+                    <h2 class="text-gradient mt-3">Verificación de Seguridad</h2>
+                    <p class="lead-text">Ingrese el código de verificación para continuar</p>
+                </div>
+
+                <!-- Tarjeta Principal -->
+                <div class="card verification-container">
+                    <div class="card-body p-4">
+                        <!-- Animación de Seguridad -->
+                        <div class="security-animation mb-4">
+                            <div class="circle-scanner"></div>
+                            <i class="fas fa-shield-alt security-icon"></i>
+                        </div>
+
+                        <!-- Formulario -->
+                        <form method="post" class="verification-form" id="verificationForm">
+                            {% csrf_token %}
+                            
+                            <!-- Campo de Código -->
+                            <div class="code-input-container">
+                                <input type="text" 
+                                       maxlength="1" 
+                                       class="code-input" 
+                                       data-index="0" 
+                                       required>
+                                <input type="text" 
+                                       maxlength="1" 
+                                       class="code-input" 
+                                       data-index="1" 
+                                       required>
+                                <input type="text" 
+                                       maxlength="1" 
+                                       class="code-input" 
+                                       data-index="2" 
+                                       required>
+                                <input type="text" 
+                                       maxlength="1" 
+                                       class="code-input" 
+                                       data-index="3" 
+                                       required>
+                                <input type="text" 
+                                       maxlength="1" 
+                                       class="code-input" 
+                                       data-index="4" 
+                                       required>
+                                <input type="text" 
+                                       maxlength="1" 
+                                       class="code-input" 
+                                       data-index="5" 
+                                       required>
+                                <input type="hidden" name="code" id="finalCode">
+                            </div>
+
+                            <!-- Botón de Verificación -->
+                            <button type="submit" class="btn btn-verify mt-4">
+                                <span class="btn-text">Verificar</span>
+                                <i class="fas fa-arrow-right btn-icon"></i>
+                            </button>
+                        </form>
+
+                        <!-- Mensajes -->
+                        {% if messages %}
+                        <div class="messages-container mt-3">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} fade-in">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Información Adicional -->
+                <div class="info-section mt-4">
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>El código expira en <span id="timer">5:00</span></span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-question-circle"></i>
+                        <a href="#" class="text-decoration-none">¿Necesitas ayuda?</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <form method="post" class="flex justify-center mb-4">
-        {% csrf_token %}
-        <input type="text" name="code" maxlength="6" required 
-               class="w-48 h-12 text-center border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-               placeholder="Ingrese el código de 6 dígitos" 
-               aria-label="Código de verificación" 
-               pattern="\d{6}" 
-               oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-    </form>
-
-    <button type="button" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition duration-300" onclick="submitForm()">Verificar</button>
-    
-    <div class="mt-4 text-center">
-        <a href="{% url 'blog:login' %}" class="text-blue-600 hover:underline">Volver al inicio de sesión</a>
     </div>
 </div>
 
-<!-- Agregar Tailwind CSS -->
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<!-- Agregar Font Awesome para el ícono -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<!-- Agregar animaciones de Animate.css -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<style>
+/* Estilos Base */
+.verification-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.verification-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Logo y Animación */
+.verification-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Animación de Escáner */
+.security-animation {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+}
+
+.circle-scanner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+}
+
+.circle-scanner::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--secondary);
+    animation: rotate 2s linear infinite;
+}
+
+.security-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: var(--primary);
+    animation: pulse 2s infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Campo de Código */
+.code-input-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 2rem;
+}
+
+.code-input {
+    width: 50px;
+    height: 60px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 1.5rem;
+    text-align: center;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.code-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    transform: translateY(-2px);
+}
+
+/* Botón de Verificación */
+.btn-verify {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.btn-verify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.2);
+}
+
+.btn-verify::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: -100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+
+.btn-verify:hover::after {
+    left: 100%;
+}
+
+/* Información Adicional */
+.info-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.info-item i {
+    color: var(--primary);
+}
+
+/* Animaciones de Mensajes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
 <script>
-    // Función para enviar el formulario
-    function submitForm() {
-        document.querySelector('form').submit();
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.code-input');
+    const form = document.getElementById('verificationForm');
+    const finalCode = document.getElementById('finalCode');
+
+    // Manejar entrada de código
+    inputs.forEach((input, index) => {
+        input.addEventListener('keyup', (e) => {
+            if (e.key >= 0 && e.key <= 9) {
+                input.value = e.key;
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                updateFinalCode();
+            } else if (e.key === 'Backspace') {
+                input.value = '';
+                if (index > 0) {
+                    inputs[index - 1].focus();
+                }
+                updateFinalCode();
+            }
+        });
+
+        input.addEventListener('click', () => {
+            input.select();
+        });
+    });
+
+    // Actualizar código final
+    function updateFinalCode() {
+        finalCode.value = Array.from(inputs).map(input => input.value).join('');
     }
 
-    // Animación de bienvenida
-    document.addEventListener('DOMContentLoaded', function() {
-        const container = document.querySelector('.container');
-        container.classList.add('animate__animated', 'animate__fadeIn');
-        setTimeout(() => {
-            container.classList.add('animate__animated', 'animate__bounce');
-        }, 1000);
-    });
+    // Timer
+    let timeLeft = 300; // 5 minutos en segundos
+    const timerDisplay = document.getElementById('timer');
+
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft > 0) {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        } else {
+            form.submit();
+        }
+    }
+
+    updateTimer();
+});
 </script>
 {% endblock %} 

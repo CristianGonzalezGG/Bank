@@ -1,156 +1,684 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load form_utils %}
 
 {% block title %}Crear Cliente - Banco El Dorado{% endblock %}
 
-{% block content %}
-<div class="container py-5 animate__animated animate__fadeIn">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-gradient-primary text-white p-4 text-center">
-                    <h2 class="h3 mb-0">
-                        <i class="fas fa-user-plus me-2"></i> Registro de Nuevo Cliente
-                    </h2>
-                </div>
-
-                <div class="card-body p-4">
-                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        {% csrf_token %}
-
-                        <!-- Información Personal -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label"><i class="fas fa-id-card me-2"></i>Número de Identificación</label>
-                                {{ form.cardId|add_class:"form-control input-hover" }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label"><i class="fas fa-user me-2"></i>Nombre Completo</label>
-                                {{ form.name|add_class:"form-control input-hover" }}
-                            </div>
-                        </div>
-
-                        <!-- Información de Contacto -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label"><i class="fas fa-envelope me-2"></i>Correo Electrónico</label>
-                                {{ form.email|add_class:"form-control input-hover" }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label"><i class="fas fa-phone me-2"></i>Teléfono</label>
-                                {{ form.phone_number|add_class:"form-control input-hover" }}
-                            </div>
-                        </div>
-
-                        <!-- Dirección -->
-                        <div class="mb-4">
-                            <label class="form-label"><i class="fas fa-map-marker-alt me-2"></i>Dirección</label>
-                            {{ form.address|add_class:"form-control input-hover" }}
-                        </div>
-
-                        <!-- Subida de Foto con Animación -->
-                        <div class="mb-4">
-                            <label class="form-label"><i class="fas fa-upload me-2"></i>Foto del Cliente</label>
-                            <div class="upload-box">
-                                <input type="file" name="imageSave" id="imageUpload" accept="image/*" class="form-control input-hover" required>
-                                <div class="preview-container">
-                                    <img id="imagePreview" class="preview-image" src="{% static 'images/default-avatar.png' %}" alt="Vista Previa">
-                                    <p id="fileName">Selecciona una imagen</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Botones de Acción -->
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-secondary btn-lg me-md-2" onclick="window.history.back()">
-                                <i class="fas fa-times me-2"></i>Cancelar
-                            </button>
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-save me-2"></i>Guardar Cliente
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Estilos -->
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    /* Estilos Principales */
+    .main-container {
+        background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
     }
 
-    .input-hover {
-        border-radius: 8px;
-        transition: all 0.3s ease-in-out;
+    .main-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, 
+            rgba(var(--primary-rgb), 0.05) 0%,
+            rgba(var(--secondary-rgb), 0.05) 100%);
+        z-index: -1;
     }
 
-    .input-hover:focus {
-        border-color: #6610f2;
-        box-shadow: 0px 4px 8px rgba(102, 16, 242, 0.3);
-        transform: scale(1.02);
+    /* Títulos y Encabezados */
+    .section-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 2rem;
+        position: relative;
+        padding-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
-    .upload-box {
-        border: 2px dashed #6610f2;
-        border-radius: 10px;
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 2px;
+    }
+
+    .subsection-title {
+        color: var(--primary);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 2rem 0 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .subsection-title i {
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Campos del Formulario */
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid rgba(var(--primary-rgb), 0.1);
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: rgba(255,255,255,0.9);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+        transform: translateY(-2px);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    /* Sección de Foto */
+    .photo-upload-section {
+        margin-bottom: 2rem;
+    }
+
+    .photo-upload-container {
+        background: rgba(255,255,255,0.95);
+        border: 3px dashed rgba(var(--primary-rgb), 0.2);
+        border-radius: 15px;
+        padding: 2rem;
         text-align: center;
-        padding: 20px;
-        transition: 0.3s;
+        transition: all 0.3s ease;
         cursor: pointer;
+        position: relative;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .upload-box:hover {
-        background: rgba(102, 16, 242, 0.05);
+    .photo-upload-container:hover {
+        border-color: var(--primary);
     }
 
-    .preview-container {
+    .upload-placeholder {
+        width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 15px;
+        gap: 1rem;
     }
 
-    .preview-image {
-        max-width: 150px;
+    .upload-icon {
+        font-size: 3.5rem;
+        color: var(--primary);
+        opacity: 0.8;
+    }
+
+    .preview-container {
+        display: none; /* Inicialmente oculto */
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+        margin: 0 auto;
+    }
+
+    .preview-container img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        display: block;
+    }
+
+    .preview-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .preview-container:hover .preview-overlay {
+        opacity: 1;
+    }
+
+    .btn-change-photo,
+    .btn-remove-photo {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-change-photo {
+        background: white;
+        color: var(--primary);
+    }
+
+    .btn-remove-photo {
+        background: var(--danger);
+        color: white;
+    }
+
+    .btn-change-photo:hover,
+    .btn-remove-photo:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Preguntas de Seguridad */
+    .security-question-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .security-question-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(var(--primary-rgb), 0.1);
+    }
+
+    .question-number {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
-        border: 3px solid #6610f2;
-        padding: 5px;
-        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-right: 1rem;
     }
 
-    .preview-image:hover {
-        transform: scale(1.05);
+    /* Select2 Personalizado */
+    .select2-container--default .select2-selection--single {
+        height: 50px;
+        border: 2px solid rgba(var(--primary-rgb), 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
     }
 
-    #fileName {
-        margin-top: 10px;
-        font-size: 14px;
-        color: #555;
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 48px;
+    }
+
+    .select2-dropdown {
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border-radius: 12px;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--primary);
+    }
+
+    /* Botón Submit */
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        width: 100%;
+        margin-top: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
+    }
+
+    .btn-submit::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            rgba(255,255,255,0.2),
+            transparent,
+            transparent
+        );
+        transform: rotate(45deg);
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover::after {
+        transform: rotate(45deg) translate(50%, 50%);
+    }
+
+    /* Animaciones */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fadeInUp {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    /* Validación y Feedback */
+    .form-control.is-valid,
+    .form-select.is-valid {
+        border-color: var(--success);
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .invalid-feedback {
+        color: var(--danger);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .photo-requirements {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(var(--primary-rgb), 0.05);
+        border-radius: 10px;
+    }
+
+    .photo-requirements h5 {
+        color: var(--primary);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .photo-requirements ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .photo-requirements li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--text);
+    }
+
+    .photo-requirements li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--success);
+        font-weight: bold;
+    }
+
+    /* Animación para el drag & drop */
+    @keyframes borderPulse {
+        0% { border-color: var(--primary); }
+        50% { border-color: var(--secondary); }
+        100% { border-color: var(--primary); }
+    }
+
+    .photo-upload-container.dragging {
+        animation: borderPulse 1.5s infinite;
+        border-width: 3px;
+        border-style: dashed;
     }
 </style>
+{% endblock %}
 
-<!-- Script para Previsualizar Imagen -->
+{% block content %}
+<div class="container py-5">
+    <div class="main-container animate-fadeInUp">
+        <h1 class="section-title">Registro de Cliente</h1>
+        
+        <form method="post" enctype="multipart/form-data" id="clientForm" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <!-- Datos Personales -->
+            <div class="subsection-title">
+                <i class="fas fa-user-circle"></i>
+                <span>Datos Personales</span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.cardId.id_for_label }}">
+                            Número de Identificación
+                        </label>
+                        {{ form.cardId }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.name.id_for_label }}">
+                            Nombre Completo
+                        </label>
+                        {{ form.name }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.email.id_for_label }}">
+                            Correo Electrónico
+                        </label>
+                        {{ form.email }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.phone_number.id_for_label }}">
+                            Teléfono
+                        </label>
+                        {{ form.phone_number }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.address.id_for_label }}">
+                    Dirección
+                </label>
+                {{ form.address }}
+            </div>
+
+            <!-- Fotografía -->
+            <div class="subsection-title">
+                <i class="fas fa-camera"></i>
+                <span>Fotografía del Cliente</span>
+            </div>
+
+            <div class="photo-upload-section">
+                <div class="photo-upload-container" id="photoUploadContainer">
+                    <input type="file" 
+                           id="photoInput" 
+                           name="imageSave" 
+                           accept="image/*" 
+                           class="photo-input" 
+                           style="display: none;">
+                    
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h4>Subir Fotografía</h4>
+                        <p>Arrastra y suelta una imagen aquí o haz clic para seleccionar</p>
+                        <span class="file-types">JPG, PNG o GIF (Max. 5MB)</span>
+                    </div>
+
+                    <div class="preview-container" id="previewContainer">
+                        <img id="photoPreview" src="" alt="Vista previa">
+                        <div class="preview-overlay">
+                            <button type="button" class="btn btn-change-photo" id="changePhoto">
+                                <i class="fas fa-sync-alt"></i> Cambiar Foto
+                            </button>
+                            <button type="button" class="btn btn-remove-photo" id="removePhoto">
+                                <i class="fas fa-trash-alt"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="photo-requirements">
+                    <h5><i class="fas fa-info-circle"></i> Requisitos de la foto:</h5>
+                    <ul>
+                        <li>Formato: JPG, PNG o GIF</li>
+                        <li>Tamaño máximo: 5MB</li>
+                        <li>Dimensiones recomendadas: 800x600 píxeles</li>
+                        <li>Fondo claro y uniforme</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Preguntas de Seguridad -->
+            <div class="subsection-title">
+                <i class="fas fa-shield-alt"></i>
+                <span>Preguntas de Seguridad</span>
+            </div>
+
+            <!-- Primera Pregunta -->
+            <div class="security-question-card">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="question-number">1</div>
+                    <h5 class="mb-0">Primera Pregunta de Seguridad</h5>
+                </div>
+                <div class="form-group">
+                    {{ form.security_question_0 }}
+                </div>
+                <div class="form-group mb-0">
+                    {{ form.security_answer_0 }}
+                </div>
+            </div>
+
+            <!-- Segunda Pregunta -->
+            <div class="security-question-card">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="question-number">2</div>
+                    <h5 class="mb-0">Segunda Pregunta de Seguridad</h5>
+                </div>
+                <div class="form-group">
+                    {{ form.security_question_1 }}
+                </div>
+                <div class="form-group mb-0">
+                    {{ form.security_answer_1 }}
+                </div>
+            </div>
+
+            <!-- Tercera Pregunta -->
+            <div class="security-question-card">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="question-number">3</div>
+                    <h5 class="mb-0">Tercera Pregunta de Seguridad</h5>
+                </div>
+                <div class="form-group">
+                    {{ form.security_question_2 }}
+                </div>
+                <div class="form-group mb-0">
+                    {{ form.security_answer_2 }}
+                </div>
+            </div>
+
+            <!-- Botón Submit -->
+            <button type="submit" class="btn btn-submit">
+                <i class="fas fa-user-plus me-2"></i>
+                Crear Cliente
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const imageUpload = document.getElementById("imageUpload");
-        const imagePreview = document.getElementById("imagePreview");
-        const fileNameText = document.getElementById("fileName");
+document.addEventListener('DOMContentLoaded', function() {
+    const photoInput = document.getElementById('photoInput');
+    const photoPreview = document.getElementById('photoPreview');
+    const uploadContainer = document.getElementById('photoUploadContainer');
+    const previewContainer = document.getElementById('previewContainer');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const changePhotoBtn = document.getElementById('changePhoto');
+    const removePhotoBtn = document.getElementById('removePhoto');
 
-        imageUpload.addEventListener("change", function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    imagePreview.src = e.target.result;
-                    fileNameText.innerText = file.name;
-                };
-                reader.readAsDataURL(file);
+    function showPreview(file) {
+        if (file) {
+            // Validar tipo de archivo
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Formato no válido',
+                    text: 'Por favor, selecciona una imagen en formato JPG, PNG o GIF.',
+                    confirmButtonColor: 'var(--primary)'
+                });
+                return;
+            }
+
+            // Validar tamaño
+            if (file.size > 5 * 1024 * 1024) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Archivo demasiado grande',
+                    text: 'El tamaño máximo permitido es 5MB.',
+                    confirmButtonColor: 'var(--primary)'
+                });
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoPreview.src = e.target.result;
+                uploadPlaceholder.style.display = 'none';
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Click en el contenedor
+    uploadContainer.addEventListener('click', function(e) {
+        if (!e.target.closest('.preview-overlay')) {
+            photoInput.click();
+        }
+    });
+
+    // Cambio en el input file
+    photoInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            showPreview(this.files[0]);
+        }
+    });
+
+    // Botón cambiar foto
+    changePhotoBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        photoInput.click();
+    });
+
+    // Botón eliminar foto
+    removePhotoBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        photoInput.value = '';
+        photoPreview.src = '';
+        previewContainer.style.display = 'none';
+        uploadPlaceholder.style.display = 'flex';
+    });
+
+    // Drag & Drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadContainer.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+
+    uploadContainer.addEventListener('dragenter', function() {
+        this.classList.add('dragging');
+    });
+
+    uploadContainer.addEventListener('dragleave', function() {
+        this.classList.remove('dragging');
+    });
+
+    uploadContainer.addEventListener('drop', function(e) {
+        this.classList.remove('dragging');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            photoInput.files = dataTransfer.files;
+            showPreview(file);
+        }
+    });
+
+    // Validación del formulario
+    const form = document.getElementById('clientForm');
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                text: 'Por favor complete todos los campos requeridos correctamente.',
+                confirmButtonColor: 'var(--primary)'
+            });
+        }
+        
+        form.classList.add('was-validated');
+    });
+
+    // Efectos de hover y focus
+    const inputs = document.querySelectorAll('.form-control, .form-select');
+    
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            input.closest('.form-group').classList.add('focused');
+        });
+
+        input.addEventListener('blur', () => {
+            if (!input.value) {
+                input.closest('.form-group').classList.remove('focused');
             }
         });
     });
+});
 </script>
 {% endblock %}

@@ -1,42 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Certificado de Paz y Salvo</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
+            line-height: 1.8;
             color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 40px;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
+            background: #fff;
             padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
         }
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #333;
+            margin-bottom: 30px;
             padding-bottom: 20px;
+            border-bottom: 3px solid #004080;
+        }
+        .header h1 {
+            font-family: Georgia, serif;
+            color: #004080;
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 18px;
+            color: #666;
         }
         .content {
             margin-bottom: 40px;
+            font-size: 16px;
+        }
+        .content p {
+            margin-bottom: 15px;
+        }
+        .highlight {
+            font-size: 1.3em;
+            text-align: center;
+            font-weight: bold;
+            margin: 30px 0;
+            color: #004080;
         }
         .footer {
             text-align: center;
-            margin-top: 60px;
-            border-top: 1px solid #ccc;
+            margin-top: 40px;
             padding-top: 20px;
-        }
-        .logo {
-            max-width: 200px;
-            margin-bottom: 20px;
+            border-top: 2px solid #ccc;
         }
         .signature-line {
-            width: 200px;
-            border-top: 1px solid #333;
-            margin: 60px auto 10px;
+            width: 250px;
+            border-top: 2px solid #333;
+            margin: 40px auto 10px;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -44,35 +73,32 @@
     <div class="container">
         <div class="header">
             <h1>Certificado de Paz y Salvo</h1>
-            <p>Banco El Dorado</p>
+            <p><strong>Banco El Dorado</strong></p>
         </div>
-        
+
         <div class="content">
-            <p>Por medio de la presente, <strong>Banco El Dorado</strong> certifica que:</p>
-            
-            <p style="font-size: 1.2em; text-align: center; margin: 30px 0;">
-                <strong>{{ client.name }}</strong>
-            </p>
-            
-            <p>Identificado(a) con número de documento <strong>{{ client.cardId }}</strong>, 
-               ha cancelado en su totalidad el préstamo por valor de <strong>${{ loan.amount }}</strong>
-               ({{ loan.amount|floatformat:2 }} pesos), incluyendo capital e intereses.</p>
-            
-            <p>Este préstamo fue otorgado el <strong>{{ loan.created_at|date:"d/m/Y" }}</strong> 
-               y ha sido pagado completamente el <strong>{{ loan.updated_at|date:"d/m/Y" }}</strong>.</p>
-            
-            <p>Por lo tanto, se certifica que el titular no presenta ninguna obligación pendiente 
-               relacionada con este préstamo.</p>
+            <p>Por medio del presente documento, <strong>Banco El Dorado</strong> certifica que:</p>
+
+            <p class="highlight">{{ client.name }}</p>
+
+            <p>Identificado(a) con el documento de identidad N° <strong>{{ client.cardId }}</strong>, 
+               ha cancelado en su totalidad el préstamo otorgado por un valor de 
+               <strong>${{ loan.amount }}</strong> ({{ loan.amount|floatformat:2 }} pesos), 
+               incluyendo capital e intereses.</p>
+
+            <p>El préstamo fue concedido el <strong>{{ loan.created_at|date:"d/m/Y" }}</strong> 
+               y ha sido completamente pagado el <strong>{{ loan.updated_at|date:"d/m/Y" }}</strong>.</p>
+
+            <p>Por lo tanto, se certifica que el titular no posee ninguna obligación pendiente 
+               con respecto a este crédito.</p>
         </div>
-        
+
         <div class="footer">
             <div class="signature-line"></div>
-            <p>Gerente General<br>Banco El Dorado</p>
-            <p>Fecha de expedición: {{ date|date:"d/m/Y" }}</p>
-            <p style="font-size: 0.8em; color: #666;">
-                Este documento es válido en la fecha de su expedición.
-            </p>
+            <p><strong>Gerente General</strong><br>Banco El Dorado</p>
+            <p><strong>Fecha de expedición:</strong> {{ date|date:"d/m/Y" }}</p>
+            <p class="note">Este documento es válido únicamente en la fecha de expedición.</p>
         </div>
     </div>
 </body>
-</html> 
+</html>

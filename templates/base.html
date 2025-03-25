@@ -5,8 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Banco El Dorado{% endblock %}</title>
-    
-    <!-- Favicon -->
+    <!-- En el head -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+
+
     <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
     
     <!-- Core CSS -->
@@ -1057,7 +1060,7 @@
                     </li>
 
                     <!-- En el menú del asesor -->
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated and request.session.2fa_verified %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'blog:advisor_projections' %}">
                                 <i class="fas fa-calculator me-1"></i> Proyecciones CDT
@@ -1620,7 +1623,11 @@
             }, 3000);
         });
     </script>
-    
+    <!-- Al final del body -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Favicon -->
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Client, Account, Loan, Appointment
+from .models import Client, Account, Loan, Appointment, SecurityQuestionTemplate, ClientSecurityQuestion
 import cv2
 import os
 import base64
@@ -75,21 +75,39 @@ from django import forms
 from .models import Loan
 
 class LoanForm(forms.ModelForm):
+    client_id = forms.IntegerField(widget=forms.HiddenInput(), required=True)
+
     class Meta:
         model = Loan
-        fields = ['client', 'amount', 'interest_rate', 'repayment_term']
+        fields = ['amount', 'interest_rate', 'repayment_term']
         widgets = {
-            'client': forms.Select(attrs={'class': 'form-select'}),
-            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'interest_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'repayment_term': forms.NumberInput(attrs={'class': 'form-control'}),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese el monto del préstamo'
+            }),
+            'interest_rate': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': 'Ingrese la tasa de interés anual'
+            }),
+            'repayment_term': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese el plazo en meses'
+            })
         }
-        labels = {
-            'client': 'Cliente',
-            'amount': 'Monto del préstamo',
-            'interest_rate': 'Tasa de interés (%)',
-            'repayment_term': 'Plazo (meses)',
-        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        client_id = cleaned_data.get('client_id')
+        
+        try:
+            client = Client.objects.get(id=client_id)
+            cleaned_data['client'] = client
+        except Client.DoesNotExist:
+            raise forms.ValidationError('Cliente no encontrado')
+            
+        return cleaned_data
+
 from django import forms
 from .models import Client
 from django.core.exceptions import ValidationError
@@ -320,4 +338,122 @@ class PQRForm(forms.Form):
         required=True,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
+
+class SecurityQuestionForm(forms.ModelForm):
+    class Meta:
+        model = ClientSecurityQuestion
+        fields = ['question', 'answer']
+        widgets = {
+            'question': forms.Select(attrs={
+                'class': 'form-select mb-3',
+                'required': True
+            }),
+            'answer': forms.TextInput(attrs={
+                'class': 'form-control mb-3',
+                'required': True,
+                'placeholder': 'Tu respuesta'
+            })
+        }
+
+class ClientFormWithSecurity(forms.ModelForm):
+    security_question_0 = forms.ModelChoiceField(
+        queryset=SecurityQuestionTemplate.objects.filter(is_active=True),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'required': True,
+            'placeholder': 'Seleccione una pregunta'
+        }),
+        label='Pregunta de Seguridad 1'
+    )
+    security_answer_0 = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'required': True,
+            'placeholder': 'Ingrese su respuesta'
+        }),
+        label='Respuesta 1'
+    )
+    
+    security_question_1 = forms.ModelChoiceField(
+        queryset=SecurityQuestionTemplate.objects.filter(is_active=True),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'required': True,
+            'placeholder': 'Seleccione una pregunta'
+        }),
+        label='Pregunta de Seguridad 2'
+    )
+    security_answer_1 = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'required': True,
+            'placeholder': 'Ingrese su respuesta'
+        }),
+        label='Respuesta 2'
+    )
+    
+    security_question_2 = forms.ModelChoiceField(
+        queryset=SecurityQuestionTemplate.objects.filter(is_active=True),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'required': True,
+            'placeholder': 'Seleccione una pregunta'
+        }),
+        label='Pregunta de Seguridad 3'
+    )
+    security_answer_2 = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'required': True,
+            'placeholder': 'Ingrese su respuesta'
+        }),
+        label='Respuesta 3'
+    )
+
+    class Meta:
+        model = Client
+        fields = ['cardId', 'name', 'email', 'phone_number', 'address', 'imageSave']
+        widgets = {
+            'cardId': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Número de identificación',
+                'required': True
+            }),
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre completo',
+                'required': True
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'correo@ejemplo.com',
+                'required': True
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Número de teléfono',
+                'required': True
+            }),
+            'address': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Dirección completa',
+                'required': True
+            }),
+            'imageSave': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*',
+                'required': True
+            })
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Verificar que las preguntas sean diferentes
+        questions = []
+        for i in range(3):
+            question = cleaned_data.get(f'security_question_{i}')
+            if question in questions:
+                raise forms.ValidationError('Las preguntas de seguridad deben ser diferentes')
+            questions.append(question)
+        return cleaned_data
 

@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Proyección #{{ projection.id }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-calculator me-2"></i>
+            Detalle de Proyección #{{ projection.id }}
+        </h2>
+        <div>
+            <a href="{% url 'blog:advisor_projections' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver a la lista
+            </a>
+            <button class="btn btn-outline-primary" id="printProjectionBtn">
+                <i class="fas fa-print me-2"></i>Imprimir
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Información de la Proyección</h4>
+                    <span class="badge {% if projection.status == 'PENDING' %}bg-warning{% elif projection.status == 'REVIEWED' %}bg-info{% elif projection.status == 'CONTACTED' %}bg-success{% else %}bg-secondary{% endif %}">
+                        {{ projection.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Información del Cliente</h5>
+                            <p><strong>Nombre:</strong> {{ projection.client_name }}</p>
+                            <p><strong>Email:</strong> {{ projection.client_email }}</p>
+                            <p><strong>Fecha de solicitud:</strong> {{ projection.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Detalles de la Inversión</h5>
+                            <p><strong>Monto inicial:</strong> ${{ projection.initial_amount|floatformat:2 }}</p>
+                            <p><strong>Plazo:</strong> {{ projection.term_days }} días</p>
+                            <p><strong>Tasa:</strong> {{ projection.interest_rate }}%</p>
+                            <p><strong>Tipo de pago:</strong> {{ projection.payment_type }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5>Resultados</h5>
+                            <div class="alert alert-success">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Monto final:</strong></p>
+                                        <h3>${{ projection.final_amount|floatformat:2 }}</h3>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Interés neto:</strong></p>
+                                        <h3>${{ projection.net_interest|floatformat:2 }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if projection.advisor_notes %}
+                    <div class="alert alert-info">
+                        <h5>Notas del Asesor:</h5>
+                        {{ projection.advisor_notes|linebreaks }}
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <button class="btn btn-success" id="markReviewedBtn" data-id="{{ projection.id }}" 
+                            {% if projection.status != "PENDING" %}disabled{% endif %}>
+                            <i class="fas fa-check-circle me-2"></i>Marcar como Revisado
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Responder al Cliente</h4>
+                </div>
+                <div class="card-body">
+                    <form id="responseForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="projection_id" value="{{ projection.id }}">
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Asunto</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="subject" 
+                                   name="subject" 
+                                   value="Información sobre tu solicitud de CDT"
+                                   required
+                                   accept-charset="utf-8">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Mensaje</label>
+                            <textarea class="form-control" 
+                                      id="message" 
+                                      name="message" 
+                                      rows="6" 
+                                      required
+                                      accept-charset="utf-8">Estimado(a) {{ projection.client_name }},
+
+Gracias por su interés en nuestros Certificados de Depósito a Término (CDT).
+
+He revisado su solicitud para un CDT de ${{ projection.initial_amount|floatformat:2 }} a {{ projection.term_days }} días con una tasa del {{ projection.interest_rate }}%.
+
+Me gustaría agendar una llamada para discutir su inversión y responder cualquier pregunta que pueda tener. Por favor, indíqueme su disponibilidad para coordinar.
+
+Saludos cordiales,
+{{ user.get_full_name }}
+Asesor Financiero
+Banco El Dorado</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Enviar Respuesta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Historial de Contactos</h4>
+                </div>
+                <div class="card-body" id="responseHistory">
+                    {% if response_history %}
+                        {% for response in response_history %}
+                        <div class="border-bottom mb-3 pb-3">
+                            <h6>{{ response.subject }}</h6>
+                            <small class="text-muted">
+                                Por: {{ response.advisor }} - 
+                                {{ response.created_at|date:"d/m/Y H:i" }}
+                            </small>
+                            <p class="mt-2">{{ response.message|linebreaks }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No hay registros de contacto previos</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Acciones</h4>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-outline-danger w-100 mb-2" id="deleteProjectionBtn" data-id="{{ projection.id }}">
+                        <i class="fas fa-trash me-2"></i>Eliminar Proyección
+                    </button>
+                    <p class="text-muted small">Esta acción eliminará permanentemente la proyección y no se puede deshacer.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="deleteProjectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar esta proyección? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal de confirmación para eliminar
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteProjectionModal'));
+    const projectionId = {{ projection.id }};
+    
+    // Marcar como revisado
+    document.getElementById('markReviewedBtn').addEventListener('click', async function() {
+        try {
+            const response = await fetch('{% url "blog:mark_projection_reviewed" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ id: projectionId })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Actualizar la página para reflejar el cambio
+                location.reload();
+            } else {
+                throw new Error(data.message || 'Error al actualizar el estado');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+    
+    // Enviar respuesta
+    document.getElementById('responseForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+        
+        if (!subject || !message) {
+            alert('Por favor, complete todos los campos');
+            return;
+        }
+        
+        try {
+            const response = await fetch('{% url "blog:contact_projection_client" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    id: projectionId,
+                    subject: subject,
+                    message: message
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Respuesta enviada correctamente');
+                location.reload();
+            } else {
+                throw new Error(data.message || 'Error al enviar la respuesta');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+    
+    // Eliminar proyección
+    document.getElementById('deleteProjectionBtn').addEventListener('click', function() {
+        deleteModal.show();
+    });
+    
+    // Confirmar eliminación
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+        try {
+            const response = await fetch('{% url "blog:delete_projection" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ id: projectionId })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Redirigir a la lista de proyecciones
+                window.location.href = '{% url "blog:advisor_projections" %}';
+            } else {
+                throw new Error(data.message || 'Error al eliminar la proyección');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+            deleteModal.hide();
+        }
+    });
+    
+    // Imprimir proyección
+    document.getElementById('printProjectionBtn').addEventListener('click', function() {
+        window.print();
+    });
+    
+    // Función para obtener cookies (para CSRF)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %} 

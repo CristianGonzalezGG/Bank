@@ -13,6 +13,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.core.validators import MinValueValidator, RegexValidator
+from django.contrib.auth.models import User
 
 
 
@@ -23,25 +24,42 @@ import random
 from decimal import Decimal
 
 class Client(models.Model):
-    cardId = models.CharField(max_length=20, unique=True, null=True)
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
-    phone_number = models.CharField(max_length=15)
-    address = models.CharField(max_length=200)
-    imageSave = models.ImageField(upload_to='client_photos/', blank=True, null=True)
+    cardId = models.CharField(
+        max_length=20, 
+        unique=True, 
+        verbose_name='Número de Identificación'
+    )
+    name = models.CharField(
+        max_length=100, 
+        verbose_name='Nombre Completo'
+    )
+    email = models.EmailField(
+        verbose_name='Correo Electrónico'
+    )
+    phone_number = models.CharField(
+        max_length=15, 
+        verbose_name='Teléfono'
+    )
+    address = models.CharField(
+        max_length=200, 
+        verbose_name='Dirección'
+    )
+    imageSave = models.ImageField(
+        upload_to='client_photos/', 
+        verbose_name='Foto',
+        null=True,  # Permitir valores nulos
+        blank=True  # Permitir valores en blanco en formularios
+    )
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('blog:client_detail', args=[self.id])
 
     class Meta:
         ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['-created_at']),
-        ]
+
+    def __str__(self):
+        return f"{self.name} - {self.cardId}"
+
+    def get_absolute_url(self):
+        return reverse('blog:client_detail', args=[self.id])
 
 class Account(models.Model):
     ACCOUNT_TYPES = [
@@ -176,43 +194,40 @@ class Account(models.Model):
 
 class Loan(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    repayment_term = models.IntegerField(
-        help_text="Número de meses para el reembolso",
-        default=12
-    )
-    start_date = models.DateField(
-        default=timezone.now,
-        help_text="Fecha de inicio del préstamo"
-    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    repayment_term = models.IntegerField()
+    start_date = models.DateField(default=timezone.now)
+    next_payment_date = models.DateField(null=True, blank=True)
+    last_payment_date = models.DateField(null=True, blank=True)
     status = models.CharField(
-        max_length=20, 
-        default='PENDING',
+        max_length=20,
         choices=[
             ('PENDING', 'Pendiente'),
             ('ACTIVE', 'Activo'),
             ('PAID', 'Pagado'),
             ('DEFAULTED', 'Incumplido')
-        ]
+        ],
+        default='PENDING'
     )
-    remaining_balance = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        default=0
+    remaining_balance = models.DecimalField(max_digits=12, decimal_places=2)
+    monthly_payment = models.DecimalField(max_digits=12, decimal_places=2)
+    
+    # Campos de auditoría
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='loans_created'
     )
-    next_payment_date = models.DateField(
-        null=True, 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    verification = models.ForeignKey(
+        'LoanVerification',
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True
     )
-    monthly_payment = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        default=0
-    )
-
-    def __str__(self):
-        return f"Loan for {self.client.name} - ${self.amount}"
 
     def calculate_monthly_payment(self):
         # Handle zero interest rate case separately
@@ -241,7 +256,6 @@ class Loan(models.Model):
         return monthly_payment.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     def clean(self):
-        # Verificar préstamos activos
         if not self.pk:  # Solo para préstamos nuevos
             active_loans = Loan.objects.filter(
                 client=self.client,
@@ -250,8 +264,7 @@ class Loan(models.Model):
             
             if active_loans:
                 raise ValidationError(
-                    'El cliente tiene un préstamo activo pendiente de pago. '
-                    'Debe cancelar el préstamo actual antes de solicitar uno nuevo.'
+                    'El cliente tiene un préstamo activo pendiente de pago.'
                 )
 
     def save(self, *args, **kwargs):
@@ -264,17 +277,23 @@ class Loan(models.Model):
         super().save(*args, **kwargs)
 
     def register_payment(self, payment_amount):
+        """
+        Registra un nuevo pago y actualiza el saldo del préstamo
+        """
         # Convertir el monto del pago a Decimal
         payment_amount = Decimal(str(payment_amount))
         
-        # Verificar que el pago no sea mayor que el saldo restante
+        # Validar que el pago no exceda el saldo restante
         if payment_amount > self.remaining_balance:
-            payment_amount = self.remaining_balance
+            raise ValidationError(
+                f'El monto del pago (${payment_amount}) no puede ser mayor al saldo restante (${self.remaining_balance})'
+            )
         
         # Crear el registro de pago
         payment = Payment.objects.create(
             loan=self,
-            amount=payment_amount
+            amount=payment_amount,
+            payment_date=timezone.now()
         )
         
         # Actualizar el saldo restante
@@ -284,15 +303,15 @@ class Loan(models.Model):
         if self.remaining_balance <= Decimal('0'):
             self.status = 'PAID'
             self.remaining_balance = Decimal('0')
-        
-        # Actualizar la fecha del próximo pago
-        if self.status != 'PAID':
+        else:
+            # Actualizar la fecha del próximo pago
             self.next_payment_date = timezone.now() + timedelta(days=30)
         
-        # Guardar los cambios en el préstamo
-        self.save(update_fields=['remaining_balance', 'status', 'next_payment_date'])
-        
+        self.save()
         return payment
+
+    def get_absolute_url(self):
+        return reverse('blog:loan_detail', kwargs={'pk': self.id})
 
     def generate_certificate(self):
         if self.status != 'PAID':
@@ -305,18 +324,18 @@ class Loan(models.Model):
             os.makedirs(cert_dir, exist_ok=True)
 
             # Generar nombre único para el archivo
-            output_file = f'paz_y_salvo_{self.client.name}_{self.id}_{now().strftime("%Y%m%d%H%M%S")}.pdf'
+            output_file = f'paz_y_salvo_{self.client.name}_{self.id}_{timezone.now().strftime("%Y%m%d%H%M%S")}.pdf'
             output_path = os.path.join(cert_dir, output_file)
 
             # Preparar el contexto
             context = {
                 'loan': self,
                 'client': self.client,
-                'date': now().strftime('%d de %B de %Y'),
+                'date': timezone.now().strftime('%d de %B de %Y'),
             }
             
             # Renderizar el template HTML
-            html_content = render_to_string('loan/paz_y_salvo_template.html', context)
+            html_content = render_to_string('loan/certificate_template.html', context)
             
             # Configuración de pdfkit
             options = {
@@ -330,26 +349,17 @@ class Loan(models.Model):
                 'quiet': '',
             }
 
-            try:
-                # Intentar usar la configuración del settings
-                config = pdfkit.configuration(wkhtmltopdf=settings.WKHTMLTOPDF_CMD)
-                pdfkit.from_string(html_content, output_path, options=options, configuration=config)
-            except Exception as pdf_error:
-                print(f"Error con la configuración principal: {str(pdf_error)}")
-                # Intentar sin configuración específica
-                pdfkit.from_string(html_content, output_path, options=options)
-
-            if not os.path.exists(output_path):
-                raise Exception("El archivo PDF no se generó correctamente")
+            # Generar PDF
+            pdfkit.from_string(html_content, output_path, options=options)
 
             # Enviar correo
-            subject = 'Certificado de Paz y Salvo'
+            subject = 'Certificado de Paz y Salvo - Banco El Dorado'
             message = f'''
             Estimado(a) {self.client.name},
 
             Adjunto encontrará su certificado de paz y salvo del préstamo #{self.id}.
             
-            Gracias por confiar en nosotros.
+            Gracias por su puntualidad en los pagos y por confiar en nosotros.
 
             Atentamente,
             Banco El Dorado
@@ -368,17 +378,34 @@ class Loan(models.Model):
             
         except Exception as e:
             print(f"Error generando certificado: {str(e)}")
-            import traceback
-            traceback.print_exc()
             return None
 
+    def __str__(self):
+        return f"Loan for {self.client} - ${self.amount}"
+
 class Payment(models.Model):
-    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, related_name='payments')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_date = models.DateTimeField(auto_now_add=True)
+    loan = models.ForeignKey('Loan', on_delete=models.CASCADE, related_name='payments')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    payment_date = models.DateTimeField(default=timezone.now)
+    balance_after = models.DecimalField(max_digits=12, decimal_places=2)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='payments_created'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-payment_date']
 
     def __str__(self):
-        return f"Pago de ${self.amount} para préstamo de {self.loan.client.name}"
+        return f"Payment of ${self.amount} for loan {self.loan.id}"
+
+    def save(self, *args, **kwargs):
+        if not self.balance_after:
+            self.balance_after = self.loan.remaining_balance - self.amount
+        super().save(*args, **kwargs)
 
 class Appointment(models.Model):
     APPOINTMENT_TYPES = [
@@ -422,11 +449,92 @@ class UserTwoFactorSettings(models.Model):
         return f"2FA Settings for {self.user.username}"
 
 class TwoFactorCode(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    code = models.CharField(max_length=6)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
 
-    def is_valid(self):
-        return not self.is_verified and self.expires_at > timezone.now()
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timezone.timedelta(days=365)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"2FA Code for {self.user.username}"
+
+class LoanVerification(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    is_verified = models.BooleanField(default=False)
+    security_answers_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Verification for {self.client} - {'Verified' if self.is_verified else 'Pending'}"
+
+class SecurityQuestionTemplate(models.Model):
+    question_text = models.CharField(max_length=200)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['question_text']
+
+    def __str__(self):
+        return self.question_text
+
+class ClientSecurityQuestion(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='security_questions')
+    question = models.ForeignKey(SecurityQuestionTemplate, on_delete=models.PROTECT)
+    answer = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['created_at']
+        unique_together = ['client', 'question']
+
+    def __str__(self):
+        return f"Security Question for {self.client.name}"
+
+    def save(self, *args, **kwargs):
+        if self.answer:
+            from django.contrib.auth.hashers import make_password
+            self.answer = make_password(self.answer.lower())
+        super().save(*args, **kwargs)
+
+    def verify_answer(self, provided_answer):
+        if not self.answer or not provided_answer:
+            return False
+        from django.contrib.auth.hashers import check_password
+        return check_password(provided_answer.lower(), self.answer)
+
+class Projection(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pendiente'),
+        ('REVIEWED', 'Revisado'),
+        ('CONTACTED', 'Contactado')
+    ]
+    
+    client_name = models.CharField(max_length=100)
+    client_email = models.EmailField()
+    initial_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    final_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    net_interest = models.DecimalField(max_digits=12, decimal_places=2)
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    term_days = models.IntegerField()
+    payment_type = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    advisor_notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Projection for {self.client_name} - {self.initial_amount}"

@@ -1,79 +1,106 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4 text-primary">Detalles del Préstamo</h2>
-    
-    <div class="card">
-        <div class="card-header bg-dark text-white">
-            <h5>Información del Cliente</h5>
-        </div>
-        <div class="card-body">
-            <p><strong>Cliente:</strong> {{ loan.client.name }}</p>
-            <p><strong>Email:</strong> {{ loan.client.email }}</p>
-            <p><strong>Teléfono:</strong> {{ loan.client.phone_number }}</p>
-        </div>
-    </div>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar"></i> Detalles del Préstamo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6>Información del Cliente:</h6>
+                        <p class="mb-0"><strong>Nombre:</strong> {{ client.name }}</p>
+                        <p class="mb-0"><strong>Documento:</strong> {{ client.cardId }}</p>
+                        <p class="mb-0"><strong>Email:</strong> {{ client.email }}</p>
+                    </div>
 
-    <div class="card mt-3">
-        <div class="card-header bg-dark text-white">
-            <h5>Detalles del Préstamo</h5>
-        </div>
-        <div class="card-body">
-            <p><strong>Monto:</strong> ${{ loan.amount }}</p>
-            <p><strong>Interés:</strong> {{ loan.interest_rate }}%</p>
-            <p><strong>Plazo:</strong> {{ loan.repayment_term }} meses</p>
-            <p><strong>Saldo Restante:</strong> ${{ loan.remaining_balance }}</p>
-            <p><strong>Estado:</strong> 
-                <span class="badge {% if loan.status == 'PAID' %}bg-success{% else %}bg-warning{% endif %}">
-                    {{ loan.get_status_display }}
-                </span>
-            </p>
-        </div>
-    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h6>Detalles del Préstamo:</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Monto:</strong> ${{ loan.amount|floatformat:2 }}</li>
+                                <li><strong>Tasa de Interés:</strong> {{ loan.interest_rate }}%</li>
+                                <li><strong>Plazo:</strong> {{ loan.repayment_term }} meses</li>
+                                <li><strong>Estado:</strong> {{ loan.get_status_display }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Información de Pagos:</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Pago Mensual:</strong> ${{ monthly_payment|floatformat:2 }}</li>
+                                <li><strong>Saldo Pendiente:</strong> ${{ remaining_balance|floatformat:2 }}</li>
+                                <li><strong>Próximo Pago:</strong> {{ next_payment_date|date:"d/m/Y" }}</li>
+                            </ul>
+                        </div>
+                    </div>
 
-    <div class="mt-3">
-        <a href="{% url 'blog:loan_list' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Volver
-        </a>
+                    <div class="mb-3">
+                        <h5>Estado del Préstamo: 
+                            <span class="badge {% if loan.status == 'PAID' %}bg-success
+                                           {% elif loan.status == 'PENDING' %}bg-warning
+                                           {% else %}bg-primary{% endif %}">
+                                {{ loan.get_status_display }}
+                            </span>
+                        </h5>
+                        <p><strong>Saldo Pendiente:</strong> ${{ loan.remaining_balance|floatformat:2 }}</p>
+                        {% if loan.next_payment_date and loan.status != 'PAID' %}
+                            <p><strong>Próximo Pago:</strong> {{ loan.next_payment_date|date:"d/m/Y" }}</p>
+                        {% endif %}
+                    </div>
 
-        {% if loan.status != 'PAID' %}
-            <a href="{% url 'blog:loan_payment' loan.id %}" class="btn btn-primary">
-                <i class="fas fa-money-bill-wave"></i> Registrar Pago
-            </a>
-        {% endif %}
+                    <div class="btn-group mb-3">
+                        {% if loan.status == 'PAID' %}
+                            <a href="{% url 'blog:generate_paz_y_salvo' pk=loan.id %}" class="btn btn-success">
+                                <i class="fas fa-file-pdf"></i> Descargar Paz y Salvo
+                            </a>
+                        {% else %}
+                            <a href="{% url 'blog:loan_payment' pk=loan.id %}" class="btn btn-primary">
+                                <i class="fas fa-money-bill-wave"></i> Registrar Pago
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'blog:loan_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
 
-        {% if loan.status == 'PAID' %}
-            <a href="{% url 'blog:generate_paz_y_salvo' loan.id %}" class="btn btn-success">
-                <i class="fas fa-file-pdf"></i> Generar Paz y Salvo
-            </a>
-        {% endif %}
-    </div>
-
-    <div class="card mt-4">
-        <div class="card-header">
-            <h5>Historial de Pagos</h5>
-        </div>
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Monto</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for payment in loan.payments.all %}
-                    <tr>
-                        <td>{{ payment.payment_date }}</td>
-                        <td>${{ payment.amount }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="2" class="text-center">No hay pagos registrados.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    {% if payments %}
+                    <div class="mt-4">
+                        <h6>Historial de Pagos:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Monto</th>
+                                        <th>Saldo Después</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in payments %}
+                                    <tr>
+                                        <td>{{ payment.payment_date|date:"d/m/Y" }}</td>
+                                        <td>${{ payment.amount|floatformat:2 }}</td>
+                                        <td>${{ payment.balance_after|floatformat:2 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No hay pagos registrados para este préstamo.
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>

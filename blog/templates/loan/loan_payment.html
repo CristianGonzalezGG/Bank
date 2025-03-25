@@ -1,35 +1,79 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4 text-primary">Registrar Pago - Préstamo</h2>
-    
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            <h5>Información del Préstamo</h5>
-        </div>
-        <div class="card-body">
-            <p><strong>Cliente:</strong> {{ loan.client.name }}</p>
-            <p><strong>Monto Original:</strong> ${{ loan.amount }}</p>
-            <p><strong>Saldo Restante:</strong> ${{ loan.remaining_balance }}</p>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="payment_amount" class="form-label">Monto del Pago</label>
-                    <input type="number" step="0.01" class="form-control" id="payment_amount" name="payment_amount" required>
-                    <div class="form-text">El monto máximo a pagar es ${{ loan.remaining_balance }}</div>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-money-bill-wave"></i> Registrar Pago
+                    </h5>
                 </div>
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-money-bill-wave"></i> Registrar Pago
-                </button>
-                <a href="{% url 'blog:loan_detail' loan.id %}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
-            </form>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6>Información del Préstamo:</h6>
+                        <p class="mb-0"><strong>Cliente:</strong> {{ client.name }}</p>
+                        <p class="mb-0"><strong>Documento:</strong> {{ client.cardId }}</p>
+                        <p class="mb-0"><strong>Saldo Pendiente:</strong> ${{ remaining_balance|floatformat:2 }}</p>
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Monto del Pago</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="amount" 
+                                       name="amount" 
+                                       required 
+                                       step="0.01"
+                                       min="0.01"
+                                       max="{{ remaining_balance }}"
+                                       placeholder="Ingrese el monto del pago">
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check-circle"></i> Registrar Pago
+                            </button>
+                            <a href="{% url 'blog:loan_detail' pk=loan.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                        </div>
+                    </form>
+
+                    {% if payments %}
+                    <div class="mt-4">
+                        <h6>Historial de Pagos:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Monto</th>
+                                        <th>Saldo Después</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in payments %}
+                                    <tr>
+                                        <td>{{ payment.payment_date|date:"d/m/Y" }}</td>
+                                        <td>${{ payment.amount|floatformat:2 }}</td>
+                                        <td>${{ payment.balance_after|floatformat:2 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -4,15 +4,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from .models import ProjectionRequest, ProjectionResponse
+from .models import ProjectionRequest, ProjectionResponse, Projection
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.conf import settings
 import json
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from django.utils.html import strip_tags
 from django.utils.encoding import force_str
+from django.views.decorators.csrf import csrf_exempt
 
 app_name = 'client_portal'  # Añade esta línea
 
@@ -20,57 +21,50 @@ urlpatterns = [
 
 ]
 
-@login_required
+@csrf_exempt
 def save_projection(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-            projection = ProjectionRequest.objects.create(
-                client=request.user,
-                initial_amount=Decimal(data.get('initial_amount')),
-                term_days=int(data.get('term_days')),
-                interest_rate=Decimal(data.get('interest_rate')),
-                payment_type=data.get('payment_type'),
-                final_amount=Decimal(data.get('final_amount')) / Decimal('100'),  # Convertir de centavos
-                net_interest=Decimal(data.get('net_interest')) / Decimal('100'),  # Convertir de centavos
-                client_notes=data.get('notes', ''),
-                status='PENDING'
+            # Access form data from request.POST
+            client_name = request.POST.get('name')
+            client_email = request.POST.get('email')
+            initial_amount = request.POST.get('initial_amount')
+            final_amount = request.POST.get('final_amount')
+            net_interest = request.POST.get('net_interest')
+            interest_rate = request.POST.get('interest_rate')
+            term_days = request.POST.get('term_days')
+            payment_type = request.POST.get('payment_type')
+
+            # Convert numeric fields to Decimal
+            initial_amount = Decimal(initial_amount.replace('.', '').replace(',', '.'))
+            final_amount = Decimal(final_amount.replace('.', '').replace(',', '.'))
+            net_interest = Decimal(net_interest.replace('.', '').replace(',', '.'))
+            interest_rate = Decimal(interest_rate.replace('.', '').replace(',', '.'))
+
+            # Ensure all required fields are present
+            if not all([client_name, client_email, initial_amount, final_amount, net_interest, interest_rate, term_days, payment_type]):
+                return JsonResponse({'success': False, 'message': 'Missing required fields'}, status=400)
+
+            # Save the projection
+            projection = Projection.objects.create(
+                client_name=client_name,
+                client_email=client_email,
+                initial_amount=initial_amount,
+                final_amount=final_amount,
+                net_interest=net_interest,
+                interest_rate=interest_rate,
+                term_days=int(term_days),
+                payment_type=payment_type
             )
-            
-            # Enviar notificación por correo a los asesores
-            subject = 'Nueva Proyección CDT Pendiente'
-            message = f'''
-            Se ha recibido una nueva solicitud de proyección CDT.
-            
-            Cliente: {data.get('client_name')}
-            Email: {data.get('client_email')}
-            Monto: ${data.get('initial_amount')}
-            Plazo: {data.get('term_days')} días
-            
-            Por favor revise la solicitud en el panel de gestión.
-            '''
-            
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [settings.ADVISOR_EMAIL],  # Asegúrate de configurar esto en settings.py
-                fail_silently=True,
-            )
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Proyección guardada exitosamente',
-                'projection_id': projection.id
-            })
-            
+
+            return JsonResponse({'success': True, 'message': 'Projection saved successfully'})
+
+        except (InvalidOperation, ValueError) as e:
+            return JsonResponse({'success': False, 'message': f'Error converting values: {str(e)}'}, status=400)
         except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': str(e)
-            }, status=400)
-            
-    return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
+            return JsonResponse({'success': False, 'message': f'Unexpected error: {str(e)}'}, status=500)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
 
 @login_required
 def advisor_projections(request):

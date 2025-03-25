@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco El Dorado - Código de Verificación</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+        .code-container {
+            background: #ecf0f1;
+            padding: 25px;
+            margin: 20px auto;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .code {
+            font-size: 40px;
+            font-weight: bold;
+            color: #1abc9c;
+            letter-spacing: 8px;
+        }
+        .cta {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .warning {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .footer {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 30px;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Banco El Dorado - Verificación de Seguridad</div>
+        
+        <p>Estimado(a) <strong>{{ user.get_full_name|default:user.username }}</strong>,</p>
+        
+        <p>Para completar tu proceso de autenticación, ingresa el siguiente código:</p>
+        
+        <div class="code-container">
+            <div class="code">{{ code }}</div>
+        </div>
+        
+        <p class="cta">Este código expirará en <strong>{{ expiry_minutes }}</strong> minutos.</p>
+        
+        <p class="warning">⚠️ Por tu seguridad, no compartas este código con nadie.</p>
+        
+        <div class="footer">
+            Este es un correo automático, por favor no responder.<br>
+            Si no solicitaste este código, ignora este mensaje.
+        </div>
+    </div>
+</body>
+</html>

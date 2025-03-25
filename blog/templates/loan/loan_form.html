@@ -1,43 +1,839 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4 text-primary">{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Préstamo</h2>
-    <div class="card">
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="text-danger">
-                                {{ field.errors }}
-                            </div>
-                        {% endif %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Stepper Progress -->
+            <div class="progress-stepper mb-4">
+                <div class="step active" id="step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-text">Buscar Cliente</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-text">Verificación</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-text">Préstamo</div>
+                </div>
+                <div class="step" id="step4">
+                    <div class="step-circle">4</div>
+                    <div class="step-text">Confirmación</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Client Search -->
+            <div class="card shadow-sm" id="searchStep">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-search"></i> Buscar Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <form id="searchForm" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="clientSearch" 
+                                   class="form-control" 
+                                   placeholder="Ingrese número de documento..."
+                                   autocomplete="off">
+                            <button class="btn btn-primary" type="submit" id="searchBtn">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                    <div id="clientInfo" class="alert alert-info d-none">
+                        <!-- Información del cliente se mostrará aquí -->
                     </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Guardar
-                </button>
-                <a href="{% url 'blog:loan_list' %}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
-            </form>
+                    <div id="searchResults" class="mt-3">
+                        <!-- Los resultados se mostrarán aquí -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Verification -->
+            <div class="card shadow-sm d-none" id="verificationStep">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Verificación de Seguridad</h5>
+                </div>
+                <div class="card-body">
+                    <div id="codeVerification">
+                        <div id="selectedClientInfo" class="alert alert-info mb-3">
+                            <!-- Info del cliente seleccionado -->
+                        </div>
+                        <p class="mb-3">Se ha enviado un código de verificación al correo del cliente.</p>
+                        <div class="verification-code-input mb-3">
+                            <input type="text" maxlength="1" class="form-control code-input" data-index="0">
+                            <input type="text" maxlength="1" class="form-control code-input" data-index="1">
+                            <input type="text" maxlength="1" class="form-control code-input" data-index="2">
+                            <input type="text" maxlength="1" class="form-control code-input" data-index="3">
+                            <input type="text" maxlength="1" class="form-control code-input" data-index="4">
+                            <input type="text" maxlength="1" class="form-control code-input" data-index="5">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" id="verifyCodeBtn">
+                                <i class="fas fa-check-circle"></i> Verificar Código
+                            </button>
+                            <button class="btn btn-outline-secondary" id="resendCodeBtn">
+                                <i class="fas fa-redo"></i> Reenviar Código
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Loan Form -->
+            <div class="card shadow-sm d-none" id="loanFormStep">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Detalles del Préstamo</h5>
+                </div>
+                <div class="card-body">
+                    <div id="loanClientInfo" class="alert alert-info mb-3"></div>
+                    <form id="loanForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="client_id" id="client_id">
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Monto del Préstamo</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="amount" 
+                                       name="amount" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="repayment_term" class="form-label">Plazo (meses)</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="repayment_term" 
+                                   name="repayment_term" 
+                                   required 
+                                   min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="interest_rate" class="form-label">Tasa de Interés Anual (%)</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="interest_rate" 
+                                   name="interest_rate" 
+                                   required 
+                                   step="0.01">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Continuar a Verificación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Step 4: Security Questions -->
+            <div class="card shadow-sm d-none" id="securityQuestionsStep">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Preguntas de Seguridad</h5>
+                </div>
+                <div class="card-body">
+                    <div id="securityQuestionsForm">
+                        <!-- Las preguntas se cargarán aquí -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Modal for Active Loan Warning -->
+<div class="modal fade" id="activeLoanModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Préstamo Activo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-ban text-warning" style="font-size: 48px;"></i>
+                </div>
+                <p>El cliente seleccionado ya tiene un préstamo activo. No es posible crear un nuevo préstamo hasta que el actual sea cancelado.</p>
+                <div class="alert alert-info">
+                    <strong>Préstamo Actual:</strong>
+                    <ul class="mb-0" id="activeLoanDetails">
+                        <!-- Active loan details will be populated here -->
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
 <style>
-    .form-control {
-        margin-bottom: 10px;
+    .progress-stepper {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
     }
-    select, input {
+
+    .step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+    }
+
+    .step::after {
+        content: '';
+        position: absolute;
         width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        height: 2px;
+        background: #dee2e6;
+        top: 25px;
+        left: 50%;
+        z-index: 1;
+    }
+
+    .step:last-child::after {
+        display: none;
+    }
+
+    .step-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    .step.active .step-circle {
+        background: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+
+    .step-text {
+        margin-top: 0.5rem;
+        color: #6c757d;
+    }
+
+    .step.active .step-text {
+        color: #007bff;
+    }
+
+    .verification-code-input {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .code-input {
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        font-size: 1.5rem;
+    }
+
+    .search-result-item {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .search-result-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .shake {
+        animation: shake 0.5s ease-in-out;
     }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedClientId = null;
+    let selectedClientData = null;
+    const searchForm = document.getElementById('searchForm');
+    const clientSearch = document.getElementById('clientSearch');
+    const searchResults = document.getElementById('searchResults');
+    const clientInfo = document.getElementById('clientInfo');
+
+    // Función para actualizar el progreso del stepper
+    function updateStepperProgress(step) {
+        document.querySelectorAll('.step').forEach((el, index) => {
+            if (index < step) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        });
+    }
+
+    // Manejar búsqueda de cliente
+    searchForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const query = clientSearch.value.trim();
+        if (!query) return;
+
+        try {
+            const response = await fetch(`/api/search-clients/?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            if (data.length === 1) {
+                // Si solo hay un resultado, seleccionarlo automáticamente
+                selectClient(data[0]);
+            } else if (data.length > 1) {
+                // Mostrar resultados para selección
+                showSearchResults(data);
+            } else {
+                // No se encontraron resultados
+                showNoResults();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al buscar el cliente'
+            });
+        }
+    });
+
+    function showSearchResults(clients) {
+        searchResults.innerHTML = clients.map(client => `
+            <div class="alert alert-info">
+                <h6>${client.name}</h6>
+                <p class="mb-0">Documento: ${client.cardId}</p>
+                <p class="mb-0">Email: ${client.email}</p>
+                <button class="btn btn-primary btn-sm mt-2" onclick="selectClient(${JSON.stringify(client)})">
+                    Continuar con este cliente
+                </button>
+            </div>
+        `).join('');
+    }
+
+    function showNoResults() {
+        searchResults.innerHTML = `
+            <div class="alert alert-warning">
+                No se encontraron clientes con ese documento.
+            </div>
+        `;
+    }
+
+    async function selectClient(client) {
+        try {
+            const response = await fetch(`/api/check-active-loan/${client.id}/`);
+            const data = await response.json();
+
+            if (data.hasActiveLoan) {
+                showActiveLoanModal(data.activeLoan, client);
+            } else {
+                selectedClientId = client.id;
+                selectedClientData = client;
+                await proceedToVerification(client);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al verificar el estado del cliente'
+            });
+        }
+    }
+
+    async function proceedToVerification(client) {
+        try {
+            // Enviar código de verificación
+            const response = await fetch('/api/send-verification-code/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ clientId: client.id })
+            });
+
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Error al enviar el código de verificación');
+            }
+
+            // Mostrar mensaje de éxito
+            Swal.fire({
+                icon: 'success',
+                title: 'Código Enviado',
+                text: `Se ha enviado un código de verificación al correo ${client.email}`,
+                showConfirmButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Actualizar UI para mostrar paso de verificación
+                    document.getElementById('searchStep').classList.add('d-none');
+                    document.getElementById('verificationStep').classList.remove('d-none');
+                    updateStepperProgress(2);
+                }
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error al proceder con la verificación. Por favor, intente nuevamente.',
+            });
+        }
+    }
+
+    function showActiveLoanModal(loanData, client) {
+        const modalContent = `
+            <div class="alert alert-warning">
+                <h6>Préstamo Activo Encontrado</h6>
+                <p>El cliente ${client.name} tiene un préstamo activo con los siguientes detalles:</p>
+                <ul>
+                    <li>Monto: $${loanData.amount}</li>
+                    <li>Fecha de inicio: ${loanData.start_date}</li>
+                    <li>Saldo pendiente: $${loanData.remaining_balance}</li>
+                    <li>Estado: ${loanData.status}</li>
+                </ul>
+                <p class="mb-0">No es posible solicitar un nuevo préstamo hasta que el actual sea cancelado.</p>
+            </div>
+        `;
+
+        Swal.fire({
+            title: 'Préstamo Activo',
+            html: modalContent,
+            icon: 'warning',
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Función auxiliar para obtener el token CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Manejar inputs del código de verificación
+    const codeInputs = document.querySelectorAll('.code-input');
+    codeInputs.forEach((input, index) => {
+        input.addEventListener('keyup', (e) => {
+            if (e.key >= '0' && e.key <= '9') {
+                // Mover al siguiente input
+                if (index < codeInputs.length - 1) {
+                    codeInputs[index + 1].focus();
+                }
+            } else if (e.key === 'Backspace') {
+                // Mover al input anterior
+                if (index > 0) {
+                    codeInputs[index - 1].focus();
+                }
+            }
+        });
+
+        // Permitir solo números
+        input.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    });
+
+    // Manejar verificación del código
+    const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+    verifyCodeBtn.addEventListener('click', async function() {
+        try {
+            // Deshabilitar el botón y mostrar loading
+            verifyCodeBtn.disabled = true;
+            const originalText = verifyCodeBtn.innerHTML;
+            verifyCodeBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verificando...';
+
+            // Obtener el código completo
+            const code = Array.from(codeInputs).map(input => input.value).join('');
+
+            if (code.length !== 6) {
+                throw new Error('Por favor, ingrese el código completo de 6 dígitos');
+            }
+
+            // Enviar código para verificación
+            const response = await fetch('/api/verify-code/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    clientId: selectedClientId,
+                    code: code
+                })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Código inválido');
+            }
+
+            // Mostrar mensaje de éxito
+            await Swal.fire({
+                icon: 'success',
+                title: 'Código Verificado',
+                text: 'El código ha sido verificado correctamente',
+                showConfirmButton: true
+            });
+
+            // Llamar a la función de verificación exitosa
+            await handleSuccessfulVerification();
+
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error al verificar el código',
+            });
+
+            // Limpiar inputs
+            codeInputs.forEach(input => input.value = '');
+            codeInputs[0].focus();
+
+        } finally {
+            // Restaurar el botón
+            verifyCodeBtn.disabled = false;
+            verifyCodeBtn.innerHTML = originalText;
+        }
+    });
+
+    // Manejar reenvío de código
+    const resendCodeBtn = document.getElementById('resendCodeBtn');
+    resendCodeBtn.addEventListener('click', async function() {
+        try {
+            resendCodeBtn.disabled = true;
+            const originalText = resendCodeBtn.innerHTML;
+            resendCodeBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Reenviando...';
+
+            const response = await fetch('/api/send-verification-code/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ clientId: selectedClientId })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Error al reenviar el código');
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Código Reenviado',
+                text: 'Se ha enviado un nuevo código de verificación',
+            });
+
+            // Limpiar inputs
+            codeInputs.forEach(input => input.value = '');
+            codeInputs[0].focus();
+
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error al reenviar el código',
+            });
+        } finally {
+            resendCodeBtn.disabled = false;
+            resendCodeBtn.innerHTML = originalText;
+        }
+    });
+
+    // Actualizar la función que maneja la verificación exitosa
+    async function handleSuccessfulVerification() {
+        try {
+            // Actualizar el formulario de préstamo con la información del cliente
+            document.getElementById('client_id').value = selectedClientId;
+            document.getElementById('loanClientInfo').innerHTML = `
+                <h6>Cliente Verificado:</h6>
+                <p class="mb-0"><strong>Nombre:</strong> ${selectedClientData.name}</p>
+                <p class="mb-0"><strong>Documento:</strong> ${selectedClientData.cardId}</p>
+                <p class="mb-0"><strong>Email:</strong> ${selectedClientData.email}</p>
+            `;
+
+            // Ocultar paso de verificación y mostrar formulario
+            document.getElementById('verificationStep').classList.add('d-none');
+            document.getElementById('loanFormStep').classList.remove('d-none');
+            updateStepperProgress(3);
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al procesar la verificación'
+            });
+        }
+    }
+
+    // Manejar envío del formulario de préstamo
+    const loanForm = document.getElementById('loanForm');
+    loanForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+        try {
+            // Obtener datos del formulario
+            const formData = {
+                client_id: selectedClientId,
+                amount: document.getElementById('amount').value,
+                interest_rate: document.getElementById('interest_rate').value,
+                repayment_term: document.getElementById('repayment_term').value
+            };
+
+            // Validar datos del préstamo
+            if (!formData.amount || !formData.interest_rate || !formData.repayment_term) {
+                throw new Error('Por favor complete todos los campos del préstamo');
+            }
+
+            // Cargar preguntas de seguridad
+            const questionsResponse = await fetch(`/api/security-questions/${selectedClientId}/`);
+            const questionsData = await questionsResponse.json();
+            
+            if (questionsResponse.status !== 200) {
+                throw new Error(questionsData.error || 'Error al cargar preguntas de seguridad');
+            }
+            
+            if (!Array.isArray(questionsData) || questionsData.length === 0) {
+                throw new Error('No se encontraron preguntas de seguridad');
+            }
+
+            // Guardar datos del formulario en sessionStorage
+            sessionStorage.setItem('loanFormData', JSON.stringify(formData));
+            
+            // Mostrar preguntas de seguridad
+            document.getElementById('loanFormStep').classList.add('d-none');
+            document.getElementById('securityQuestionsStep').classList.remove('d-none');
+            updateStepperProgress(4);
+
+            // Generar HTML para las preguntas
+            const questionsHTML = questionsData.map((q, index) => `
+                <div class="mb-3">
+                    <label class="form-label">${q.question}</label>
+                    <input type="text" class="form-control security-answer" 
+                           data-question="${q.id}" required>
+                </div>
+            `).join('');
+
+            document.getElementById('securityQuestionsForm').innerHTML = `
+                ${questionsHTML}
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" id="submitSecurityAnswersBtn">
+                        <i class="fas fa-check-circle"></i> Crear Préstamo
+                    </button>
+                </div>
+            `;
+
+            // Mover el event listener aquí, justo después de crear el botón
+            const submitSecurityAnswersBtn = document.getElementById('submitSecurityAnswersBtn');
+            submitSecurityAnswersBtn.addEventListener('click', async function() {
+                try {
+                    // Deshabilitar el botón y mostrar loading
+                    this.disabled = true;
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+                    const answers = Array.from(document.querySelectorAll('.security-answer'))
+                        .map(input => ({
+                            question_id: input.dataset.question,
+                            answer: input.value.trim()
+                        }));
+
+                    if (answers.some(answer => !answer.answer)) {
+                        throw new Error('Por favor responda todas las preguntas');
+                    }
+
+                    // Obtener los datos del formulario guardados
+                    const formData = JSON.parse(sessionStorage.getItem('loanFormData'));
+                    if (!formData) {
+                        throw new Error('No se encontraron los datos del préstamo');
+                    }
+
+                    console.log('Enviando datos:', {
+                        client_id: selectedClientId,
+                        answers: answers
+                    });
+
+                    // Verificar respuestas
+                    const verifyResponse = await fetch('/api/verify-security-answers/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            client_id: selectedClientId,
+                            answers: answers
+                        })
+                    });
+
+                    const verifyResult = await verifyResponse.json();
+                    console.log('Resultado verificación:', verifyResult); // Para depuración
+
+                    if (!verifyResult.success) {
+                        throw new Error(verifyResult.message || 'Las respuestas de seguridad son incorrectas');
+                    }
+
+                    // Crear préstamo
+                    const response = await fetch('/loan/create/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Error al crear el préstamo');
+                    }
+
+                    const result = await response.json();
+                    console.log('Respuesta creación préstamo:', result); // Para depuración
+
+                    if (!result.success) {
+                        throw new Error(result.error || 'Error al crear el préstamo');
+                    }
+
+                    // Animación de éxito
+                    const container = document.querySelector('.container');
+                    container.style.animation = 'fadeOutUp 0.5s ease-out';
+
+                    // Mostrar mensaje de éxito con animación
+                    await Swal.fire({
+                        icon: 'success',
+                        title: '¡Préstamo Creado!',
+                        text: 'El préstamo ha sido creado exitosamente',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Ver Detalles',
+                        allowOutsideClick: false,
+                        didOpen: (modal) => {
+                            modal.querySelector('.swal2-success-circular-line-left').style.animation = 'rotate 1s ease-in-out';
+                        }
+                    });
+
+                    // Limpiar datos y redirigir
+                    sessionStorage.removeItem('loanFormData');
+                    window.location.href = result.redirect_url;
+
+                } catch (error) {
+                    console.error('Error detallado:', error);
+                    
+                    // Mostrar error con animación
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message,
+                        showClass: {
+                            popup: 'animate__animated animate__shakeX'
+                        }
+                    });
+
+                    // Sacudir el formulario
+                    const form = document.getElementById('securityQuestionsForm');
+                    form.classList.add('shake');
+                    setTimeout(() => form.classList.remove('shake'), 500);
+
+                } finally {
+                    // Restaurar el botón
+                    this.disabled = false;
+                    this.innerHTML = originalText;
+                }
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message
+            });
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+        }
+    });
+
+    // Agregar estilos CSS para las animaciones
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeOutUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
 {% endblock %}
 

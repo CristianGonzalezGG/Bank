@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #0d6efd; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: #f8f9fa; }
+        .footer { text-align: center; padding: 20px; color: #6c757d; }
+        .question { margin: 15px 0; padding: 10px; background-color: white; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Confirmación de Registro</h1>
+        </div>
+        <div class="content">
+            <p>Estimado/a {{ client.name }},</p>
+            <p>Gracias por registrarte en nuestro sistema. A continuación, encontrarás tus preguntas de seguridad:</p>
+            
+            {% for question in questions %}
+            <div class="question">
+                <strong>Pregunta {{ forloop.counter }}:</strong>
+                <p>{{ question.question.question_text }}</p>
+            </div>
+            {% endfor %}
+            
+            <p><strong>Importante:</strong> Por razones de seguridad, las respuestas no se incluyen en este correo. 
+            Por favor, asegúrate de recordar tus respuestas ya que serán necesarias para verificar tu identidad.</p>
+        </div>
+        <div class="footer">
+            <p>Este es un correo automático, por favor no responder.</p>
+        </div>
+    </div>
+</body>
+</html> 
