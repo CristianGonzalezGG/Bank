@@ -29,6 +29,7 @@ urlpatterns = [
     path('client/<int:id>/', views.client_detail, name='client_detail'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('tarjetas-debito/', views.tarjetas_debito, name='tarjetas_debito'),
     path('loans/', views.loan_list, name='loan_list'),
     path('loan/create/', views.loan_create, name='loan_create'),
     path('loan/<int:pk>/', views.loan_detail, name='loan_detail'),

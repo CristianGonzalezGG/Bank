@@ -106,16 +106,32 @@ Inicio | Banco el Dorado
         </div>
     </section>
 
-    <!-- Sección Tarjetas de Crédito -->
+    <!-- Sección Tarjetas -->
     <section class="p-4 mt-4 mb-4" style="background-color: #f0f8ff; border-radius: 8px; border-left: 4px solid #d4af37;">
         <div class="row">
             <div class="col-md-12">
-                <h3 style="color: #00468b; font-weight: 600;">Tarjetas de Crédito</h3>
-                <p style="color: #4d4d4d;">Elige entre nuestras tarjetas de crédito y disfruta de beneficios exclusivos y flexibilidad en tus pagos.</p>
-                <button class="btn btn-primary">
-                    <i class="fas fa-credit-card me-2"></i>
-                    Comparar Tarjetas
-                </button>
+                <h3 style="color: #00468b; font-weight: 600;">Nuestras Tarjetas</h3>
+                <p style="color: #4d4d4d;">Descubre nuestra amplia gama de tarjetas diseñadas para adaptarse a tus necesidades financieras.</p>
+                
+                <div class="d-flex flex-wrap gap-3 mt-3">
+                    <!-- Tarjetas de Crédito -->
+                    <div class="card p-3 flex-grow-1" style="min-width: 260px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <h5 style="color: #00468b;"><i class="fas fa-credit-card me-2"></i>Tarjetas de Crédito</h5>
+                        <p style="font-size: 0.9rem;">Disfruta de beneficios exclusivos, flexibilidad en tus pagos y recompensas por tus compras.</p>
+                        <button class="btn btn-primary">
+                            Comparar Tarjetas de Crédito
+                        </button>
+                    </div>
+                    
+                    <!-- Tarjetas Débito - Nueva sección -->
+                    <div class="card p-3 flex-grow-1" style="min-width: 260px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background-color: #fffaf0;">
+                        <h5 style="color: #d4af37;"><i class="fas fa-wallet me-2"></i>Tarjetas Débito</h5>
+                        <p style="font-size: 0.9rem;">Acceso seguro a tu dinero, descuentos exclusivos y gestión fácil desde nuestra app.</p>
+                        <a href="{% url 'blog:tarjetas_debito' %}" class="btn btn-outline-primary" style="border-color: #d4af37; color: #d4af37;">
+                            Explorar Tarjetas Débito
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

@@ -1,0 +1,37 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'images/logo.png' %}" alt="Banco El Dorado" height="40">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Inicio</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Productos
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'cuentas' %}">Cuentas</a></li>
+                        <li><a class="dropdown-item" href="{% url 'prestamos' %}">Préstamos</a></li>
+                        <li class="nav-item {% if request.resolver_match.url_name == 'tarjetas_debito' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'tarjetas_debito' %}">
+                                <i class="fas fa-credit-card me-1"></i>Tarjetas Débito
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="d-flex">
+                <a href="{% url 'tarjetas_debito' %}" class="btn btn-primary ms-2 d-none d-md-flex align-items-center">
+                    <i class="fas fa-credit-card me-1"></i>Descubre Nuestras Tarjetas
+                </a>
+            </div>
+        </div>
+    </div>
+</nav> 

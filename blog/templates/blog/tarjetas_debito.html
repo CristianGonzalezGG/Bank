@@ -1,0 +1,613 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tarjetas Débito - Banco El Dorado {% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tarjetas.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section con efectos 3D y paralaje -->
+<section class="hero-section">
+    <div class="parallax-bg"></div>
+    <div class="hero-content">
+        <div class="hero-title-container" data-aos="fade-up">
+            <h1 class="hero-title">
+                <span class="hero-title-prefix">Descubre Nuestra Exclusiva Colección de</span>
+                <span class="hero-title-main">TARJETAS <span class="accent">DÉBITO</span></span>
+                <div class="hero-title-underline"></div>
+                <span class="hero-title-tagline">Diseñadas para elevar tu experiencia financiera</span>
+            </h1>
+        </div>
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">Descubre un mundo de posibilidades con nuestra exclusiva colección de tarjetas</p>
+        <div class="hero-cta-container" data-aos="fade-up" data-aos-delay="200">
+            <a href="#card-slider" class="btn btn-primary btn-glow">Explorar Tarjetas</a>
+            <a href="/solicitar-tarjeta" class="btn btn-outline-light">Solicitar Ahora</a>
+        </div>
+    </div>
+    <div class="cards-floating-container">
+        <div class="floating-card" data-depth="0.2">
+            <img src="{% static 'images/savings.jpeg' %}" alt="Tarjeta Gold" class="real-card-img gold-card-img">
+            <div class="card-shine"></div>
+        </div>
+        <div class="floating-card" data-depth="0.4">
+            <img src="{% static 'images/Checkings.jpeg' %}" alt="Tarjeta Platinum" class="real-card-img platinum-card-img">
+            <div class="card-shine"></div>
+        </div>
+        <div class="floating-card" data-depth="0.6">
+            <img src="{% static 'images/Checkings.jpeg' %}" alt="Tarjeta Black" class="real-card-img black-card-img">
+            <div class="card-badge-premium">PREMIUM</div>
+            <div class="card-shine"></div>
+        </div>
+    </div>
+    <div class="scroll-indicator">
+        <div class="mouse">
+            <div class="wheel"></div>
+        </div>
+        <div>
+            <span class="scroll-text">Scroll para descubrir</span>
+        </div>
+    </div>
+</section>
+
+<!-- Novedades con efecto glassmorphism -->
+<section class="announcement-section">
+    <div class="container">
+        <div class="glass-card" data-aos="zoom-in">
+            <div class="glass-card-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="glass-card-content">
+                <h3>Novedades en tarjetas débito</h3>
+                <p>A partir del <strong>1 de junio de 2025</strong>, todas nuestras tarjetas incorporarán tecnología NFC para pagos sin contacto, brindándote mayor seguridad y conveniencia en tus transacciones diarias.</p>
+            </div>
+            <a href="#" class="glass-card-btn">
+                <span>Más información</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Slider 3D de tarjetas con efectos avanzados -->
+<section id="card-slider" class="card-showcase-section">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-up">Nuestras Tarjetas Exclusivas</h2>
+        <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Selecciona la tarjeta que mejor se adapte a tu estilo de vida</p>
+        
+        <div class="card-carousel-container" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-carousel">
+                <!-- Tarjeta Estándar (Cuenta Corriente) -->
+                <div class="card-item">
+                    <div class="card-3d-wrap">
+                        <div class="card-3d-wrapper">
+                            <div class="card-front">
+                                <div class="card-real-image">
+                                    <img src="{% static 'images/Checkings.jpeg' %}" alt="Tarjeta Cuenta Corriente" class="card-img">
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-stripe"></div>
+                                <div class="card-benefits">
+                                    <ul>
+                                        <li>Sin cuota de manejo el primer año</li>
+                                        <li>Retiros gratuitos en nuestra red</li>
+                                        <li>Compras seguras en línea</li>
+                                    </ul>
+                                </div>
+                                <a href="/tarjetas/estandar" class="card-cta">Conocer más</a>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Tarjeta Cuenta Corriente</h4>
+                    <p class="card-description">La manera más práctica de acceder a tu dinero</p>
+                </div>
+
+                <!-- Tarjeta Oro (Cuenta de Ahorros) -->
+                <div class="card-item">
+                    <div class="card-badge">Favorita</div>
+                    <div class="card-3d-wrap">
+                        <div class="card-3d-wrapper">
+                            <div class="card-front">
+                                <div class="card-real-image">
+                                    <img src="{% static 'images/savings.jpeg' %}" alt="Tarjeta Cuenta de Ahorros" class="card-img">
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-stripe"></div>
+                                <div class="card-benefits">
+                                    <ul>
+                                        <li>Cuota de manejo preferencial</li>
+                                        <li>Retiros ilimitados nacionales</li>
+                                        <li>Descuentos exclusivos en comercios</li>
+                                        <li>Asistencia 24/7</li>
+                                    </ul>
+                                </div>
+                                <a href="/tarjetas/oro" class="card-cta">Conocer más</a>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Tarjeta Cuenta de Ahorros</h4>
+                    <p class="card-description">Beneficios exclusivos para nuestros clientes especiales</p>
+                </div>
+
+                <!-- Tarjeta Black (Combinando imágenes) -->
+                <div class="card-item">
+                    <div class="card-3d-wrap">
+                        <div class="card-3d-wrapper">
+                            <div class="card-front">
+                                <div class="card-real-image card-black-overlay">
+                                    <img src="{% static 'images/Checkings.jpeg' %}" alt="Tarjeta Black" class="card-img">
+                                    <div class="premium-overlay">PREMIUM BLACK</div>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-stripe"></div>
+                                <div class="card-benefits">
+                                    <ul>
+                                        <li>Sin cuota de manejo permanente</li>
+                                        <li>Retiros globales sin costo</li>
+                                        <li>Seguro de compra protegida</li>
+                                        <li>Acceso a salas VIP</li>
+                                        <li>Concierge personal</li>
+                                    </ul>
+                                </div>
+                                <a href="/tarjetas/black" class="card-cta">Conocer más</a>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Tarjeta Débito Black</h4>
+                    <p class="card-description">Exclusividad y prestigio en cada transacción</p>
+                </div>
+
+                <!-- Tarjeta Joven (Con overlay) -->
+                <div class="card-item">
+                    <div class="card-3d-wrap">
+                        <div class="card-3d-wrapper">
+                            <div class="card-front">
+                                <div class="card-real-image card-youth-overlay">
+                                    <img src="{% static 'images/savings.jpeg' %}" alt="Tarjeta Joven" class="card-img">
+                                    <div class="youth-overlay">JOVEN</div>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-stripe"></div>
+                                <div class="card-benefits">
+                                    <ul>
+                                        <li>Sin cuota hasta los 25 años</li>
+                                        <li>Descuentos en entretenimiento</li>
+                                        <li>App con control de gastos</li>
+                                    </ul>
+                                </div>
+                                <a href="/tarjetas/joven" class="card-cta">Conocer más</a>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Tarjeta Débito Joven</h4>
+                    <p class="card-description">Diseñada para jóvenes entre 14 y 25 años</p>
+                </div>
+
+                <!-- Tarjeta Virtual (Con efecto especial) -->
+                <div class="card-item">
+                    <div class="card-3d-wrap">
+                        <div class="card-3d-wrapper">
+                            <div class="card-front">
+                                <div class="card-real-image card-virtual-overlay">
+                                    <img src="{% static 'images/savings.jpeg' %}" alt="Tarjeta Virtual" class="card-img">
+                                    <div class="virtual-badge">100% DIGITAL</div>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-stripe"></div>
+                                <div class="card-benefits">
+                                    <ul>
+                                        <li>100% digital, sin plástico</li>
+                                        <li>Activación inmediata</li>
+                                        <li>Compatible con Apple Pay y Google Pay</li>
+                                        <li>Seguridad para compras online</li>
+                                    </ul>
+                                </div>
+                                <a href="/tarjetas/virtual" class="card-cta">Conocer más</a>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Tarjeta Débito Virtual</h4>
+                    <p class="card-description">100% digital para un mundo conectado</p>
+                </div>
+            </div>
+
+            <div class="carousel-nav">
+                <button class="prev-btn" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                <div class="carousel-dots"></div>
+                <button class="next-btn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección de características con animaciones -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title text-center" data-aos="fade-up">Características destacadas</h2>
+        
+        <div class="features-grid">
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-icon-container">
+                    <i class="feature-icon fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Seguridad avanzada</h3>
+                <p class="feature-description">Tecnología de chip y pagos sin contacto para proteger tus transacciones</p>
+            </div>
+            
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-icon-container">
+                    <i class="feature-icon fas fa-percent"></i>
+                </div>
+                <h3 class="feature-title">Descuentos exclusivos</h3>
+                <p class="feature-description">Accede a promociones especiales en establecimientos asociados</p>
+            </div>
+            
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-icon-container">
+                    <i class="feature-icon fas fa-globe"></i>
+                </div>
+                <h3 class="feature-title">Cobertura global</h3>
+                <p class="feature-description">Usa tu tarjeta en cualquier parte del mundo con las mejores tasas</p>
+            </div>
+            
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-icon-container">
+                    <i class="feature-icon fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="feature-title">Tecnología móvil</h3>
+                <p class="feature-description">Compatible con billeteras digitales para pagos rápidos desde tu móvil</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección de control de tarjeta con webGL y animaciones -->
+<section class="app-control-section">
+    <div class="scene-container">
+        <canvas id="app-control-canvas"></canvas>
+    </div>
+    <div class="container">
+        <div class="app-content">
+            <div class="app-info" data-aos="fade-right">
+                <h2 class="section-title">Control total desde nuestra app</h2>
+                <p class="section-subtitle">Gestiona tus tarjetas desde cualquier lugar</p>
+                
+                <div class="app-features">
+                    <div class="app-feature">
+                        <div class="app-feature-icon">
+                            <i class="fas fa-toggle-on"></i>
+                        </div>
+                        <div class="app-feature-text">
+                            <h4>Activa o desactiva</h4>
+                            <p>Prende o apaga tu tarjeta temporalmente desde la app</p>
+                        </div>
+                    </div>
+                    
+                    <div class="app-feature">
+                        <div class="app-feature-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="app-feature-text">
+                            <h4>Bloqueo inmediato</h4>
+                            <p>Bloquea tu tarjeta instantáneamente si la pierdes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="app-feature">
+                        <div class="app-feature-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="app-feature-text">
+                            <h4>Control geográfico</h4>
+                            <p>Define regiones donde tu tarjeta puede ser utilizada</p>
+                        </div>
+                    </div>
+                    
+                    <div class="app-feature">
+                        <div class="app-feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="app-feature-text">
+                            <h4>Notificaciones</h4>
+                            <p>Recibe alertas en tiempo real por cada movimiento</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="app-cta">
+                    <a href="/descargar-app" class="btn btn-primary btn-glow">
+                        <i class="fas fa-download me-2"></i>Descargar App
+                    </a>
+                    <a href="#" class="btn btn-text" data-bs-toggle="modal" data-bs-target="#demoAppModal">
+                        <i class="fas fa-play-circle me-2"></i>Ver demostración
+                    </a>
+                </div>
+            </div>
+            
+            <div class="app-device" data-aos="fade-up">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <!-- Aquí se mostrará la animación de la interfaz de la app -->
+                        <div class="app-interface">
+                            <div class="app-header">
+                                <div class="app-logo"></div>
+                                <div class="app-profile"></div>
+                            </div>
+                            <div class="app-card-control">
+                                <div class="app-card-visual"></div>
+                                <div class="app-toggle-button"></div>
+                            </div>
+                            <div class="app-menu">
+                                <div class="app-menu-item active"></div>
+                                <div class="app-menu-item"></div>
+                                <div class="app-menu-item"></div>
+                                <div class="app-menu-item"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección de ofertas con efecto de tarjetas flotantes -->
+<section class="offers-section">
+    <div class="container">
+        <div class="offers-header" data-aos="fade-up">
+            <h2 class="section-title">Ofertas especiales</h2>
+            <p class="section-subtitle">Descubre las ventajas de usar tu tarjeta El Dorado</p>
+        </div>
+        
+        <div class="offers-grid">
+            <div class="offer-card" data-aos="flip-left" data-aos-delay="100">
+                <div class="offer-image">
+                    <img src="{% static 'images/restaurant.jpeg' %}" alt="Restaurantes">
+                </div>
+                <div class="offer-content">
+                    <div class="offer-badge">EXCLUSIVO</div>
+                    <h3 class="offer-title">20% de descuento</h3>
+                    <p class="offer-description">En restaurantes seleccionados, pagando con tu tarjeta débito</p>
+                    <a href="/ofertas/restaurantes" class="offer-link">Ver restaurantes <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+            
+            <div class="offer-card" data-aos="flip-left" data-aos-delay="200">
+                <div class="offer-image">
+                    <img src="{% static 'images/cine.jpg' %}" alt="Cines">
+                </div>
+                <div class="offer-content">
+                    <div class="offer-badge">TODOS LOS DÍAS</div>
+                    <h3 class="offer-title">2x1 en cines</h3>
+                    <p class="offer-description">En todas las salas de cine asociadas durante toda la semana</p>
+                    <a href="/ofertas/cines" class="offer-link">Ver más <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+            
+            <div class="offer-card" data-aos="flip-left" data-aos-delay="300">
+                <div class="offer-image">
+                    <img src="{% static 'images/tiendas.jpg' %}" alt="Tiendas">
+                </div>
+                <div class="offer-content">
+                    <div class="offer-badge">LIMITADO</div>
+                    <h3 class="offer-title">Hasta 30% off</h3>
+                    <p class="offer-description">En tiendas de moda y accesorios durante este mes</p>
+                    <a href="/ofertas/tiendas" class="offer-link">Ver tiendas <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+            
+            <div class="offer-card" data-aos="flip-left" data-aos-delay="400">
+                <div class="offer-image">
+                    <img src="{% static 'images/viajes.jpeg' %}" alt="Viajes">
+                </div>
+                <div class="offer-content">
+                    <div class="offer-badge">VIAJEROS</div>
+                    <h3 class="offer-title">10% cashback</h3>
+                    <p class="offer-description">En tus gastos de viaje pagando con tarjeta débito El Dorado</p>
+                    <a href="/ofertas/viajes" class="offer-link">Ver más <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="offers-footer text-center" data-aos="fade-up">
+            <a href="/ofertas" class="btn btn-primary">Ver todas las ofertas</a>
+        </div>
+    </div>
+</section>
+
+<!-- Sección de testimonios con slider usando Bootstrap -->
+<section class="testimonials-section py-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-5" data-aos="fade-up">Lo que dicen nuestros clientes</h2>
+        
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-aos="fade-up" data-aos-delay="100">
+            <div class="carousel-inner">
+                <!-- Testimonio 1 -->
+                <div class="carousel-item active">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-column">
+                                <p class="card-text mb-4 fst-italic">"La tarjeta débito Black es simplemente excepcional. El servicio de concierge me ha sacado de apuros en varias ocasiones durante mis viajes."</p>
+                                <div class="d-flex align-items-center mt-3">
+                                    <div class="flex-shrink-0">
+                                        <img src="{% static 'images/client1.jpg' %}" alt="Carlos Mendoza" class="rounded-circle" width="60" height="60">
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="mb-0">Carlos Mendoza</h5>
+                                        <small class="text-primary">Ejecutivo de Marketing</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonio 2 -->
+                <div class="carousel-item">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-column">
+                                <p class="card-text mb-4 fst-italic">"Como estudiante, la tarjeta Joven me ha ayudado a gestionar mejor mis finanzas. Los descuentos en entretenimiento son geniales."</p>
+                                <div class="d-flex align-items-center mt-3">
+                                    <div class="flex-shrink-0">
+                                        <img src="{% static 'images/client2.jpeg' %}" alt="Marcela Sánchez" class="rounded-circle" width="60" height="60">
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="mb-0">Marcela Sánchez</h5>
+                                        <small class="text-primary">Estudiante Universitaria</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonio 3 -->
+                <div class="carousel-item">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-column">
+                                <p class="card-text mb-4 fst-italic">"Poder encender y apagar mi tarjeta desde la app me da una tranquilidad enorme. El servicio al cliente es excepcional cuando lo he necesitado."</p>
+                                <div class="d-flex align-items-center mt-3">
+                                    <div class="flex-shrink-0">
+                                        <img src="{% static 'images/client3.jpg' %}" alt="Roberto Gómez" class="rounded-circle" width="60" height="60">
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="mb-0">Roberto Gómez</h5>
+                                        <small class="text-primary">Arquitecto</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Controles de Carousel -->
+            <div class="d-flex justify-content-center mt-4">
+                <button class="btn btn-sm mx-2 rounded-circle btn-outline-primary carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn btn-sm mx-2 rounded-circle btn-outline-primary carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <!-- Indicadores -->
+            <div class="carousel-indicators position-relative mt-3">
+                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="0" class="active bg-primary" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="1" class="bg-primary" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="2" class="bg-primary" aria-label="Slide 3"></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Final con efecto de partículas -->
+<section class="cta-section">
+    <div class="cta-background-wrapper">
+        <div class="cta-overlay"></div>
+        <div class="cta-particles" id="particles-js"></div>
+        <div class="cta-animated-shapes">
+            <div class="cta-shape shape-1"></div>
+            <div class="cta-shape shape-2"></div>
+            <div class="cta-shape shape-3"></div>
+        </div>
+    </div>
+    
+    <div class="container position-relative">
+        <div class="cta-card" data-aos="zoom-in">
+            <div class="cta-card-content">
+                <div class="cta-icon">
+                  
+                </div>
+                <h2 class="cta-title">Potencia tu futuro financiero</h2>
+                <div class="cta-divider"></div>
+                <p class="cta-text">Nuestras tarjetas débito están diseñadas para ofrecerte seguridad, flexibilidad y beneficios exclusivos en cada transacción.</p>
+                
+                <div class="cta-stats">
+                    <div class="cta-stat-item">
+                        <span class="cta-stat-number">100%</span>
+                        <span class="cta-stat-text">Seguridad</span>
+                    </div>
+                    <div class="cta-stat-item">
+                        <span class="cta-stat-number">24/7</span>
+                        <span class="cta-stat-text">Asistencia</span>
+                    </div>
+                    <div class="cta-stat-item">
+                        <span class="cta-stat-number">0</span>
+                        <span class="cta-stat-text">Comisiones</span>
+                    </div>
+                </div>
+                
+                <div class="cta-buttons">
+                    <a href="/solicitar-tarjeta" class="btn btn-primary btn-lg btn-special">
+                        <span>Solicitar Ahora</span>
+                        <div class="btn-special-effect"></div>
+                    </a>
+                    <a href="/contacto" class="btn btn-outline-special btn-lg">
+                        <i class="fas fa-headset me-2"></i>Hablar con un asesor
+                    </a>
+                </div>
+            </div>
+            
+            <div class="cta-card-image">
+                <div class="cta-cards-display">
+                    <img src="{% static 'images/Checkings.jpeg' %}" alt="Tarjeta débito" class="floating-cta-card card-1">
+                    <img src="{% static 'images/savings.jpeg' %}" alt="Tarjeta débito" class="floating-cta-card card-2">
+                </div>
+            </div>
+        </div>
+        
+        <div class="cta-trust-badges" data-aos="fade-up" data-aos-delay="300">
+            <div class="trust-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>Protección Antifraude</span>
+            </div>
+            <div class="trust-badge">
+                <i class="fas fa-check-circle"></i>
+                <span>Aprobación Inmediata</span>
+            </div>
+            <div class="trust-badge">
+                <i class="fas fa-lock"></i>
+                <span>Datos Encriptados</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de demostración de app -->
+<div class="modal fade" id="demoAppModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cómo gestionar tu tarjeta desde nuestra app</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="ratio ratio-16x9">
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Demostración de App" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/parallax.js/1.5.0/parallax.min.js"></script>
+<script src="{% static 'js/tarjetas.js' %}"></script>
+{% endblock %}

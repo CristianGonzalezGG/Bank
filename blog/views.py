@@ -720,6 +720,9 @@ def loan_create(request):
 
     return render(request, 'loan/loan_form.html')
 
+def tarjetas_debito(request):
+       return render(request, 'blog/tarjetas_debito.html')
+
 @login_required
 def loan_update(request, pk):
     loan = get_object_or_404(Loan, pk=pk)
