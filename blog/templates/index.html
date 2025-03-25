@@ -2,19 +2,246 @@
 {% load static %}
 
 {% block title %}
-Inicio | Banco el Dorado
+Banco el Dorado | Tu Banca del Futuro
+{% endblock %}
+
+{% block extra_head %}
+<!-- Importaciones necesarias para efectos avanzados -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.1/dist/locomotive-scroll.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/splitting@1.0.6/dist/splitting.css">
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+<!-- Definición de variables CSS y estilos básicos -->
+<style>
+    :root {
+        --primary-color: #00468b;
+        --accent-color: #d4af37;
+        --dark-color: #333333;
+        --light-color: #ffffff;
+        --bg-color: #f5f5f5;
+        --text-color: #4d4d4d;
+        
+        --transition-fast: 0.3s;
+        --transition-medium: 0.5s;
+        --cubic-bezier: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        
+        --box-shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --box-shadow-md: 0 10px 20px rgba(0, 0, 0, 0.1);
+        --box-shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.15);
+        
+        --gradient-primary: linear-gradient(135deg, #00468b, #006ac1);
+        --gradient-accent: linear-gradient(135deg, #d4af37, #f5cc59);
+    }
+    
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    section {
+        background-color: #ffffff;
+        color: var(--text-color);
+        padding: 100px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        overflow: hidden;
+        padding: 150px 0 100px;
+    }
+    
+    .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+    
+    .hero-shapes .shape {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(50px);
+    }
+    
+    .shape-1 {
+        top: 20%;
+        left: 5%;
+        width: 300px;
+        height: 300px;
+        background-color: rgba(0, 70, 139, 0.1);
+    }
+    
+    .shape-2 {
+        bottom: 10%;
+        right: 5%;
+        width: 250px;
+        height: 250px;
+        background-color: rgba(212, 175, 55, 0.1);
+    }
+    
+    .shape-3 {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: 400px;
+        background-color: rgba(0, 70, 139, 0.05);
+    }
+    
+    .hero-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .hero-text {
+        flex: 0 0 50%;
+        padding-right: 50px;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        color: var(--dark-color);
+        line-height: 1.2;
+    }
+    
+    .gradient-text {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.25rem;
+        max-width: 500px;
+        margin-bottom: 30px;
+        color: var(--text-color);
+    }
+    
+    .hero-image-container {
+        flex: 0 0 50%;
+        position: relative;
+    }
+    
+    .hero-image-wrapper {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--box-shadow-lg);
+    }
+    
+    .hero-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 20px;
+    }
+    
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 70, 139, 0.2), rgba(212, 175, 55, 0.2));
+        border-radius: 20px;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all var(--transition-fast) var(--cubic-bezier);
+        cursor: pointer;
+        border: none;
+        outline: none;
+        text-decoration: none;
+        line-height: 1.4;
+    }
+    
+    .btn i {
+        margin-left: 8px;
+    }
+    
+    .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: 0 5px 15px rgba(0, 70, 139, 0.3);
+    }
+    
+    .btn-primary:hover {
+        box-shadow: 0 8px 20px rgba(0, 70, 139, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-light {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+    }
+    
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .btn-glow {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transform: skewX(-15deg);
+        opacity: 0;
+    }
+    
+    /* Este estilo asegura que el contenedor principal sea visible */
+    #main-container {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        position: relative;
+        z-index: 1;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <!-- Hero Section -->
-    <div class="hero-section text-center p-5 mb-5" style="background-color: #f0f8ff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-        <h1 class="display-4 font-weight-bold" style="color: #00468b;">Bienvenido a Banco El Dorado</h1>
-        <p class="lead" style="color: #4d4d4d;">Tu aliado financiero para alcanzar tus metas y construir un futuro próspero.</p>
-        <button class="btn btn-primary btn-lg mt-3">
-            Conoce Nuestros Servicios
-            <i class="fas fa-arrow-right ms-2"></i>
-        </button>
+    <div class="hero-section p-0 mb-5" style="background-color: #f0f8ff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); overflow: hidden;">
+        <div class="row g-0">
+            <div class="col-lg-6 p-5 d-flex flex-column justify-content-center">
+                <h1 class="display-4 font-weight-bold" style="color: #00468b;">Bienvenido a Banco El Dorado</h1>
+                <p class="lead" style="color: #4d4d4d;">Tu aliado financiero para alcanzar tus metas y construir un futuro próspero.</p>
+                <button class="btn btn-primary btn-lg mt-3" style="align-self: flex-start;">
+                    Conoce Nuestros Servicios
+                    <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <img src="{% static 'images/Designer.jpeg' %}" alt="Servicios financieros personalizados" class="img-fluid" style="height: 100%; object-fit: cover; object-position: center;">
+            </div>
+        </div>
     </div>
 
     <!-- Servicios Section -->
@@ -78,34 +305,6 @@ Inicio | Banco el Dorado
     </section>
 
     <!-- Secciones de servicios detallados -->
-    <!-- Sección Cuentas de Ahorro -->
-    <section class="p-4 mt-4 mb-4" style="background-color: #f0f8ff; border-radius: 8px; border-left: 4px solid #d4af37;">
-        <div class="row">
-            <div class="col-md-12">
-                <h3 style="color: #00468b; font-weight: 600;">Cuentas de Ahorro</h3>
-                <p style="color: #4d4d4d;">Disfruta de los beneficios de nuestras cuentas de ahorro, con tasas preferenciales y fácil acceso en nuestras plataformas digitales.</p>
-                <button class="btn btn-primary">
-                    <i class="fas fa-piggy-bank me-2"></i>
-                    Abrir una Cuenta
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección Préstamos Personales -->
-    <section class="p-4 mt-4 mb-4" style="background-color: #f7f7f7; border-radius: 8px; border-left: 4px solid #d4af37;">
-        <div class="row">
-            <div class="col-md-12">
-                <h3 style="color: #00468b; font-weight: 600;">Préstamos Personales</h3>
-                <p style="color: #4d4d4d;">Obtén un préstamo personal con condiciones flexibles y aprobación rápida para que puedas alcanzar tus objetivos.</p>
-                <button class="btn btn-primary">
-                    <i class="fas fa-hand-holding-usd me-2"></i>
-                    Solicitar Préstamo
-                </button>
-            </div>
-        </div>
-    </section>
-
     <!-- Sección Tarjetas -->
     <section class="p-4 mt-4 mb-4" style="background-color: #f0f8ff; border-radius: 8px; border-left: 4px solid #d4af37;">
         <div class="row">
@@ -132,34 +331,6 @@ Inicio | Banco el Dorado
                         </a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección Citas -->
-    <section class="p-4 mt-4 mb-4" style="background-color: #f7f7f7; border-radius: 8px; border-left: 4px solid #d4af37;">
-        <div class="row">
-            <div class="col-md-12">
-                <h3 style="color: #00468b; font-weight: 600;">Agenda una Cita</h3>
-                <p style="color: #4d4d4d;">Programa una cita con uno de nuestros asesores financieros para obtener asesoramiento personalizado.</p>
-                <button class="btn btn-primary" id="btnCita">
-                    <i class="fas fa-calendar-check me-2"></i>
-                    Agendar Cita
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección Sedes -->
-    <section class="p-4 mt-4 mb-4" style="background-color: #f0f8ff; border-radius: 8px; border-left: 4px solid #d4af37;">
-        <div class="row">
-            <div class="col-md-12">
-                <h3 style="color: #00468b; font-weight: 600;">Nuestras Sedes</h3>
-                <p style="color: #4d4d4d;">Visita cualquiera de nuestras sedes a nivel nacional. Encuentra la más cercana a ti.</p>
-                <button class="btn btn-primary">
-                    <i class="fas fa-location-dot me-2"></i>
-                    Ver Ubicaciones
-                </button>
             </div>
         </div>
     </section>
