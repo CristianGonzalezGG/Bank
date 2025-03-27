@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Resultados de búsqueda{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Búsqueda de Clientes</h2>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" action="{% url 'blog:search_clients' %}">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Nombre o número de identificación..." value="{{ query }}">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% if results %}
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Resultados ({{ results|length }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Documento</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for client in results %}
+                                    <tr>
+                                        <td>{{ client.name }}</td>
+                                        <td>{{ client.cardId }}</td>
+                                        <td>
+                                            <a href="{{ client.url }}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> Ver
+                                            </a>
+                                            <a href="{% url 'blog:create_account' client.id %}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-plus"></i> Cuenta
+                                            </a>
+                                            <a href="{% url 'blog:loan_create' %}?client_id={{ client.id }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-money-bill-wave"></i> Préstamo
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% elif query %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>No se encontraron clientes que coincidan con "{{ query }}".
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

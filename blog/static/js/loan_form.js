@@ -23,7 +23,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchClients(query) {
         try {
-            const response = await fetch(`/api/search-clients/?q=${query}`);
+            const response = await fetch(`/search-clients/?q=${query}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
             const data = await response.json();
             
             searchResults.innerHTML = '';

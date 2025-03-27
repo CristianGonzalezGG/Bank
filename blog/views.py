@@ -76,6 +76,7 @@ from client_portal.forms import ProjectionForm
 from django.db import transaction
 from .utils import send_verification_email  # Agregar esta importación
 from django.urls import reverse  # Agregar esta importación
+from django.db.models import Q
 
 def id_verification(request):
     if request.method == 'POST':
@@ -180,21 +181,34 @@ def apertura_cuenta(request):
 
 @login_required
 def search_clients(request):
-    card_id = request.GET.get('cardId', '').strip()
-    client = None
-    accounts = None
-
-    if card_id:
-        client = Client.objects.filter(cardId__icontains=card_id).first()
-        if client:
-            accounts = client.accounts.all()
-
-    return render(request, 'card_info.html', {
-        'client': client,
-        'accounts': accounts,
-        'query': card_id,
-        'debug': True  # Enable debugging info if needed
-    })
+    query = request.GET.get('q', '')
+    if len(query) < 3:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'Ingrese al menos 3 caracteres para buscar'}, status=400)
+        else:
+            messages.warning(request, 'Ingrese al menos 3 caracteres para buscar')
+            return redirect('blog:client_list')
+    
+    clients = Client.objects.filter(
+        Q(name__icontains=query) | 
+        Q(cardId__icontains=query)
+    )[:10]  # Limitamos a 10 resultados
+    
+    results = []
+    for client in clients:
+        results.append({
+            'id': client.id,
+            'name': client.name,
+            'cardId': client.cardId,
+            'email': client.email,
+            'url': reverse('blog:client_detail', args=[client.id])
+        })
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse(results, safe=False)
+    else:
+        # Para solicitudes no AJAX, renderizar una plantilla con los resultados
+        return render(request, 'client/search_results.html', {'results': results, 'query': query})
 
 
 
@@ -670,7 +684,7 @@ def loan_detail(request, pk):
 
 @login_required
 def loan_create(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             data = json.loads(request.body)
             client = get_object_or_404(Client, id=data['client_id'])
@@ -679,7 +693,7 @@ def loan_create(request):
             verification = LoanVerification.objects.filter(
                 client=client,
                 is_verified=True,
-                security_answers_verified=True,  # Ensure answers are verified
+                security_answers_verified=True,
                 expires_at__gt=timezone.now()
             ).order_by('-created_at').first()
 
@@ -701,6 +715,12 @@ def loan_create(request):
                 start_date=timezone.now().date()
             )
 
+            # Calcular saldo y cuotas
+            loan.remaining_balance = loan.amount
+            loan.monthly_payment = loan.calculate_monthly_payment()
+            loan.next_payment_date = loan.start_date + timedelta(days=30)
+            loan.save()
+
             return JsonResponse({
                 'success': True,
                 'redirect_url': reverse('blog:loan_detail', args=[loan.id])
@@ -718,7 +738,18 @@ def loan_create(request):
                 'error': f"Error inesperado: {str(e)}"
             }, status=500)
 
-    return render(request, 'loan/loan_form.html')
+    # Para solicitudes GET normales, renderizar la plantilla
+    client_id = request.GET.get('client_id')
+    initial_data = {}
+    
+    if client_id:
+        try:
+            client = Client.objects.get(id=client_id)
+            initial_data['client'] = client
+        except Client.DoesNotExist:
+            messages.error(request, 'Cliente no encontrado')
+    
+    return render(request, 'loan/loan_form.html', {'initial_data': initial_data})
 
 def tarjetas_debito(request):
        return render(request, 'blog/tarjetas_debito.html')

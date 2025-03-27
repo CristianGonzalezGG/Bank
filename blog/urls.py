@@ -52,10 +52,11 @@ urlpatterns = [
     path('pqr/', views.pqr, name='pqr'),
     path('proyecciones/', views.proyecciones_view, name='proyecciones'),
     path('send-projection-email/', views.send_projection_email, name='send_projection_email'),
-    path('search-clients/', views.search_clients, name='search_client'),  # Esta es la línea que agregamos
+    
+    # API de búsqueda de clientes (usada para todas las búsquedas)
+    path('search-clients/', views.search_clients, name='search_clients'),
     
     # APIs
-    path('api/search-clients/', views.search_clients, name='search_clients'),
     path('api/check-active-loan/<int:client_id>/', views.check_active_loan, name='check_active_loan'),
     path('api/send-verification-code/', views.send_verification_code, name='send_verification_code'),
     path('api/verify-code/', views.verify_code, name='verify_code'),

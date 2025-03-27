@@ -297,7 +297,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!query) return;
 
         try {
-            const response = await fetch(`/api/search-clients/?q=${encodeURIComponent(query)}`);
+            const response = await fetch(`/search-clients/?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
             const data = await response.json();
 
             if (data.length === 1) {

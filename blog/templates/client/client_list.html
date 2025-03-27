@@ -14,6 +14,12 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Clientes</h2>
                 <div>
+                    <div class="input-group mb-3">
+                        <input type="text" id="clientSearchInput" class="form-control" placeholder="Buscar cliente..." aria-label="Buscar cliente">
+                        <button class="btn btn-outline-secondary" type="button" id="searchClientBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
                     <small class="text-muted me-3">
                         <i class="fas fa-sync-alt me-1"></i>
                         Última actualización: <span id="lastUpdate">{% now "H:i:s" %}</span>
@@ -23,6 +29,8 @@
                     </a>
                 </div>
             </div>
+            
+            <div id="searchResults" class="mb-3" style="display: none;"></div>
             
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 {% for client in clients %}
@@ -170,6 +178,68 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(function() {
         document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
     }, 1000);
+    
+    // Funcionalidad de búsqueda de clientes
+    const searchInput = document.getElementById('clientSearchInput');
+    const searchBtn = document.getElementById('searchClientBtn');
+    const searchResults = document.getElementById('searchResults');
+    
+    // Función para realizar la búsqueda
+    function performSearch() {
+        const query = searchInput.value.trim();
+        if (query.length < 3) {
+            searchResults.innerHTML = '<div class="alert alert-warning">Ingrese al menos 3 caracteres para buscar</div>';
+            searchResults.style.display = 'block';
+            return;
+        }
+        
+        // Mostrar indicador de carga
+        searchResults.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Buscando...</span></div></div>';
+        searchResults.style.display = 'block';
+        
+        // Realizar la solicitud AJAX a la URL correcta
+        fetch(`{% url 'blog:search_clients' %}?q=${query}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la búsqueda');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.results && data.results.length > 0) {
+                let html = '<div class="list-group">';
+                data.results.forEach(client => {
+                    html += `<a href="${client.url}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">${client.name}</h5>
+                        </div>
+                        <p class="mb-1">ID: ${client.cardId}</p>
+                    </a>`;
+                });
+                html += '</div>';
+                searchResults.innerHTML = html;
+            } else {
+                searchResults.innerHTML = '<div class="alert alert-info">No se encontraron clientes con esa búsqueda</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            searchResults.innerHTML = '<div class="alert alert-danger">Error al buscar clientes</div>';
+        });
+    }
+    
+    // Eventos para la búsqueda
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
 });
 </script>
 
